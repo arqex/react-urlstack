@@ -1,30 +1,25 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
-import Test from '../../src/Test';
+import React from 'react'
+import {StyleSheet, View, Text} from 'react-native'
+import {Navigator} from 'react-urlstack'
+import routes from './routes'
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          <Test />
-        </header>
-      </div>
-    );
-  }
+export default function StackApp(props){
+  return (
+    <View style={ styles.container }>
+      <Navigator routes={ routes }
+        store={ props.store }
+        DrawerComponent={ DrawerComponent }
+        transitionTime={ 1000 } /> 
+    </View>
+  )
 }
 
-export default App;
+const styles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    bottom: 0,
+    top: 0,
+    left: 0,
+    right: 1,
+  }
+})
