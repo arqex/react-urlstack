@@ -1,0 +1,25 @@
+{
+  "name": "react-urlstack",
+  "version": "0.0.1",
+  "description": "A responsive navigator for react-native based on URLs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arqex/react-urlstack.git"
+  },
+  "keywords": [
+    "react-native",
+    "navigator",
+    "url",
+    "router"
+  ],
+  "author": "Javier Marquez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/arqex/react-urlstack/issues"
+  },
+  "homepage": "https://github.com/arqex/react-urlstack#readme"
+}
