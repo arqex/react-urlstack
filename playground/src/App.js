@@ -2,13 +2,14 @@ import React from 'react'
 import {StyleSheet, View, Text} from 'react-native'
 import {Navigator} from 'react-urlstack'
 import routes from './routes'
+import SideMenu from './components/SideMenu';
 
 export default function StackApp(props){
   return (
     <View style={ styles.container }>
       <Navigator routes={ routes }
         store={ props.store }
-        DrawerComponent={ DrawerComponent }
+        DrawerComponent={ SideMenu }
         transitionTime={ 1000 } /> 
     </View>
   )
