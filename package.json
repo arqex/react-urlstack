@@ -4,7 +4,8 @@
   "description": "A responsive navigator for react-native based on URLs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "playground": "node ./playground/scripts/start.js"
   },
   "repository": {
     "type": "git",
@@ -21,5 +22,14 @@
   "bugs": {
     "url": "https://github.com/arqex/react-urlstack/issues"
   },
-  "homepage": "https://github.com/arqex/react-urlstack#readme"
+  "homepage": "https://github.com/arqex/react-urlstack#readme",
+  "devDependencies": {
+    "@babel/core": "^7.2.0",
+    "@babel/preset-env": "^7.2.0",
+    "@babel/preset-react": "^7.0.0",
+    "react": "^16.6.3",
+    "react-art": "^16.6.3",
+    "react-dom": "^16.6.3",
+    "react-native-web": "^0.9.9"
+  }
 }
