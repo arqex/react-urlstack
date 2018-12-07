@@ -4,21 +4,13 @@ import ListItem from '../components/ListItem';
 import {getItems} from '../data/testItems';
 
 class TestList extends Component {
-	static navigationOptions = {
-		title: 'Collection queue'
-	}
-
 	constructor( props ) {
 		super( props )
 		this.state = {
 			items: getItems()
 		}
 
-		let urlParts = props.router.location.pathname.split('/');
-		if( urlParts.length > 2 ){
-			urlParts.pop()
-		}
-		this.baseUrl = urlParts.join('/')
+		this.baseUrl = props.baseUrl || '/list'
 	}
 
 	render() {

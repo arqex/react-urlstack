@@ -34,7 +34,7 @@ export default class ScreenWrapper extends Component {
 					indexes={indexes}
 					layout={layout} >
 					<ScreenStack router={ router }
-						transition={ transition.tabTransition || TransitionTabDefault }
+						screenTransition={ transition.tabTransition || TransitionTabDefault }
 						stack={ item.tabs.stack }
 						index={ item.tabs.index } />
 				</Screen>

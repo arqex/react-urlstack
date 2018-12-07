@@ -1,19 +1,39 @@
 import React from 'react'
-import {View, Text, StyleSheet} from 'react-native'
+import {View, Text, StyleSheet, TouchableHighlight} from 'react-native'
 
 export default function SideMenu(props) {
+  let router = props.router;
+
   return (
-    <View style={styles.drawerStyles}>
-      <Text>My drawer component</Text>
+    <View style={styles.menu}>
+      <Text>React URL Stack</Text>
+      <View>
+        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.push('/')}>
+          <Text>Welcome</Text>
+        </TouchableHighlight>
+        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.push('/list')}>
+          <Text>Basic stack</Text>
+        </TouchableHighlight>
+        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.push('/tabs')}>
+          <Text>Tab navigation</Text>
+        </TouchableHighlight>
+        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.push('/simpleScreen')}>
+          <Text>Simple screen</Text>
+        </TouchableHighlight>
+        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.push('/modal')}>
+          <Text>Open modal</Text>
+        </TouchableHighlight>
+      </View>
     </View>
   ) 
 } 
 
 const styles = StyleSheet.create({
-  drawerStyles: {
+  menu: {
+    boxSizing: 'border-box',
     backgroundColor: '#ddd',
-    top: 0, bottom: 0,
-    width: 400,
+    flex: 1,
+    width: 300,
     padding: 20
   }
 })

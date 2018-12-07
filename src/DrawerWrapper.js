@@ -26,18 +26,24 @@ export default class DrawerWrapper extends Component {
 
 	render(){
 		let { Drawer, router, collapsible } = this.props
+		let handle, overlay
+		if( collapsible ){
+			handle = <View style={ styles.handle } />
+			overlay = (
+			<Animated.View style={ [styles.overlay, this.overlayAnimStyle] }
+				onClick={ () => this.closeDrawer() }>
+			</Animated.View>
+			)
+		}
 		let containerStyles = [
 			styles.container,
-			collapsible && styles.collapsibleDrawer,
+			collapsible && styles.collapsibleContainer,
 			this.animatedStyles
 		]
+
 		let drawerStyles = [
-			styles.drawer
-		]		
-		let overlayStyles = [
-			styles.overlay,
-			this.overlayAnimStyle,
-			collapsible && styles.collapsibleOverlay,
+			styles.drawer,
+			collapsible && styles.collapsibleDrawer
 		]
 
 		let snapPoints = [
@@ -46,7 +52,7 @@ export default class DrawerWrapper extends Component {
 
 		return (
 			<Animated.View style={ containerStyles }>
-				<Animated.View style={ overlayStyles } onClick={ () => this.closeDrawer() }></Animated.View>
+				{ overlay }
 				<Interactable.View dragEnabled={ collapsible }
 					ref="drawer"
 					horizontalOnly={ true } snapPoints={ snapPoints }
@@ -55,7 +61,7 @@ export default class DrawerWrapper extends Component {
 					animatedValueX={ this.drawerPos }>
 					<View style={ drawerStyles } onLayout={ e => this.updateLayout(e) }>
 						<Drawer router={ router } />
-						<View style={ styles.dragHandle } />
+						{ handle }
 					</View>
 				</Interactable.View>
 			</Animated.View>
@@ -69,6 +75,14 @@ export default class DrawerWrapper extends Component {
 		this.drawerWidth = layout.width;
 		this.calculateDrawerIndex();
 		this.forceUpdate();
+	}
+
+	componentDidUpdate( prevProps ){
+		if( prevProps.collapsible && !this.props.collapsible ){
+			this.drawerPos.setValue(0);
+			console.log('Resetting position')
+			this.forceUpdate()
+		}
 	}
 
 	calculateDrawerIndex(){
@@ -109,16 +123,24 @@ export default class DrawerWrapper extends Component {
 
 let styles = StyleSheet.create({
 	container: {
+		flexDirection: 'row'
 	},
-	collapsibleDrawer: {
-    	position: 'absolute',
+	collapsibleContainer: {
+    position: 'absolute',
 		top: 0, bottom: 0, left: '-100%',
 		width: '100%',
-    	flexDirection: 'row-reverse',
+    flexDirection: 'row-reverse',
 		zIndex: 2000,
 		backgroundColor: '#e0e0e0',
 	},
 	drawer: {
+    // position: 'absolute',
+		top: 0, left: 0,
+		height: '100%', width: '100%',
+		flex: 1,
+		zIndex: 20000
+	},
+	collapsibleDrawer: {
     left: 0,
     width: '100%',
     flex: 1,
@@ -126,13 +148,7 @@ let styles = StyleSheet.create({
 		position: 'relative',
 		zIndex: 20000
 	},
-	drawerBg: {
-		backgroundColor: 'blue',
-		width: 4000,
-		position: 'absolute',
-		top: 0, bottom: 0, right: 0
-	},
-	dragHandle: {
+	handle: {
 		width: 40,
 		top: 0, bottom: 0, right: -20,
 		// backgroundColor: 'green',
@@ -146,6 +162,9 @@ let styles = StyleSheet.create({
 		position: 'absolute',
 		left: '100%'
 	},
-	collapsibleOverlay: {
+	expander: {
+		position: 'absolute',
+		height: '100%',
+		top: 0, left: 0, bottom: 0
 	}
 })

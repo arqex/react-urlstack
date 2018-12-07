@@ -1,10 +1,26 @@
 import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {Animated, View, StyleSheet} from 'react-native'
 import memoize from './utils/memoize'
 import ScreenWrapper from './ScreenWrapper'
 import animatedStyles from './utils/animatedStyles'
 
 export default class ScreenStack extends Component {
+	static propTypes = {
+		router: PropTypes.object,
+		screenTransition: PropTypes.func,
+		stackTransition: PropTypes.func,
+		stackIndexes: PropTypes.object,
+		stack: PropTypes.object,
+		index: PropTypes.number,
+		layout: PropTypes.object
+	}
+
+	static defaultProps = {
+		stackTransition: () => ({}),
+		stackIndexes: {}
+	}
+
 	constructor( props ){
 		super( props );
 		

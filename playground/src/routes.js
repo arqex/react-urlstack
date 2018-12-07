@@ -4,6 +4,9 @@ import PersonDetails from './screens/PersonDetails'
 import Welcome from './screens/Welcome'
 import Modal from './screens/Modal'
 import Tabs from './screens/Tabs'
+import Tab1 from './screens/Tab1'
+import Tab2 from './screens/Tab2'
+import Tab3 from './screens/Tab3'
 
 export default [
 	{ path: '/tabs', cb: Tabs, children: [
@@ -21,7 +24,7 @@ export default [
 			{path: '/moreInfo', cb: PersonMoreInfo }
 		]}
 	]},
-	{ path: '/simpleScreen', cb: LastScreen },
+	{ path: '/simpleScreen', cb: PersonMoreInfo },
 	{ path: '/modal', cb: Modal },
 	{ path: '*', cb: Welcome }
 ]

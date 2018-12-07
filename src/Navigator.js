@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import createRouter from '../src/Router'
+import createRouter from 'urlstack'
 import { Dimensions, View, StyleSheet, Animated } from 'react-native'
 import ScreenStack from './ScreenStack'
 import ModalWrapper from './ModalWrapper'
@@ -198,6 +198,7 @@ export default class Navigator extends Component {
 let styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		flexDirection: 'row'
+		flexDirection: 'row',
+		overflow: 'hidden'
 	}
 })
