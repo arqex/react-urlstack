@@ -36,6 +36,7 @@
     "react-native-web": "^0.9.9"
   },
   "dependencies": {
-    "urlstack": "^0.1.1"
+    "urlstack": "^0.5.0",
+    "react-interactable": "^0.6.2"
   }
 }

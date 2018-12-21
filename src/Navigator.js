@@ -57,7 +57,8 @@ export default class Navigator extends Component {
 					index={ index }
 					layout={ layout } />
 				<ModalWrapper router={ router }
-					item={ this.getModalItem( router.stack ) }
+					stack={ router.modal.stack }
+					index={ router.modal.stack }
 					transition={ modalTransition.modal }
 					indexes={ indexes.modal }
 					layout={ layout } />
@@ -106,14 +107,6 @@ export default class Navigator extends Component {
 		return {stack, index}
 	}
 
-	getModalItem( routerStack ){
-		let i = routerStack.length
-		while( i-- > 0 ){
-			if( routerStack[i].isModal )
-				return routerStack[i]
-		}
-	}
-
 	startRouter( routes ){
 		this.router = createRouter( routes );
 		this.fu = () => this.forceUpdate();
@@ -152,8 +145,7 @@ export default class Navigator extends Component {
 	}
 
 	detectModal(){
-		let item = this.router.stack[ this.router.activeIndex ]
-		return item && item.isModal
+		return this.router.modal.active;
 	}
 
 	updateModalIndexes( showModal ){

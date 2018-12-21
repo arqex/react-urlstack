@@ -8,19 +8,19 @@ export default function SideMenu(props) {
     <View style={styles.menu}>
       <Text>React URL Stack</Text>
       <View>
-        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.push('/')}>
+        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.navigate('/')}>
           <Text>Welcome</Text>
         </TouchableHighlight>
-        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.push('/list')}>
+        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.navigate('/list')}>
           <Text>Basic stack</Text>
         </TouchableHighlight>
-        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.push('/tabs')}>
+        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.navigate('/tabs')}>
           <Text>Tab navigation</Text>
         </TouchableHighlight>
-        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.push('/simpleScreen')}>
+        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.navigate('/simpleScreen')}>
           <Text>Simple screen</Text>
         </TouchableHighlight>
-        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.push('/modal')}>
+        <TouchableHighlight style={ styles.menuItem } onClick={ () => router.navigate('/modal')}>
           <Text>Open modal</Text>
         </TouchableHighlight>
       </View>

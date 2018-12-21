@@ -18,7 +18,7 @@ export default function TestDetails( props ){
 	return (
 		<View>
 			{ list }
-			<TouchableHighlight onPress={ () => props.router.push( props.router.location.pathname + '/moreDetails') }>
+			<TouchableHighlight onPress={ () => props.router.navigate( props.router.location.pathname + '/moreDetails') }>
 				<Text>More details</Text>
 			</TouchableHighlight>
 		</View>

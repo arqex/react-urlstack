@@ -53,7 +53,7 @@ export default class DrawerWrapper extends Component {
 		return (
 			<Animated.View style={ containerStyles }>
 				{ overlay }
-				<Interactable.View dragEnabled={ collapsible }
+				<Interactable.View dragEnabled={ !!collapsible }
 					ref="drawer"
 					horizontalOnly={ true } snapPoints={ snapPoints }
 					boundaries={{right: this.drawerWidth, bounce: 0.5}}

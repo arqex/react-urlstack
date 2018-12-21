@@ -27,13 +27,13 @@ class TestTabs extends Component {
 		let i = location.matches.length;
 		while( i-- > 0 ){
 			if( location.matches[i] === TestTabs ){
-				return router.push( location.matchIds[i] + '/' + tab )
+				return router.navigate( location.matchIds[i] + '/' + tab )
 			}
 		}
 	}
 }
 
-TestTabs.urlstackOptions = { tabs: true };
+TestTabs.navigationOptions = {};
 
 export default TestTabs;
 

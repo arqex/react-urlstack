@@ -63,7 +63,7 @@ class TestList extends Component {
 			<ListItem key={item.id}
 				title={item.name}
 				subtitle={ item.email }
-				onPress={ () => router.push( this.baseUrl+ '/' + item.id ) } />
+				onPress={ () => router.navigate( this.baseUrl+ '/' + item.id ) } />
 		)
 	}
 

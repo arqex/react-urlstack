@@ -10,7 +10,7 @@ function TestModal( props ){
 	)
 }
 
-TestModal.urlstackOptions = { modal: true }
+TestModal.navigatorOptions = {}
 
 export default TestModal
 
