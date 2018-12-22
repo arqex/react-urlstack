@@ -22,6 +22,12 @@ export default class DrawerWrapper extends Component {
 				outputRange: [0,0,.5,.5]
 			})
 		}
+
+		const drawerMethods = {
+			open: () => this.openDrawer(),
+			close: () => this.closeDrawer()
+		}
+		this._drawerMethods = drawerMethods
 	}
 
 	render(){
@@ -60,7 +66,7 @@ export default class DrawerWrapper extends Component {
 					onSnapStart={ e => this.onSnap( e ) }
 					animatedValueX={ this.drawerPos }>
 					<View style={ drawerStyles } onLayout={ e => this.updateLayout(e) }>
-						<Drawer router={ router } />
+						<Drawer router={ router } drawer={ this._drawerMethods } />
 						{ handle }
 					</View>
 				</Interactable.View>

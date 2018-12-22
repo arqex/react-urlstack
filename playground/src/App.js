@@ -2,7 +2,7 @@ import React from 'react'
 import {StyleSheet, View, Text} from 'react-native'
 import {Navigator} from 'react-urlstack'
 import routes from './routes'
-import SideMenu from './components/SideMenu';
+import SideMenu from './components/menu/SideMenu';
 
 export default function StackApp(props){
   return (
