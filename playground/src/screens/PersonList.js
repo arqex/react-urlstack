@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FlatList, StyleSheet, Text, View, TouchableHighlight } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import ListItem from '../components/ListItem';
 import {getItems} from '../data/testItems';
 
@@ -43,15 +43,6 @@ class TestList extends Component {
 		return (
 			<View style={styles.container}>
 				<Text style={styles.text}>There are no items yet.</Text>
-				{this.renderButton()}
-			</View>
-		)
-	}
-
-	renderButton() {
-		return (
-			<View style={styles.bottomButton}>
-				<Button onPress={() => this.openAddArticle()} text="Add a new item" />
 			</View>
 		)
 	}

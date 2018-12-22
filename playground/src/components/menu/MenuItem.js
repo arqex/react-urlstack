@@ -3,10 +3,12 @@ import { Text, StyleSheet } from 'react-native';
 import Hoverable from '../hover/Hoverable';
 
 const MenuItem = ({
-	children, router, route
+	children, router, route, active
 }) => (
-	<Hoverable style={ styles.container } hoverStyle={ styles.hover } onPress={ () => router.navigate( route ) }>
-		<Text style={ styles.text }>{ children }</Text>
+	<Hoverable style={ [styles.container, active && styles.activeContainer] }
+		hoverStyle={ [styles.hover] }
+		onPress={ () => router.navigate( route ) }>
+			<Text style={ [styles.text, active && styles.active] }>{ children }</Text>
 	</Hoverable>
 );
 
@@ -22,6 +24,12 @@ let styles = StyleSheet.create({
 	},
 	hover: {
 		backgroundColor: '#fff'
+	},
+	activeContainer: {
+		backgroundColor: '#ddd'
+	},
+	active: {
+		fontWeight: 'bold'
 	}
 })
 

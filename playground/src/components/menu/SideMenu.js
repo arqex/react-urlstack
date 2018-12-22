@@ -15,23 +15,24 @@ export default class SideMenu extends Component {
   }
   render() {
     let router = this.props.router;
+    let currentRoute = router.location.pathname;
 
     return (
       <View style={styles.menu}>
         <MenuTitle />
         <View>
           <MenuGroup title="Navigation examples">
-            <MenuItem router={router} route="/">Welcome</MenuItem>
-            <MenuItem router={router} route="/list">Basic stack</MenuItem>
-            <MenuItem router={router} route="/tabs">Tab navigation</MenuItem>
-            <MenuItem router={router} route="/modal">Modal</MenuItem>
-            <MenuItem router={router} route="/unknown">Unexistant route</MenuItem>
+            <MenuItem router={router} active={ currentRoute === '/'} route="/">Welcome</MenuItem>
+            <MenuItem router={router} active={ currentRoute.slice(0,5) === '/list'} route="/list">Basic stack</MenuItem>
+            <MenuItem router={router} active={ currentRoute.slice(0,5) === '/tabs'} route="/tabs">Tab navigation</MenuItem>
+            <MenuItem router={router} active={ currentRoute.slice(0,6) === '/modal'} route="/modal">Modal</MenuItem>
+            <MenuItem router={router} active={ currentRoute.slice(0,8) === '/unknown'} route="/unknown">Unexistant route</MenuItem>
           </MenuGroup>
         </View>
       </View>
     )
   }
-  
+
   componentDidUpdate(){
     let nextRoute = this.getRoute()
     if( nextRoute !== this._lastRoute ){
