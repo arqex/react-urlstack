@@ -8,8 +8,10 @@ import Tab1 from './screens/Tab1'
 import Tab2 from './screens/Tab2'
 import Tab3 from './screens/Tab3'
 import SimpleScreen from './screens/SimpleScreen'
+import Screen404 from './screens/Screen404'
 
 export default [
+	{ path: '/', cb: Welcome },
 	{ path: '/tabs', cb: Tabs, isTabs: true, children: [
 		{ path: '/tab1', cb: Tab1 },
 		{ path: '/tab2', cb: Tab2 },
@@ -27,5 +29,5 @@ export default [
 	]},
 	{ path: '/simpleScreen', cb: SimpleScreen },
 	{ path: '/modal', cb: Modal, isModal: true },
-	{ path: '/*', cb: Welcome }
+	{ path: '/*', cb: Screen404 }
 ]
