@@ -5,6 +5,7 @@ import { Dimensions, View, StyleSheet, Animated } from 'react-native'
 import ScreenStack from './ScreenStack'
 import ModalWrapper from './ModalWrapper'
 import DrawerWrapper from './DrawerWrapper'
+import { ContextProvider, contextMethods, TransitionLayer } from './utils/sharedElementContext'
 import TransitionDesktopDefault from './defaultTransitions/TransitionDesktopDefault'
 import TransitionMobileDefault from './defaultTransitions/TransitionMobileDefault'
 import TransitionModalDefault from './defaultTransitions/TransitionModalDefault'
@@ -43,26 +44,29 @@ export default class Navigator extends Component {
 		let layout = { width, height }
 
 		return (
-			<View style={ styles.container }>
-				<DrawerWrapper router={ router }
-					transition={ modalTransition.dock }
-					indexes={ indexes.stack }
-					collapsible={ transition({},{}).collapsibleDrawer }
-					Drawer={ DrawerComponent } />
-				<ScreenStack router={ router }
-					screenTransition={ transition }
-					stackTransition={ modalTransition.stack }
-					stackIndexes={ indexes.stack }
-					stack={ stack }
-					index={ index }
-					layout={ layout } />
-				<ModalWrapper router={ router }
-					stack={ router.modal.stack }
-					index={ router.modal.stack }
-					transition={ modalTransition.modal }
-					indexes={ indexes.modal }
-					layout={ layout } />
-			</View>
+			<ContextProvider {...contextMethods}>
+				<View style={styles.container}>
+					<DrawerWrapper router={router}
+						transition={modalTransition.dock}
+						indexes={indexes.stack}
+						collapsible={transition({}, {}).collapsibleDrawer}
+						Drawer={DrawerComponent} />
+					<ScreenStack router={router}
+						screenTransition={transition}
+						stackTransition={modalTransition.stack}
+						stackIndexes={indexes.stack}
+						stack={stack}
+						index={index}
+						layout={layout} />
+					<ModalWrapper router={router}
+						stack={router.modal.stack}
+						index={router.modal.stack}
+						transition={modalTransition.modal}
+						indexes={indexes.modal}
+						layout={layout} />
+					<TransitionLayer />
+				</View>
+			</ContextProvider>
 		)
 	}
 

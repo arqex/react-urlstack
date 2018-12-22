@@ -8,7 +8,6 @@ export default function StackApp(props){
   return (
     <View style={ styles.container }>
       <Navigator routes={ routes }
-        store={ props.store }
         DrawerComponent={ SideMenu }
         transitionTime={ 1000 } /> 
     </View>
