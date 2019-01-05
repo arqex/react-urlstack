@@ -2,6 +2,9 @@ import React, {Component} from 'react'
 import { StyleSheet, Animated } from 'react-native'
 import TransitionTabDefault from './defaultTransitions/TransitionTabDefault'
 import animatedStyles from './utils/animatedStyles'
+import Context from './utils/wrapperContext'
+
+const ScreenContext = React.createContext('screen');
 
 export default class ScreenWrapper extends Component {
 	constructor(props){
@@ -15,10 +18,16 @@ export default class ScreenWrapper extends Component {
 			styles.container,
 			this.animatedStyles
 		]
+		let contextValue = {
+			transition: this.props.transition,
+			indexes: this.props.indexes
+		}
 
 		return (
 			<Animated.View style={ containerStyles }>
-				{ this.renderScreen() }
+				<Context.Provider value={contextValue}>
+					{ this.renderScreen() }
+				</Context.Provider>
 			</Animated.View>
 		)
 	}

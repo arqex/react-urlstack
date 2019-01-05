@@ -5,7 +5,7 @@ import { Dimensions, View, StyleSheet, Animated } from 'react-native'
 import ScreenStack from './ScreenStack'
 import ModalWrapper from './ModalWrapper'
 import DrawerWrapper from './DrawerWrapper'
-import { ContextProvider, contextMethods, TransitionLayer } from './utils/sharedElementContext'
+import { SharedElementWrapper } from './utils/sharedElementContext'
 import TransitionDesktopDefault from './defaultTransitions/TransitionDesktopDefault'
 import TransitionMobileDefault from './defaultTransitions/TransitionMobileDefault'
 import TransitionModalDefault from './defaultTransitions/TransitionModalDefault'
@@ -44,7 +44,7 @@ export default class Navigator extends Component {
 		let layout = { width, height }
 
 		return (
-			<ContextProvider {...contextMethods}>
+			<SharedElementWrapper router={router}>
 				<View style={styles.container}>
 					<DrawerWrapper router={router}
 						transition={modalTransition.dock}
@@ -64,9 +64,8 @@ export default class Navigator extends Component {
 						transition={modalTransition.modal}
 						indexes={indexes.modal}
 						layout={layout} />
-					<TransitionLayer />
 				</View>
-			</ContextProvider>
+			</SharedElementWrapper>
 		)
 	}
 

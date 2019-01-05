@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { Context } from './utils/sharedElementContext';
 
 export default class SharedElement extends Component {
@@ -14,7 +14,7 @@ export default class SharedElement extends Component {
 	render() {
 		return (
 			<View>
-				<Text>Shared element</Text>
+				{ this.props.children }
 			</View>
 		);
 	}

@@ -1,2 +1,3 @@
 import Navigator from './src/Navigator';
-export {Navigator};
+import SharedElement from './src/SharedElement';
+export {Navigator, SharedElement};
