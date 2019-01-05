@@ -11,7 +11,7 @@ export default class ScreenStack extends Component {
 		screenTransition: PropTypes.func,
 		stackTransition: PropTypes.func,
 		stackIndexes: PropTypes.object,
-		stack: PropTypes.object,
+		stack: PropTypes.array,
 		index: PropTypes.number,
 		layout: PropTypes.object
 	}
