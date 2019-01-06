@@ -8,25 +8,22 @@ const Context = React.createContext('sharedElement');
 let currentRoute = false
 // We will be storing the mounted elements by routes
 let mountedElements = {}
-// We keep a quick reference to what route belong to what instance
-let routeByInstance = new WeakMap()
 
 // When a shared element is mounted it calls to this function
 // and we register it
 function mount(instance) {
 	let id = instance.props.sharedId
-	if (!mountedElements[currentRoute]) {
-		mountedElements[currentRoute] = []
+	let wrapper = instance.props.wrapper.id
+	if (!mountedElements[wrapper]) {
+		mountedElements[wrapper] = []
 	}
-	mountedElements[currentRoute].push(instance);
-	routeByInstance.set( instance, currentRoute );
-	console.log( `Mounting ${id}`, mountedElements[ currentRoute ] );
+	mountedElements[wrapper].push(instance);
+	console.log( `Mounting ${id}`, mountedElements[ wrapper ] );
 }
 
 // When it's unmounted we delete the references to it
 function unmount(instance) {
-	let route = routeByInstance.get( instance );
-	let stack = mountedElements[ route ]
+	let stack = mountedElements[ instance.props.wrapper.id ]
 	if( !stack ) return;
 	
 	if (stack) {
@@ -37,9 +34,8 @@ function unmount(instance) {
 			}
 		}
 	}
-	routeByInstance.delete( instance );
 
-	console.log(`Mounting ${id}`, mountedElements[ route ]);
+	console.log(`Unmounting ${id}`, mountedElements[ wrapper ]);
 }
 
 class TransitionLayer extends Component {
@@ -68,11 +64,11 @@ class TransitionLayer extends Component {
 	}
 	checkRouteChange(){
 		let nextRoute = this.getCurrentRoute()
-		if (currentRoute !== nextRoute) {
-			currentRoute = nextRoute
+		if (currentRoute !== nextRoute && !this.state.transitioning) {
 			this.setState({ transitioning: true }, () => {
 				console.log('Updating')
-				this.startTransitions(currentRoute, nextRoute)
+				this.startTransitions(currentRoute, nextRoute);
+				currentRoute = nextRoute;
 				this.setState({transitioning: false})
 			})
 		}

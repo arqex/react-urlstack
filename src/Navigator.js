@@ -9,7 +9,7 @@ import { SharedElementWrapper } from './utils/sharedElementContext'
 import TransitionDesktopDefault from './defaultTransitions/TransitionDesktopDefault'
 import TransitionMobileDefault from './defaultTransitions/TransitionMobileDefault'
 import TransitionModalDefault from './defaultTransitions/TransitionModalDefault'
-import memoize from './utils/memoize'
+import {memoize} from './utils/utils'
 
 export default class Navigator extends Component {
 	constructor( props ){

@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {Animated, View, StyleSheet} from 'react-native'
-import memoize from './utils/memoize'
+import {memoize} from './utils/utils'
 import ScreenWrapper from './ScreenWrapper'
 import animatedStyles from './utils/animatedStyles'
 
@@ -18,7 +18,7 @@ export default class ScreenStack extends Component {
 
 	static defaultProps = {
 		stackTransition: () => ({}),
-		stackIndexes: {}
+		stackIndexes: {} 
 	}
 
 	constructor( props ){

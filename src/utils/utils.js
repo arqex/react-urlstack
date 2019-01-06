@@ -1,4 +1,4 @@
-export default function memoize( fn ){
+export function memoize( fn ){
 	var args, value;
 
 	function recalculate( fnArgs ){
@@ -22,4 +22,8 @@ export default function memoize( fn ){
 
 		return value
 	}
+}
+
+export function createId(){
+  return Math.round( Math.random() * 10000000 ).toString(36);
 }
