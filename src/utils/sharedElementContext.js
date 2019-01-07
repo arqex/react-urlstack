@@ -3,39 +3,58 @@ import {Animated, View, StyleSheet, Text} from 'react-native'
 
 const Context = React.createContext('sharedElement');
 
-// Keep track of the current route, when it changes is when transition starts
-// see the TransitionLayer component
-let currentRoute = false
 // We will be storing the mounted elements by routes
 let mountedElements = {}
 
 // When a shared element is mounted it calls to this function
 // and we register it
-function mount(instance) {
-	let id = instance.props.sharedId
-	let wrapper = instance.props.wrapper.id
+function register(instance, props ) {
+	let wrapper = props.wrapper.id
 	if (!mountedElements[wrapper]) {
 		mountedElements[wrapper] = []
 	}
 	mountedElements[wrapper].push(instance);
-	console.log( `Mounting ${id}`, mountedElements[ wrapper ] );
+	console.log( `Mounting ${wrapper}`, mountedElements[ wrapper ] );
 }
 
 // When it's unmounted we delete the references to it
-function unmount(instance) {
-	let stack = mountedElements[ instance.props.wrapper.id ]
+function unregister(instance) {
+	let wrapper = instance.props.wrapper.id
+	let stack = mountedElements[ wrapper ]
 	if( !stack ) return;
 	
 	if (stack) {
 		let i = stack.length
 		while (i-- > 0) {
 			if (stack[i] === instance) {
-				stack.splice(i, 1);
+				stack.splice(i, 1); 
 			}
 		}
 	}
 
-	console.log(`Unmounting ${id}`, mountedElements[ wrapper ]);
+	console.log(`Unmounting ${wrapper}`, mountedElements[ wrapper ]);
+}
+
+// Layers registered callback to listen to transitions
+let clbks = []
+
+// This method is called just before starting the screen transition when the URL changes
+// Screen stack is the one responsible of calling it through the context
+function startTransition( prevIndexes, nextIndexes ){
+	let screens = {};
+	Object.keys( prevIndexes ).forEach( id => {
+		if( prevIndexes[id].relative === 0 ){
+			screens.fromScreen = {id, index: nextIndexes[id].relative};
+		}
+	})
+	Object.keys( nextIndexes ).forEach( id => {
+		if( nextIndexes[id].relative === 0 ){
+			screens.toScreen = {id, index: prevIndexes[id].relative};
+		}
+	})
+	
+	// Call the layer callback to print out the shared element transitions
+	clbks.forEach( clbk => clbk(screens) )
 }
 
 class TransitionLayer extends Component {
@@ -44,7 +63,9 @@ class TransitionLayer extends Component {
 		this.state = {
 			elements: []
 		}
+		this.checkForTransitions = this.checkForTransitions.bind(this);
 	}
+
 	render(){
 		return (
 			<View style={ styles.container }>
@@ -52,34 +73,16 @@ class TransitionLayer extends Component {
 			</View>
 		)
 	}
-	getCurrentRoute() {
-		let location = this.props.router.location;
-		return location.pathname + location.search;
-	}
-	componentDidMount(){
-		currentRoute = this.getCurrentRoute()
-	}
-	componentDidUpdate(){
-		this.checkRouteChange()
-	}
-	checkRouteChange(){
-		let nextRoute = this.getCurrentRoute()
-		if (currentRoute !== nextRoute && !this.state.transitioning) {
-			this.setState({ transitioning: true }, () => {
-				console.log('Updating')
-				this.startTransitions(currentRoute, nextRoute);
-				currentRoute = nextRoute;
-				this.setState({transitioning: false})
-			})
-		}
-	}
 
-	startTransitions( prevRoute, nextRoute ){
-		let couples = this.getTransitionCouples( prevRoute, nextRoute )
+	checkForTransitions({fromScreen, toScreen}){
+		let couples = this.getTransitionCouples( fromScreen.id, toScreen.id )
 		console.log('Couples', couples)
 		if( !couples.length ) return;
-		let elements = this.state.elements.slice()
-		couples.forEach( couple => this.startTransition( elements, couple ) )
+
+		let elements = couples.map( couple => (
+			this.renderElement( couple, toScreen.index )
+		));
+
 		this.setState({elements})
 
 		// Delete the elements from the state when the transition is over
@@ -100,15 +103,35 @@ class TransitionLayer extends Component {
 			this.setState({ elements: stateElements})
 		}, 500)
 	}
-	startTransition( elements, { leaving, entering }){
-		console.log( 'Pushing element', leaving, entering );
-		elements.push( <Text key={ elements.length }>Some element</Text> )
+
+	renderElement( {leaving, entering}, enteringFrom ){
+		
+		return React.cloneElement( leaving, {
+			fromIndex: 0,
+			toIndex: enteringFrom,
+			fromBox: leaving.box,
+			toBox: entering.box,
+			fromProps: this.cleanProps( leaving.props ),
+			toProps: this.cleanProps( entering.props )
+		})
+	}
+
+	cleanProps( props ){
+		let clean = {};
+
+		Object.keys( props ).forEach( p => {
+			if( p !== 'se' && p !== 'wrapper' && p !== 'children' && p !== 'transitionStyles' ) {
+				clean[ p ] = props[p]
+			}
+		});
+
+		return clean;
 	}
 	
-	getTransitionCouples( prevRoute, nextRoute ){
+	getTransitionCouples( fromId, toId ){
 		
-		let leaving = mountedElements[prevRoute]
-		let entering = mountedElements[nextRoute]
+		let leaving = mountedElements[fromId]
+		let entering = mountedElements[toId]
 		if( !leaving || !entering ) return [];
 
 		leaving = leaving.slice()
@@ -133,6 +156,21 @@ class TransitionLayer extends Component {
 		}
 		return couples;
 	}
+
+	componentDidMount(){
+		// Start listening to transitions
+		clbks.push( this.checkForTransitions );
+	}
+
+	componentWillUnmount(){
+		let i = clbks.length;
+		while( i-- > 0 ){
+			if( clbks[i] === this.checkForTransitions ){
+				// Remove the callback
+				clbks.splice( i , 1 );
+			}
+		}
+	}
 }
 
 const styles = StyleSheet.create({
@@ -146,20 +184,8 @@ const styles = StyleSheet.create({
 	}
 })
 
-let listening = false;
-function setListener( router ){
-	if( listening ) return;
-	listening = true;
-
-	// Wait for the first render to start
-	setTimeout( () => router.onChange( onRouteChange ), 100 )
-}
-function onRouteChange( location ){
-
-}
-
 const SharedElementWrapper = props => (
-	<Context.Provider value={{ mount, unmount }}>
+	<Context.Provider value={{ register, unregister, startTransition }}>
 		{ props.children }
 		<TransitionLayer router={ props.router } />
 	</Context.Provider>

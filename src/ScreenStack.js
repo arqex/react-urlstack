@@ -4,6 +4,7 @@ import {Animated, View, StyleSheet} from 'react-native'
 import {memoize} from './utils/utils'
 import ScreenWrapper from './ScreenWrapper'
 import animatedStyles from './utils/animatedStyles'
+import {Context} from './utils/sharedElementContext'
 
 export default class ScreenStack extends Component {
 	static propTypes = {
@@ -20,6 +21,8 @@ export default class ScreenStack extends Component {
 		stackTransition: () => ({}),
 		stackIndexes: {} 
 	}
+
+	static contextType = Context;
 
 	constructor( props ){
 		super( props );
@@ -61,8 +64,8 @@ export default class ScreenStack extends Component {
 		if( !layout ) return;
 
 		let screens = [];
-		stack.forEach(item => {
-			let { Screen, key, location } = item
+		stack.forEach( item => {
+			let key = item.key;
 
 			if( !indexes[key] ) {
 				// We are probably rebuilding indexes after navigating
@@ -73,7 +76,7 @@ export default class ScreenStack extends Component {
 				<ScreenWrapper item={ item }
 					ScreenStack={ ScreenStack }
 					router={ router }
-					indexes={ indexes[item.key] }
+					indexes={ indexes[ key ] }
 					layout={ layout }
 					transition={ this.props.screenTransition }
 					key={ key } />
@@ -88,7 +91,7 @@ export default class ScreenStack extends Component {
 	}
 
 	componentDidUpdate() {
-		let { stack, index, stackTransition,  } = this.props
+		let { stack, index } = this.props
 		let indexes = this.calculateIndexes( this.state.indexes, stack, this.previousIndex )
 
 		// Check if the indexes has changed
@@ -100,8 +103,10 @@ export default class ScreenStack extends Component {
 		// indexes to start the animations
 		if (this.needRelativeUpdate) {
 			this.needRelativeUpdate = false;
+			let nextIndexes = this.updateRelativeIndexes(indexes, stack, index);
+			this.context.startTransition( this.state.indexes, nextIndexes );
 			this.setState({
-				indexes: this.updateRelativeIndexes(indexes, stack, index)
+				indexes: nextIndexes
 			})
 		}
 

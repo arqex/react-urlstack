@@ -5,8 +5,6 @@ import animatedStyles from './utils/animatedStyles'
 import Context from './utils/wrapperContext'
 import {createId} from './utils/utils'
 
-const ScreenContext = React.createContext('screen');
-
 export default class ScreenWrapper extends Component {
 	constructor(props){
 		super(props)
@@ -24,7 +22,7 @@ export default class ScreenWrapper extends Component {
 		let contextValue = {
 			transition: this.props.transition,
 			indexes: this.props.indexes,
-			wrapperId: this.id
+			id: this.props.item.key
 		}
 
 		return (

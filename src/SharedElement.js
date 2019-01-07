@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Animated } from 'react-native';
+import { Animated } from 'react-native';
 import { Context } from './utils/sharedElementContext';
 import WrapperContext from './utils/wrapperContext';
 
@@ -11,7 +11,12 @@ class SharedElement extends Component {
 		
 		if( props.fromProps ){
 			// We are in the transition layer, prepare the animation
+			console.log('Amazing we got it!', props )
 			this.animatedValue = new Animated.Value( props.fromIndex )
+		}
+		else {
+			// We are mounted by the user, register the shared element
+			this.props.se.register( this, props );
 		}
 	}
 
@@ -24,9 +29,9 @@ class SharedElement extends Component {
 		console.log('Shared', this.props.se, this.props.wrapper );
 
 		return (
-			<View style={ style }>
+			<Animated.View style={ style } onLayout={ e => this.box = e.nativeEvent.layout }>
 				{ this.props.children }
-			</View>
+			</Animated.View>
 		);
 	}
 
@@ -37,8 +42,6 @@ class SharedElement extends Component {
 		if( !this.props.transitionStyle ){
 			this.transitionStyle = this.boxInterpolator();
 		}
-
-
 
 		return this.transitionStyle;
 	}
@@ -68,14 +71,10 @@ class SharedElement extends Component {
 				duration: 500
 			}).start();
 		}
-		else {
-			// We are mounted by the user, register the shared element
-			this.props.se.mount( this );
-		}
 	}
 	
 	componentWillUnmount(){
-		this.props.se.unmount( this );
+		this.props.se.unregister( this );
 	}
 }
 
