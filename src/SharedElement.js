@@ -18,12 +18,19 @@ class SharedElement extends Component {
 			// We are mounted by the user, register the shared element
 			this.props.se.register( this, props );
 		}
+
+		this.SE = SharedElement;
 	}
 
 	render() {
 		let style = this.props.style || {};
-		if( this.props.transitioning ){
-			style = { ...style, ...this.getTransitionStyle() }
+		if( this.props.animatedValue ){
+			style = {
+				...style,
+				position: 'absolute',
+				...this.props.fromBox,
+				...this.getTransitionStyle()
+			}
 		}
 
 		console.log('Shared', this.props.se, this.props.wrapper );
@@ -74,7 +81,9 @@ class SharedElement extends Component {
 	}
 	
 	componentWillUnmount(){
-		this.props.se.unregister( this );
+		if( this.animatedValue ){
+			this.props.se.unregister( this );
+		}
 	}
 }
 

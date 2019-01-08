@@ -84,7 +84,7 @@ class TransitionLayer extends Component {
 		));
 
 		this.setState({elements})
-
+			/*
 		// Delete the elements from the state when the transition is over
 		setTimeout( () => {
 			let stateElements = this.state.elements.slice();
@@ -102,18 +102,21 @@ class TransitionLayer extends Component {
 			
 			this.setState({ elements: stateElements})
 		}, 500)
+		*/
 	}
 
 	renderElement( {leaving, entering}, enteringFrom ){
-		
-		return React.cloneElement( leaving, {
-			fromIndex: 0,
-			toIndex: enteringFrom,
-			fromBox: leaving.box,
-			toBox: entering.box,
-			fromProps: this.cleanProps( leaving.props ),
-			toProps: this.cleanProps( entering.props )
-		})
+		let SharedElement = leaving.SE;
+
+		return (
+			<SharedElement toIndex={ enteringFrom }
+				fromBox={ leaving.box }
+				toBox={ entering.box }
+				fromProps={ this.cleanProps( leaving.props ) }
+				toProps={ this.cleanProps( entering.props ) }>
+					{ leaving.props.children }	
+			</SharedElement>
+		);
 	}
 
 	cleanProps( props ){
