@@ -180,10 +180,8 @@ const styles = StyleSheet.create({
 	container: {
 		position: 'absolute',
 		top: 0, right: 0, left: 0, bottom: 0,
-		zIndex: -10000
-	},
-	transitioning:{
-		zIndex: 10000
+		zIndex: 10000,
+		pointerEvents: 'none'
 	}
 })
 

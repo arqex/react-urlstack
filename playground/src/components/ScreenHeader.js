@@ -1,25 +1,22 @@
-import React from 'react'
+import React, {Component} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 import {SharedComponent} from 'react-urlstack';
 
-export default class ScreenHeader extends SharedComponent {
-	render( prevProps, nextProps ){
-		return (
-			<View>
 
-			</View>
-		)
+export default class ScreenHeader extends Component {
+	render(){
+		return (
+			<SharedComponent style={ styles.bar }>
+				<SharedComponent style={ styles.content }>
+					<View></View>
+					<Text>{ this.props.title }</Text>
+				</SharedComponent>
+			</SharedComponent>
+		);
 	}
 }
 
-<Header title="One" subtitle="my one" />
-<Header title="One" subtitle="my one" />
-
-let transition = ({fromIndex, toIndex, animatedValue, fromProps, toProps, fromBox, toBox, interpolator, boxInterpolator}) => {
-	return boxInterpolator()
-}
-<SharedElement id="header" transitionStyle={ transition }>
-	<Animated.View>
-		<Text>Title</Text>
-		<Text>Subtitle</Text>
-	</Animated.View>
-</SharedElement>
+let styles = StyleSheet.create({
+	bar: {},
+	content: {}
+})

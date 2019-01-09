@@ -23,7 +23,7 @@ class SharedElement extends Component {
 	}
 
 	render() {
-		let style = this.props.style || {};
+		let style = {pointerEvents: 'auto', ...( this.props.style || {} )};
 		if( this.props.animatedValue ){
 			style = {
 				...style,
