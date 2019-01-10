@@ -19,7 +19,13 @@ class SharedElement extends Component {
 		if( props.fromProps ){
 			// We are in the transition layer, prepare the animation
 			console.log('Amazing we got it!', props )
-			this.animatedValue = new Animated.Value( props.fromIndex )
+			this.animatedLeaving = new Animated.Value(props.fromIndex)
+			this.animatedEntering = animatedLeaving.interpolate({
+				inputRange: [-1, 0, 1],
+				outputRange: [ 0, props.toIndex, 0]
+			})
+
+			this.SE = SharedElement;
 		}
 		else if( props.wrapper ){
 			// We are mounted by the user, register the shared element
@@ -27,14 +33,13 @@ class SharedElement extends Component {
 			this.registered = true;
 		}
 
-		this.SE = SharedElement;
 	}
 
 	render() {
-		if( this.animatedValue ) return this.renderTransition();
+		if( this.animatedLeaving ) return this.renderTransition();
 
 		let viewStyles = [this.props.style];
-		if( this.animatedValue ){
+		if( this.animatedLeaving ){
 			viewStyles = viewStyles.concat([
 				styles.position,
 				this.props.fromBox,
@@ -59,27 +64,50 @@ class SharedElement extends Component {
 
 	getTransitionStyle(){
 		if( this.transitionStyles ) return this.transitionStyles;
-		let { transitionStyle, contentTransition, fromBox, toBox, fromProps, toProps } = this.props;
+		let { transitionStyle, contentTransition, fromBox, toBox, fromProps, toProps, fromIndex, toIndex } = this.props;
 		let styles = {};
 
-		styles.container = transitionStyle ? 
-			transitionStyle( this.animatedValue, toIndex, fromBox, toBox, fromProps, toProps ) : 
+		let containerStyles = transitionStyle ? 
+			transitionStyle( this.animatedLeaving, toIndex, fromBox, toBox, fromProps, toProps ) : 
 			this.boxInterpolator()
 		;
 
-		if( !this.props.transitionStyle ){
-			this.transitionStyle = this.boxInterpolator();
-		}
+		styles.container = [
+			this.props.style,
+			styles.transition,
+			fromBox,
+			containerStyles
+		];
 
-		return this.transitionStyle;
+		let leavingStyles = {};
+		if( fromProps.contentTransition ){
+			leavingStyles = fromProps.contentTransition( this.animatedLeaving, fromIndex, toIndex, fromBox )
+		}
+		styles.leaving = [
+			styles.transition,
+			fromBox,
+			leavingStyles
+		]
+
+		let enteringStyles = {};
+		if (fromProps.contentTransition) {
+			enteringStyles = fromProps.contentTransition(this.animatedEntering, fromIndex, toIndex, fromBox)
+		}
+		styles.entering = [
+			styles.transition,
+			fromBox,
+			enteringStyles
+		]
+
+		return this.transitionStyles = styles;
 	}
 
-	boxInterpolator( animatedValue, fromIndex, toIndex, fromBox, toBox ){
+	boxInterpolator( animatedLeaving, fromIndex, toIndex, fromBox, toBox ){
 		let styles = {};
 		let props = this.props;
 		['x', 'y', 'width', 'height'].forEach( attr => {
 			styles[ boxAttrs[attr] ] = this.interpolator(
-				animatedValue || this.animatedValue,
+				animatedLeaving || this.animatedLeaving,
 				fromIndex || props.fromIndex,
 				toIndex || props.toIndex,
 				(fromBox || props.fromBox)[attr],
@@ -89,19 +117,19 @@ class SharedElement extends Component {
 		return styles;
 	}
 
-	interpolator( animatedValue, fromIndex, toIndex, fromValue, toValue ){
+	interpolator( animatedLeaving, fromIndex, toIndex, fromValue, toValue ){
 		if( fromValue === toValue ) return fromValue;
 		let inverted = fromValue > toValue;
-		return animatedValue.interpolate({
+		return animatedLeaving.interpolate({
 			inputRange: inverted ? [toIndex, toIndex, fromIndex, fromIndex] : [fromIndex, fromIndex, toIndex, toIndex],
 			outputRange: inverted ? [toValue, toValue, fromValue, fromValue] : [fromValue, fromValue, toValue, toValue]
 		})
 	}
 
 	componentDidMount(){
-		if( this.animatedValue ){
+		if( this.animatedLeaving ){
 			// We are in the transition layer, start the animation
-			Animated.timing( this.animatedValue ,{
+			Animated.timing( this.animatedLeaving ,{
 				toValue: this.props.toIndex,
 				duration: 500
 			}).start();
@@ -116,7 +144,7 @@ class SharedElement extends Component {
 }
 
 const styles = StyleSheet.create({
-	position: { position: 'absolute'}
+	transition: { position: 'absolute', overflow: 'hidden' }
 })
 
 function ContextConsumerHOC( Component ){
