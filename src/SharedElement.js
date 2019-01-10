@@ -31,6 +31,8 @@ class SharedElement extends Component {
 	}
 
 	render() {
+		if( this.animatedValue ) return this.renderTransition();
+
 		let viewStyles = [this.props.style];
 		if( this.animatedValue ){
 			viewStyles = viewStyles.concat([
@@ -43,7 +45,7 @@ class SharedElement extends Component {
 		console.log('Shared', this.props.se, this.props.wrapper );
 
 		return (
-			<Animated.View style={ viewStyles }
+			<Animated.View style={ this.props.style }
 				onLayout={ e => this.box = e.nativeEvent.layout }
 				pointerEvents="auto">
 				{ this.props.children }
@@ -51,9 +53,19 @@ class SharedElement extends Component {
 		);
 	}
 
-	getTransitionStyle(){
-		if( this.transitionStyle ) return this.transitionStyle;
+	renderTransition(){
+		let viewStyles = {}
+	}
 
+	getTransitionStyle(){
+		if( this.transitionStyles ) return this.transitionStyles;
+		let { transitionStyle, contentTransition, fromBox, toBox, fromProps, toProps } = this.props;
+		let styles = {};
+
+		styles.container = transitionStyle ? 
+			transitionStyle( this.animatedValue, toIndex, fromBox, toBox, fromProps, toProps ) : 
+			this.boxInterpolator()
+		;
 
 		if( !this.props.transitionStyle ){
 			this.transitionStyle = this.boxInterpolator();
