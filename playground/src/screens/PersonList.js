@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import ListItem from '../components/ListItem';
+import ScreenHeader from '../components/ScreenHeader';
 import {getItems} from '../data/testItems';
-import {SharedElement} from 'react-urlstack';
 
 class TestList extends Component {
 	constructor( props ) {
@@ -26,9 +26,7 @@ class TestList extends Component {
 
 		return (
 			<View style={styles.container}>
-				<SharedElement sharedId="titleBar">
-					<Text>Person List</Text>
-				</SharedElement>
+				<ScreenHeader title="Person list" />
 				<FlatList data={items}
 					renderItem={({ item }) => this.renderItem(item)} />
 			</View>

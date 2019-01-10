@@ -1,22 +1,26 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import {SharedComponent} from 'react-urlstack';
+import {StyleSheet, Text} from 'react-native';
+import {SharedElement} from 'react-urlstack';
 
 
 export default class ScreenHeader extends Component {
 	render(){
 		return (
-			<SharedComponent style={ styles.bar }>
-				<SharedComponent style={ styles.content }>
-					<View></View>
-					<Text>{ this.props.title }</Text>
-				</SharedComponent>
-			</SharedComponent>
+			<SharedElement style={ styles.bar }>
+				<SharedElement style={ styles.content }>
+					<Text style={ styles.text }>{ this.props.title }</Text>
+				</SharedElement>
+			</SharedElement>
 		);
 	}
 }
 
 let styles = StyleSheet.create({
-	bar: {},
-	content: {}
+	bar: {
+		backgroundColor: 'red',
+	},
+	content: {},
+	test: {
+		color: 'white',
+	}
 })

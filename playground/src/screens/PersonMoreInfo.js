@@ -1,7 +1,7 @@
 import React from 'react'
 import {View, Text} from 'react-native'
 import { getById } from '../data/testItems';
-import { SharedElement } from 'react-urlstack';
+import ScreenHeader from '../components/ScreenHeader';
 
 export default function TestDetails( props ){
 	let details = getById( props.location.params.id );
@@ -10,9 +10,7 @@ export default function TestDetails( props ){
 	Object.keys( details ).forEach( key => {
 		list.push(
 			<View key={ key }>
-				<SharedElement sharedId="titleBar">
-					<Text>Person more info</Text>
-				</SharedElement>
+				<ScreenHeader title="Person more info" />
 				<Text>This is just a screen to test a third level</Text>
 			</View>
 		)

@@ -1,9 +1,16 @@
 import React, { Component } from 'react';
-import { Animated } from 'react-native';
+import { Animated, StyleSheet } from 'react-native';
 import { Context } from './utils/sharedElementContext';
 import WrapperContext from './utils/wrapperContext';
 
 console.log('Hola')
+
+const boxAttrs = {
+	x: 'left',
+	y: 'top',
+	width: 'width',
+	height: 'height'
+}
 
 class SharedElement extends Component {
 	constructor(props) {
@@ -14,29 +21,31 @@ class SharedElement extends Component {
 			console.log('Amazing we got it!', props )
 			this.animatedValue = new Animated.Value( props.fromIndex )
 		}
-		else {
+		else if( props.wrapper ){
 			// We are mounted by the user, register the shared element
-			this.props.se.register( this, props );
+			props.se.register( this, props );
+			this.registered = true;
 		}
 
 		this.SE = SharedElement;
 	}
 
 	render() {
-		let style = {pointerEvents: 'auto', ...( this.props.style || {} )};
-		if( this.props.animatedValue ){
-			style = {
-				...style,
-				position: 'absolute',
-				...this.props.fromBox,
-				...this.getTransitionStyle()
-			}
+		let viewStyles = [this.props.style];
+		if( this.animatedValue ){
+			viewStyles = viewStyles.concat([
+				styles.position,
+				this.props.fromBox,
+				this.getTransitionStyle()
+			])
 		}
 
 		console.log('Shared', this.props.se, this.props.wrapper );
 
 		return (
-			<Animated.View style={ style } onLayout={ e => this.box = e.nativeEvent.layout }>
+			<Animated.View style={ viewStyles }
+				onLayout={ e => this.box = e.nativeEvent.layout }
+				pointerEvents="auto">
 				{ this.props.children }
 			</Animated.View>
 		);
@@ -55,8 +64,15 @@ class SharedElement extends Component {
 
 	boxInterpolator( animatedValue, fromIndex, toIndex, fromBox, toBox ){
 		let styles = {};
-		['top', 'left', 'width', 'height'].forEach( attr => {
-			styles[ attr ] = this.interpolator( animatedValue, fromIndex, toIndex, fromBox[attr], toBox[attr] )
+		let props = this.props;
+		['x', 'y', 'width', 'height'].forEach( attr => {
+			styles[ boxAttrs[attr] ] = this.interpolator(
+				animatedValue || this.animatedValue,
+				fromIndex || props.fromIndex,
+				toIndex || props.toIndex,
+				(fromBox || props.fromBox)[attr],
+				(toBox || props.toBox)[attr]
+				)
 		});
 		return styles;
 	}
@@ -81,11 +97,15 @@ class SharedElement extends Component {
 	}
 	
 	componentWillUnmount(){
-		if( this.animatedValue ){
+		if( this.registered ){
 			this.props.se.unregister( this );
 		}
 	}
 }
+
+const styles = StyleSheet.create({
+	position: { position: 'absolute'}
+})
 
 function ContextConsumerHOC( Component ){
 	return function SharedElementHOC( props ){

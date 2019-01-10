@@ -68,7 +68,7 @@ class TransitionLayer extends Component {
 
 	render(){
 		return (
-			<View style={ styles.container }>
+			<View style={ styles.container } pointerEvents="none">
 				{ this.state.elements }
 			</View>
 		)
@@ -84,7 +84,7 @@ class TransitionLayer extends Component {
 		));
 
 		this.setState({elements})
-			/*
+		
 		// Delete the elements from the state when the transition is over
 		setTimeout( () => {
 			let stateElements = this.state.elements.slice();
@@ -102,7 +102,7 @@ class TransitionLayer extends Component {
 			
 			this.setState({ elements: stateElements})
 		}, 500)
-		*/
+		
 	}
 
 	renderElement( {leaving, entering}, enteringFrom ){
@@ -113,7 +113,8 @@ class TransitionLayer extends Component {
 				fromBox={ leaving.box }
 				toBox={ entering.box }
 				fromProps={ this.cleanProps( leaving.props ) }
-				toProps={ this.cleanProps( entering.props ) }>
+				toProps={ this.cleanProps( entering.props ) }
+				style={ leaving.props.style }>
 					{ leaving.props.children }	
 			</SharedElement>
 		);
@@ -180,8 +181,7 @@ const styles = StyleSheet.create({
 	container: {
 		position: 'absolute',
 		top: 0, right: 0, left: 0, bottom: 0,
-		zIndex: 10000,
-		pointerEvents: 'none'
+		zIndex: 10000
 	}
 })
 
