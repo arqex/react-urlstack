@@ -102,11 +102,14 @@ export default class ScreenStack extends Component {
 		// If the flag needRelativeUpdate is up, we need to update the relative
 		// indexes to start the animations
 		if (this.needRelativeUpdate) {
-			this.needRelativeUpdate = false;
 			let nextIndexes = this.updateRelativeIndexes(indexes, stack, index);
-			this.context.startTransition( this.state.indexes, nextIndexes );
-			this.setState({
-				indexes: nextIndexes
+
+			// Unfortunatelly we need to wait another cycle to let the onLayout callbacks to
+			// be called, and get the box from any sharedElements
+			setTimeout( () => {
+				this.needRelativeUpdate = false;
+				this.context.startTransition( this.state.indexes, nextIndexes );
+				this.setState({ indexes: nextIndexes })
 			})
 		}
 
@@ -149,8 +152,6 @@ export default class ScreenStack extends Component {
 			delete indexes[key]
 			updated = true;
 		})
-
-		console.log( updated )
 
 		return updated ? indexes : oldIndexes
 	}

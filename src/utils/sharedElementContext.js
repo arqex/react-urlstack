@@ -41,6 +41,8 @@ let clbks = []
 // This method is called just before starting the screen transition when the URL changes
 // Screen stack is the one responsible of calling it through the context
 function startTransition( prevIndexes, nextIndexes ){
+	// return console.log( 'Start transition');
+
 	let screens = {};
 	Object.keys( prevIndexes ).forEach( id => {
 		if( prevIndexes[id].relative === 0 ){
@@ -79,12 +81,16 @@ class TransitionLayer extends Component {
 		console.log('Couples', couples)
 		if( !couples.length ) return;
 
-		let elements = couples.map( couple => (
-			this.renderElement( couple, toScreen.index )
-		));
+		setTimeout( () => {
+			let elements = couples.map( couple => (
+				this.renderElement( couple, toScreen.index )
+			));
+	
+			this.setState({elements})
+		});
+	}
 
-		this.setState({elements})
-		
+	setRemoveElements( elements ){
 		// Delete the elements from the state when the transition is over
 		setTimeout( () => {
 			let stateElements = this.state.elements.slice();
@@ -102,7 +108,6 @@ class TransitionLayer extends Component {
 			
 			this.setState({ elements: stateElements})
 		}, 500)
-		
 	}
 
 	renderElement( {leaving, entering}, enteringFrom ){
@@ -112,8 +117,8 @@ class TransitionLayer extends Component {
 			<SharedElement toIndex={ enteringFrom }
 				fromBox={ leaving.box }
 				toBox={ entering.box }
-				fromProps={ this.cleanProps( leaving.props ) }
-				toProps={ this.cleanProps( entering.props ) }
+				fromProps={ leaving.props }
+				toProps={ entering.props }
 				style={ leaving.props.style }>
 					{ leaving.props.children }	
 			</SharedElement>

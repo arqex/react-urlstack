@@ -7,9 +7,7 @@ export default class ScreenHeader extends Component {
 	render(){
 		return (
 			<SharedElement style={ styles.bar }>
-				<SharedElement style={ styles.content }>
-					<Text style={ styles.text }>{ this.props.title }</Text>
-				</SharedElement>
+				<Text style={ styles.text }>{ this.props.title }</Text>
 			</SharedElement>
 		);
 	}

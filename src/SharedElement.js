@@ -3,8 +3,6 @@ import { Animated, StyleSheet } from 'react-native';
 import { Context } from './utils/sharedElementContext';
 import WrapperContext from './utils/wrapperContext';
 
-console.log('Hola')
-
 const boxAttrs = {
 	x: 'left',
 	y: 'top',
@@ -20,23 +18,24 @@ class SharedElement extends Component {
 			// We are in the transition layer, prepare the animation
 			console.log('Amazing we got it!', props )
 			this.animatedLeaving = new Animated.Value(props.fromIndex)
-			this.animatedEntering = animatedLeaving.interpolate({
+			this.animatedEntering = this.animatedLeaving.interpolate({
 				inputRange: [-1, 0, 1],
 				outputRange: [ 0, props.toIndex, 0]
 			})
-
-			this.SE = SharedElement;
 		}
 		else if( props.wrapper ){
 			// We are mounted by the user, register the shared element
 			props.se.register( this, props );
 			this.registered = true;
 		}
-
+		
+		this.SE = SharedElement;
 	}
 
 	render() {
-		if( this.animatedLeaving ) return this.renderTransition();
+		if( this.animatedLeaving ) {
+			return this.renderTransition();
+		} 
 
 		let viewStyles = [this.props.style];
 		if( this.animatedLeaving ){
@@ -47,11 +46,11 @@ class SharedElement extends Component {
 			])
 		}
 
-		console.log('Shared', this.props.se, this.props.wrapper );
+		// console.log('Shared', this.props.se, this.props.wrapper );
 
 		return (
 			<Animated.View style={ this.props.style }
-				onLayout={ e => this.box = e.nativeEvent.layout }
+				onLayout={ e => this._setBox(e) }
 				pointerEvents="auto">
 				{ this.props.children }
 			</Animated.View>
@@ -59,47 +58,72 @@ class SharedElement extends Component {
 	}
 
 	renderTransition(){
-		let viewStyles = {}
+		let viewStyles = this.getTransitionStyle();
+
+		return (
+			<Animated.View style={ viewStyles.containerStyles } pointerEvents="auto">
+				<Animated.View styles={ viewStyles.leaving }>
+					{ this.props.fromProps.children }
+				</Animated.View>
+				<Animated.View styles={ viewStyles.entering }>
+					{ this.props.toProps.children }
+				</Animated.View>
+			</Animated.View>
+		)
 	}
 
 	getTransitionStyle(){
 		if( this.transitionStyles ) return this.transitionStyles;
 		let { transitionStyle, contentTransition, fromBox, toBox, fromProps, toProps, fromIndex, toIndex } = this.props;
-		let styles = {};
+		let st = {};
 
 		let containerStyles = transitionStyle ? 
 			transitionStyle( this.animatedLeaving, toIndex, fromBox, toBox, fromProps, toProps ) : 
 			this.boxInterpolator()
 		;
 
-		styles.container = [
-			this.props.style,
+		st.container = [
 			styles.transition,
+			this.props.style,
 			fromBox,
 			containerStyles
 		];
 
 		let leavingStyles = {};
 		if( fromProps.contentTransition ){
-			leavingStyles = fromProps.contentTransition( this.animatedLeaving, fromIndex, toIndex, fromBox )
+			leavingStyles = fromProps.contentTransition( this.animatedLeaving, 0, toIndex, fromBox )
 		}
-		styles.leaving = [
+		st.leaving = [
 			styles.transition,
-			fromBox,
+			this.boxToStyle( fromBox ),
 			leavingStyles
 		]
 
 		let enteringStyles = {};
 		if (fromProps.contentTransition) {
-			enteringStyles = fromProps.contentTransition(this.animatedEntering, fromIndex, toIndex, fromBox)
+			enteringStyles = fromProps.contentTransition(this.animatedEntering, -toIndex, 0, toBox )
 		}
-		styles.entering = [
+		st.entering = [
 			styles.transition,
-			fromBox,
+			this.boxToStyle( toBox ),
 			enteringStyles
 		]
 
-		return this.transitionStyles = styles;
+		return this.transitionStyles = st;
+	}
+
+	boxToStyle( box ){
+		return {
+			left: box.x,
+			top: box.y,
+			width: box.width,
+			height: box.height
+		}
+	}
+
+	_setBox( e ){
+		this.props.wrapper && console.log( 'Setting box',  this.props.wrapper.id )
+		this.box = e.nativeEvent.layout
 	}
 
 	boxInterpolator( animatedLeaving, fromIndex, toIndex, fromBox, toBox ){
@@ -127,6 +151,8 @@ class SharedElement extends Component {
 	}
 
 	componentDidMount(){
+		this.props.wrapper && console.log('Mounted', this.props.wrapper.id );
+		
 		if( this.animatedLeaving ){
 			// We are in the transition layer, start the animation
 			Animated.timing( this.animatedLeaving ,{
@@ -149,7 +175,7 @@ const styles = StyleSheet.create({
 
 function ContextConsumerHOC( Component ){
 	return function SharedElementHOC( props ){
-		console.log('HOC')
+		
 		return (
 			<Context.Consumer>
 				{ se => (
