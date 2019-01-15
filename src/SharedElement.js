@@ -17,11 +17,8 @@ class SharedElement extends Component {
 		if( props.fromProps ){
 			// We are in the transition layer, prepare the animation
 			console.log('Amazing we got it!', props )
-			this.animatedLeaving = new Animated.Value(props.fromIndex)
-			this.animatedEntering = this.animatedLeaving.interpolate({
-				inputRange: [-1, 0, 1],
-				outputRange: [ 0, props.toIndex, 0]
-			})
+			this.animatedLeaving = new Animated.Value( 0 )
+			this.animatedEntering = new Animated.Value( -props.toIndex )
 		}
 		else if( props.wrapper ){
 			// We are mounted by the user, register the shared element
@@ -61,11 +58,11 @@ class SharedElement extends Component {
 		let viewStyles = this.getTransitionStyle();
 
 		return (
-			<Animated.View style={ viewStyles.containerStyles } pointerEvents="auto">
-				<Animated.View styles={ viewStyles.leaving }>
+			<Animated.View style={ viewStyles.container } pointerEvents="auto">
+				<Animated.View style={ viewStyles.leaving }>
 					{ this.props.fromProps.children }
 				</Animated.View>
-				<Animated.View styles={ viewStyles.entering }>
+				<Animated.View style={ viewStyles.entering }>
 					{ this.props.toProps.children }
 				</Animated.View>
 			</Animated.View>
@@ -74,8 +71,11 @@ class SharedElement extends Component {
 
 	getTransitionStyle(){
 		if( this.transitionStyles ) return this.transitionStyles;
-		let { transitionStyle, contentTransition, fromBox, toBox, fromProps, toProps, fromIndex, toIndex } = this.props;
+		let { transitionStyle, fromBox, toBox, fromProps, toProps, toIndex } = this.props;
 		let st = {};
+
+		let fb = this.boxToStyle( fromBox )
+		let tb = this.boxToStyle( toBox )
 
 		let containerStyles = transitionStyle ? 
 			transitionStyle( this.animatedLeaving, toIndex, fromBox, toBox, fromProps, toProps ) : 
@@ -85,27 +85,27 @@ class SharedElement extends Component {
 		st.container = [
 			styles.transition,
 			this.props.style,
-			fromBox,
+			fb,
 			containerStyles
 		];
 
 		let leavingStyles = {};
 		if( fromProps.contentTransition ){
-			leavingStyles = fromProps.contentTransition( this.animatedLeaving, 0, toIndex, fromBox )
+			leavingStyles = fromProps.contentTransition( this.animatedLeaving, 0, toIndex, fb )
 		}
 		st.leaving = [
 			styles.transition,
-			this.boxToStyle( fromBox ),
+			fb,
 			leavingStyles
 		]
 
 		let enteringStyles = {};
 		if (fromProps.contentTransition) {
-			enteringStyles = fromProps.contentTransition(this.animatedEntering, -toIndex, 0, toBox )
+			enteringStyles = fromProps.contentTransition(this.animatedEntering, -toIndex, 0, tb )
 		}
 		st.entering = [
 			styles.transition,
-			this.boxToStyle( toBox ),
+			tb,
 			enteringStyles
 		]
 
@@ -155,8 +155,13 @@ class SharedElement extends Component {
 		
 		if( this.animatedLeaving ){
 			// We are in the transition layer, start the animation
-			Animated.timing( this.animatedLeaving ,{
+			Animated.timing( this.animatedLeaving, {
 				toValue: this.props.toIndex,
+				duration: 500
+			}).start();
+			
+			Animated.timing( this.animatedEntering, {
+				toValue: 0,
 				duration: 500
 			}).start();
 		}
@@ -190,4 +195,5 @@ function ContextConsumerHOC( Component ){
 	}
 }
 
-export default ContextConsumerHOC( SharedElement )
+const SharedElementWithContext = ContextConsumerHOC( SharedElement )
+export default SharedElementWithContext

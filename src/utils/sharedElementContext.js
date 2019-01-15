@@ -87,6 +87,7 @@ class TransitionLayer extends Component {
 			));
 	
 			this.setState({elements})
+			this.setRemoveElements( elements )
 		});
 	}
 
