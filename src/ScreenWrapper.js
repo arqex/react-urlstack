@@ -3,7 +3,7 @@ import { StyleSheet, Animated } from 'react-native'
 import TransitionTabDefault from './defaultTransitions/TransitionTabDefault'
 import animatedStyles from './utils/animatedStyles'
 import Context from './utils/wrapperContext'
-import {createId} from './utils/utils'
+import {createId, nofn} from './utils/utils'
 
 export default class ScreenWrapper extends Component {
 	constructor(props){
@@ -12,6 +12,11 @@ export default class ScreenWrapper extends Component {
 		this.id = createId()
 
 		this.setAnimatedLayout( props.indexes, props.layout )
+	}
+
+	static defaultProps ={
+		onReady: nofn,
+		onUnmount: nofn
 	}
 
 	render(){
@@ -26,7 +31,7 @@ export default class ScreenWrapper extends Component {
 		}
 
 		return (
-			<Animated.View style={ containerStyles }>
+			<Animated.View style={ containerStyles } onLayout={ () => this.props.onReady( contextValue.id ) }>
 				<Context.Provider value={contextValue}>
 					{ this.renderScreen() }
 				</Context.Provider>
@@ -82,6 +87,10 @@ export default class ScreenWrapper extends Component {
 			screen !== indexes.screen ||
 			relative !== indexes.relative
 		)
+	}
+
+	componentWillUnmount(){
+		this.props.onUnmount( this.props.item.key )
 	}
 }
 

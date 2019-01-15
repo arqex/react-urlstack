@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {Animated, View, StyleSheet} from 'react-native'
-import {memoize} from './utils/utils'
+import {memoize, bind} from './utils/utils'
 import ScreenWrapper from './ScreenWrapper'
 import animatedStyles from './utils/animatedStyles'
 import {Context} from './utils/sharedElementContext'
@@ -39,6 +39,12 @@ export default class ScreenStack extends Component {
 		// memoize a couple of methods
 		this.calculateIndexes = memoize( this.calculateIndexes.bind( this ) )
 		this.updateRelativeIndexes = memoize( this.updateRelativeIndexes.bind( this ) )
+
+		// Track the screens that are ready for transitions
+		// the one who have already a layout
+		this.readyScreens = {}
+
+		bind( this, ['_onScreenReady', '_onScreenUnmount'] );
 	}
 
 	render(){
@@ -79,6 +85,8 @@ export default class ScreenStack extends Component {
 					indexes={ indexes[ key ] }
 					layout={ layout }
 					transition={ this.props.screenTransition }
+					onReady={ this._onScreenReady }
+					onUnmount={ this._onScreenUnmount }
 					key={ key } />
 			)
 		})
@@ -103,14 +111,7 @@ export default class ScreenStack extends Component {
 		// indexes to start the animations
 		if (this.needRelativeUpdate) {
 			let nextIndexes = this.updateRelativeIndexes(indexes, stack, index);
-
-			// Unfortunatelly we need to wait another cycle to let the onLayout callbacks to
-			// be called, and get the box from any sharedElements
-			setTimeout( () => {
-				this.needRelativeUpdate = false;
-				this.context.startTransition( this.state.indexes, nextIndexes );
-				this.setState({ indexes: nextIndexes })
-			})
+			this.updateIndexesWhenReady( nextIndexes )
 		}
 
 		// If the pointer to the current screen has changed we need to start
@@ -186,6 +187,55 @@ export default class ScreenStack extends Component {
 		})
 
 		return indexes;
+	}
+
+	updateIndexesWhenReady( nextIndexes ){
+		let allReady = true;
+		let stack = this.props.stack;
+		let i = stack.length;
+		while( i-- > 0 && allReady ){
+			allReady = this.readyScreens[ stack[i].key ]
+		}
+
+		if( allReady ){
+			this.needRelativeUpdate = false;
+			this.startTransition( this.state.indexes, nextIndexes );
+			this.setState({ indexes: nextIndexes })
+		}
+		else {
+			// Wait for the ready signal from the wrappers
+			setTimeout( () => this.updateIndexesWhenReady( nextIndexes ) );
+		}
+	}
+
+	startTransition( prevIndexes, nextIndexes ){
+		console.log('Transitions start')
+		// Screen transitions
+		let transition = this.props.screenTransition
+		this.props.stack.forEach( ({key}) => {
+			let prevIndex = prevIndexes[key];
+			let nextIndex = nextIndexes[key];
+
+			if( prevIndex & nextIndex && prevIndex.relative === nextIndex.relative) {
+				Animated.timing( nextIndex.transition, {
+					toValue: nextIndex.relative,
+					easing: transition.easing,
+					duration: transition.duration || 300,
+					useNativeDriver: true,
+				}).start()
+			}
+		})
+
+		// Signal for shared elements transition to start
+		this.context.startTransition( prevIndexes, nextIndexes );
+	}
+
+	_onScreenReady( id ){
+		this.readyScreens[ id ] = 1;
+	}
+
+	_onScreenUnmount( id ){
+		delete this.readyScreens[id];
 	}
 }
 

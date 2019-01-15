@@ -27,3 +27,11 @@ export function memoize( fn ){
 export function createId(){
   return Math.round( Math.random() * 10000000 ).toString(36);
 }
+
+export function nofn(){}
+
+export function bind( that, methods ){
+	methods.forEach( m => {
+		that[m] = that[m].bind(that)
+	})
+}
