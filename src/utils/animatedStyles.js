@@ -1,5 +1,5 @@
-export default function animatedStyles( transitionCreator, indexes, layout ){
-	let transition = transitionCreator( indexes, layout )
+export default function animatedStyles( generator, indexes, layout ){
+	let transition = typeof generator === 'function' ? generator( indexes, layout ) : generator;
 	let styles = transition.styles || {}
 
 	let animatedStyles = {}

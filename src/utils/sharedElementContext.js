@@ -81,14 +81,12 @@ class TransitionLayer extends Component {
 		console.log('Couples', couples)
 		if( !couples.length ) return;
 
-		setTimeout( () => {
-			let elements = couples.map( couple => (
-				this.renderElement( couple, toScreen.index )
-			));
-	
-			this.setState({elements})
-			this.setRemoveElements( elements )
-		});
+		let elements = couples.map( couple => (
+			this.renderElement( couple, toScreen.index )
+		));
+
+		this.setState({elements})
+		this.setRemoveElements( elements )
 	}
 
 	setRemoveElements( elements ){

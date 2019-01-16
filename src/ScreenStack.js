@@ -84,7 +84,7 @@ export default class ScreenStack extends Component {
 					router={ router }
 					indexes={ indexes[ key ] }
 					layout={ layout }
-					transition={ this.props.screenTransition }
+					transition={ item.Screen.transition || this.props.screenTransition }
 					onReady={ this._onScreenReady }
 					onUnmount={ this._onScreenUnmount }
 					key={ key } />
@@ -94,13 +94,13 @@ export default class ScreenStack extends Component {
 	}
 
 	updateLayout( e ){
-		this.setState({ layout: e.nativeEvent.layout })
+		this.setState({ layout: e.nativeEvent.layout });
 		this.animatedStyles = animatedStyles(this.props.stackTransition, this.props.stackIndexes, e.nativeEvent.layout )
 	}
 
 	componentDidUpdate() {
-		let { stack, index } = this.props
-		let indexes = this.calculateIndexes( this.state.indexes, stack, this.previousIndex )
+		let { stack, index, screenTransition } = this.props
+		let indexes = this.calculateIndexes( this.state.indexes, stack, this.previousIndex, screenTransition )
 
 		// Check if the indexes has changed
 		if( indexes !== this.state.indexes ){
@@ -164,7 +164,6 @@ export default class ScreenStack extends Component {
 	updateRelativeIndexes( oldIndexes, stack, activeIndex ){
 		let indexes =  { ...oldIndexes }
 		let count = stack.length
-		let transition = this.props.screenTransition
 
 		stack.forEach( ({key}, i) => {
 			let index = {
@@ -172,15 +171,6 @@ export default class ScreenStack extends Component {
 				count: count,
 				relative: activeIndex - i,
 				transition: indexes[key].transition,
-			}
-
-			if( index.relative !== indexes[key].relative ){
-				Animated.timing( index.transition, {
-					toValue: index.relative,
-					easing: transition.easing,
-					duration: transition.duration || 300,
-					useNativeDriver: true,
-				}).start()
 			}
 
 			indexes[key] = index;
@@ -203,20 +193,22 @@ export default class ScreenStack extends Component {
 			this.setState({ indexes: nextIndexes })
 		}
 		else {
-			// Wait for the ready signal from the wrappers
+			// Wait for the ready (onLayout) signal from the wrappers
 			setTimeout( () => this.updateIndexesWhenReady( nextIndexes ) );
 		}
 	}
 
 	startTransition( prevIndexes, nextIndexes ){
 		console.log('Transitions start')
+		let layout = this.state.layout
+
 		// Screen transitions
-		let transition = this.props.screenTransition
-		this.props.stack.forEach( ({key}) => {
+		this.props.stack.forEach( ({key, Screen}) => {
 			let prevIndex = prevIndexes[key];
 			let nextIndex = nextIndexes[key];
 
-			if( prevIndex & nextIndex && prevIndex.relative === nextIndex.relative) {
+			if( prevIndex && nextIndex && prevIndex.relative !== nextIndex.relative) {
+				let transition = this.calculateScreenTransition( Screen.transition, nextIndex, layout );
 				Animated.timing( nextIndex.transition, {
 					toValue: nextIndex.relative,
 					easing: transition.easing,
@@ -228,6 +220,16 @@ export default class ScreenStack extends Component {
 
 		// Signal for shared elements transition to start
 		this.context.startTransition( prevIndexes, nextIndexes );
+	}
+
+	calculateScreenTransition( generator, indexes, layout ){
+		let g = generator || this.props.screenTransition
+
+		if( typeof g === 'function' ) {
+			return g( indexes, layout )
+		}
+
+		return g
 	}
 
 	_onScreenReady( id ){

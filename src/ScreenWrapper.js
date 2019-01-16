@@ -20,6 +20,7 @@ export default class ScreenWrapper extends Component {
 	}
 
 	render(){
+		let item = this.props.item
 		let containerStyles = [
 			styles.container,
 			this.animatedStyles
@@ -27,11 +28,11 @@ export default class ScreenWrapper extends Component {
 		let contextValue = {
 			transition: this.props.transition,
 			indexes: this.props.indexes,
-			id: this.props.item.key
+			id: item.key
 		}
 
 		return (
-			<Animated.View style={ containerStyles } onLayout={ () => this.props.onReady( contextValue.id ) }>
+			<Animated.View style={ containerStyles } onLayout={ () => this.props.onReady( item.key ) }>
 				<Context.Provider value={contextValue}>
 					{ this.renderScreen() }
 				</Context.Provider>
@@ -85,7 +86,8 @@ export default class ScreenWrapper extends Component {
 		return (
 			width !== layout.width ||
 			screen !== indexes.screen ||
-			relative !== indexes.relative
+			relative !== indexes.relative ||
+			this.props.transition !== nextProps.transition
 		)
 	}
 

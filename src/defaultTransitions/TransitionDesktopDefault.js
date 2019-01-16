@@ -13,12 +13,7 @@ export default function TransitionNarrowDefault( indexes, layout ){
 			left: {
 				inputRange: [ -2, -1, 0, 1, 2 ],
 				outputRange: [ layout.width, layout.width, leftColumn, 0, 0]
-			},
-	
-			opacity: {
-				inputRange: [ -2, -.5, 0, 1, 1.5, 2 ],
-				outputRange: [ 0, 0, 1, 1, 0, 0]
-			},
+			}
 		},
 		easing: Easing.linear,
 		duration: 300
