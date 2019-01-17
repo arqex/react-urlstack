@@ -44,7 +44,6 @@ export default class SideMenu extends Component {
 
 const styles = StyleSheet.create({
   menu: {
-    boxSizing: 'border-box',
     backgroundColor: '#e9eaea',
     flex: 1,
     width: 300

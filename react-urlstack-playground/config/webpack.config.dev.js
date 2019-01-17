@@ -151,8 +151,9 @@ module.exports = {
     alias: {
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
+      'react': path.join(paths.appSrc, 'node_modules/react'), // needed to not to use 2 different reacts
       'react-native': 'react-native-web',
-      'react-urlstack': path.join(paths.appSrc, 'react-urlstack')
+      'react-urlstack': path.join(paths.appSrc, 'react-urlstack') // load urlstack from the src screen
     },
     plugins: [
       // Adds support for installing with Plug'n'Play, leading to faster installs and adding
