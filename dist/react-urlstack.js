@@ -1,14 +1,14 @@
 /*!
  * *//* eslint-disable */
 /*!
- * react-urlstack v0.1.0
+ * react-urlstack v0.2.0
  * (c) 2018-present Javier Marquez
  * Released under the MIT License.
  */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('react-native'), require('react'), require('prop-types')) :
   typeof define === 'function' && define.amd ? define(['exports', 'react-native', 'react', 'prop-types'], factory) :
-  (factory((global.UrlStack = {}),global.reactNative,global.React,global.PropTypes));
+  (factory((global.UrlStack = {}),global.ReactNative,global.React,global.PropTypes));
 }(this, (function (exports,reactNative,React,PropTypes) { 'use strict';
 
   var reactNative__default = 'default' in reactNative ? reactNative['default'] : reactNative;
@@ -50,6 +50,24 @@
     }
 
     return obj;
+  }
+
+  function _extends() {
+    _extends = Object.assign || function (target) {
+      for (var i = 1; i < arguments.length; i++) {
+        var source = arguments[i];
+
+        for (var key in source) {
+          if (Object.prototype.hasOwnProperty.call(source, key)) {
+            target[key] = source[key];
+          }
+        }
+      }
+
+      return target;
+    };
+
+    return _extends.apply(this, arguments);
   }
 
   function _inherits(subClass, superClass) {
@@ -97,16 +115,6 @@
     }
 
     return _assertThisInitialized(self);
-  }
-
-  var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-  function unwrapExports (x) {
-  	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x.default : x;
-  }
-
-  function createCommonjsModule(fn, module) {
-  	return module = { exports: {} }, fn(module, module.exports), module.exports;
   }
 
   var isarray = Array.isArray || function (arr) {
@@ -542,6 +550,16 @@
   pathToRegexp_1.tokensToFunction = tokensToFunction_1;
   pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
+  var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+  function unwrapExports (x) {
+  	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x.default : x;
+  }
+
+  function createCommonjsModule(fn, module) {
+  	return module = { exports: {} }, fn(module, module.exports), module.exports;
+  }
+
   var dist = createCommonjsModule(function (module, exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   var _a = Object.prototype, toString = _a.toString, hasOwnProperty = _a.hasOwnProperty;
@@ -779,15 +797,12 @@
 
   // parseUrl function needed for testing
   var parseUrl;
-  if( typeof commonjsGlobal === 'undefined' || !commonjsGlobal.parseUrl ){
+  if( typeof window !== 'undefined' ){
     parseUrl = function( url ){
       var a = document.createElement('a');
       a.href = url;
       return a;
     };
-  }
-  else {
-    parseUrl = commonjsGlobal.parseUrl;
   }
 
   // The lib
@@ -873,7 +888,7 @@
         candidates = this.routes;
       }
 
-      var parsed = parseUrl( url );
+      var parsed = (this.strategy.parseUrl || parseUrl)( url );
       path =  parsed.pathname;
 
       // Normalize pathname
@@ -1006,7 +1021,7 @@
       this.updateLocation('replace', location);
     },
     back: function(){
-      window.history.back();
+      this.strategy.back();
     },
     updateLocation: function( method, location ){
       var current = this.strategy.getLocation();
@@ -1082,6 +1097,52 @@
   }
 
   var onChange = function () {};
+
+  var nodeStrategy = {
+    init: function( options ){
+  		this.history = [ options.initialLocation || '/' ];
+    },
+    start: function(){
+      this.emit();
+    },
+    push: function( location ){
+  		this.history.push( location );
+      this.emit();
+    },
+    replace: function( location ){
+  		this.history[ this.history.length ] = location;
+      this.emit();
+    },
+    onChange: function( cb ){
+      onChange = cb;
+    },
+    getLocation: function(){
+      return this.history[ this.history.length - 1 ];
+    },
+    emit: function(){
+      onChange && onChange( this.getLocation() );
+  	},
+  	parseUrl: function( str ){
+  		var parts = str.split('?');
+  		var searchParts = parts[1] ? parts[1].split('#') : [];
+  		return {
+  			pathname: parts[0],
+  			search: searchParts[0] ? '?' + searchParts[0] : '',
+  			hash: searchParts[1] ? '#' + searchParts[1] : '',
+  			query: searchParts[0] ? dist$2.parse( searchParts[0] ) : {}
+  		}
+    },
+    back: function(){
+      if( this.history.length > 1 ){
+        this.history.pop();
+      }
+      this.emit();
+    }
+  };
+
+  var nodeStrategy_1 = nodeStrategy;
+
+  var onChange$1 = function () {};
   var hashStrategy = {
   	init: function (options) {
   	},
@@ -1110,7 +1171,7 @@
   		location.replace(url);
   	},
   	onChange: function (cb) {
-  		onChange = cb;
+  		onChange$1 = cb;
   	},
   	getLocation: function () {
   		if( !location.hash ){
@@ -1122,11 +1183,66 @@
   		return location.hash.slice(1);
   	},
   	emit: function () {
-  		onChange(this.getLocation());
+  		onChange$1(this.getLocation());
+  	},
+  	back: function () {
+      window.history.back();
   	}
   };
 
   var hashStrategy_1 = hashStrategy;
+
+  var onChange$2 = function () {};
+
+  var pushStrategy = {
+    init: function( options ){
+      this.basePath = options.basePath || '';
+      if( this.basePath.slice(-1) === '/' ){
+        this.basePath = this.basePath.slice(0, -1);
+      }
+    },
+    start: function(){
+      var me = this;
+
+      // Register event listener
+      window.onpopstate = function(){
+        me.emit();
+      };
+
+      // Emit first onChange
+      me.emit();
+    },
+    push: function( location ){
+      history.pushState( {}, '', this.basePath + location );
+      this.emit();
+    },
+    replace: function( location ){
+      history.replaceState( {}, '', this.basePath + location );
+      this.emit();
+    },
+    onChange: function( cb ){
+      onChange$2 = cb;
+    },
+    getLocation: function(){
+      var l = location.pathname + location.search + location.hash,
+        basePathLength = this.basePath.length
+      ;
+
+      if( l.slice(0, basePathLength) === this.basePath ){
+        l = l.slice( basePathLength );
+      }
+
+      return l;
+    },
+    emit: function(){
+      onChange$2 && onChange$2( this.getLocation() );
+    },
+  	back: function () {
+      window.history.back();
+  	}
+  };
+
+  var pushStrategy_1 = pushStrategy;
 
   // A wrapper around urlhub to better manage a stack
   // Changes in the current routes will be stacking the screens,
@@ -1151,141 +1267,237 @@
   //
   // So there is a new stack for every tab
 
-  function create( routes ){
-  	let stackRouter = {
+  function create( routes, options ){
+  	var strategy;
+  	if( typeof window === 'undefined' ){
+  		strategy = nodeStrategy_1;
+  	}
+  	else if( options && options.strategy === 'hash' ){
+  		strategy = hashStrategy_1;
+  	}
+  	else {
+  		strategy = pushStrategy_1;
+  	}
+
+  	var router = urlhub_1.create({strategy});
+
+  	// callbacks registered for be called on route changes
+  	var callbacks = [];
+
+  	var stackRouter = {
   		// The actual urlhub router
-  		router: urlhub_1.create({strategy: hashStrategy_1}),
+  		urlhub: router,
 
   		// The stack of screens in place, with nested tabs [{Screen, route, isTabs, isModal, key}]
   		stack: [],
 
   		// The current screen in the view port
   		activeIndex: -1,
+  		
+  		// Route cache to generate new routes
+  		_nestedStack: [],
+
+  		// Last navigated URLs
+  		_lastNavigated: [],
+
+  		modal: { active: false, stack: [], activeIndex: -1 },
 
   		// What to do when the URL changes
   		onChange: function( handler ){
-  			return this.router.onChange( createRouteChanger( this, handler, routes ) )
+  			callbacks.push( handler );
   		},
 
-  		// Start listening to url changes
-  		start: function(){
-  			return this.router.start();
+  		// The main method to update the current screen
+  		navigate: function( route ){
+  			var isBack = route === this._lastNavigated[ this._lastNavigated.length - 2];
+
+  			if( isBack ){
+  				this._lastNavigated.pop();
+  				// unfortunatelly this is buggy in chrome
+  				// router.back();
+  				router.push.apply( router, arguments );
+  			}
+  			else {
+  				this._lastNavigated.push( route );
+  				router.push.apply( router, arguments );
+  			}
   		}
   	};
 
-  	stackRouter.router.setRoutes( routes );
-  	// stackRouter.router.onChange( createRouteChanger( stackRouter, () => {}, routes ) );
+  	// Set routes and our callback that will generate the stacks
+  	router.setRoutes( routes );
+  	router.onChange( createRouteChanger( stackRouter, routes, callbacks ) );
 
-  	// Somem extra methods from urlhub
-  	['onBeforeChange', 'push', 'replace'].forEach( method => {
+  	// Some extra methods from urlhub
+  	['start', 'stop', 'onBeforeChange', 'replace'].forEach( method => {
   		stackRouter[method] = function(){
-  			return this.router[method].apply( this.router, arguments );
+  			return this.urlhub[method].apply( this.urlhub, arguments );
   		};
   	});
 
   	return stackRouter;
   }
 
-
   // Helper to translate urlhub's location changes to the model {stack, index}
-  function createRouteChanger( router, handler, routes ){
-  	let routeHierarchy = getHierarchy( routes );
-  	
-  	let onChange = location => {
-  		let nestedStack = createNestedStack( location, routeHierarchy );
-  		let { stack, index } = mergeStacks( router.stack, nestedStack, routeHierarchy );
-  		
-  		router.location = location;
-  		router.stack = stack;
-  		router.activeIndex = index;
+  function createRouteChanger( router, routes, callbacks ){
 
-  		return handler( location )
+  	// Get the hierarchy of absolute routes
+  	var routeData = getRouteData( routes );
+  	
+  	var onChange = location => {
+  		// Check if the change hasn't been programmatic (by the browser history or address bar )
+  		let route = location.pathname + location.search + location.hash;
+  		if( route !== router._lastNavigated[ router._lastNavigated.length - 1] ){
+  			// In this case we flush the last navigated as we can't rely on our history to try to predict
+  			// going back interactions anymore
+  			router._lastNavigated = [];
+  		}
+
+  		// Create a nested stack based on the current location
+  		var nestedStack = createNestedStack( location, routeData );
+  		var { stack, index } = mergeStacks( router._nestedStack || [], nestedStack, routeData );
+  		setStacksAndIndexes( router, splitStack( stack ), index, routeData );
+
+  		// Update attributes of the router
+  		router.location = location;
+  		router._nestedStack = stack;
+
+  		// Call user's callbacks
+  		callbacks.forEach( clbk => clbk(location) );
   	};
 
   	return onChange
   }
 
-  function createNestedStack( location, routeHierarchy ) {
-  	let { matches, matchIds} = location;
-  	let inTab = false;
-  	let stack = [];
+  function createNestedStack( location, routeData ) {
+  	var matchIds = location.matchIds;
+  	var inTab = false;
+  	var stack = [];
 
-  	matches.forEach((screen, i) => {
+  	matchIds.forEach( route => {
+  		var data = routeData[route];
+
   		if (inTab) {
-  			let tabStack = inTab.tabs.stack;
-  			inTab.tabs.index = getTabIndex(matchIds[i], tabStack);
-  			tabStack[ inTab.tabs.index ].location = location; 
+  			// If we are in a tab we won't push this route to the main stack, but to the tab one
+  			inTab.tabs.stack.push( createStackItem( route, location, data ) );
+
+  			// Get out the stack
   			inTab = false;
   			return;
   		}
 
-  		let options = screen.urlstackOptions || {};
-  		let item = {
-  			Screen: screen,
-  			route: matchIds[i],
-  			isTabs: !!options.tabs,
-  			isModal: !!options.modal,
-  			location: location,
-  			key: generateKey()
-  		};
+  		var item = createStackItem( route, location, data );
 
   		if (item.isTabs) {
-  			item.tabs = { index: 0, stack: createTabStack( routeHierarchy[item.route], routeHierarchy ) };
+  			item.tabs = { activeIndex: 0, stack: [] };
   			inTab = item;
   		}
 
   		stack.push(item);
   	});
 
+  	if( inTab ){
+  		// This means that the last screen in the hierarchy was a tab wrapper
+  		// We need to fill the tab stack at least with one ticket
+  		var tab = routeData[ matchIds[matchIds.length - 1] ];
+  		var child = getFirstTab( tab );
+  		var route = location.pathname + child.path;
+  		inTab.tabs.stack.push( createStackItem(route, location, routeData[route]) );
+  	}
+
   	return stack
   }
 
-  function createTabStack( tabs, routeHierarchy ){
-  	let stack = [];
-  	for( let route in tabs ){
-  		let options = tabs[route].urlstackOptions || {};
-  		let item = {
-  			Screen: tabs[route],
-  			route: route,
-  			location: false, // Location will be set when mounted
-  			isTabs: !!options.tabs,
-  			isModal: !!options.modal,
-  			key: generateKey()
-  		};
+  function splitStack( nestedStack ){
+  	var allStacks = [];
+  	var currentStack = [];
 
-  		if( item.isTabs ){
-  			item.tabs = { index: 0, stack: createTabStack(routeHierarchy[item.route], routeHierarchy) };
+  	nestedStack.forEach( item => {
+  		if( item.isModal ){
+  			allStacks.push( currentStack );
+  			currentStack = [ item ];
   		}
-
-  		stack.push( item );
+  		else {
+  			currentStack.push( item );
+  		}
+  	});
+  	if( currentStack.length ){
+  		allStacks.push( currentStack );
   	}
-  	
-  	return stack;
+  	return allStacks;
   }
 
-  function getTabIndex( route, tabs ){
-  	let i = tabs.length;
-  	while( i-- > 0 ){
-  		if( tabs[i].route === route ){
-  			return i;
+  function setStacksAndIndexes( router, stacks, targetIndex, routeData ){
+  	if( !stacks[0].length ){
+  		// If the first element is empty means that we are in a modal
+  		if( !router.stack.length ){
+  			// if the currentstack is empty we need to get the default screen
+  			var bgRoute = routeData[ stacks[1][0].route ].backgroundRoute || '/*';
+  			var location = router.urlhub.match( bgRoute );
+  			var {stack, index} = mergeStacks( [], createNestedStack( location, routeData ), routeData);
+  			router.stack = stack;
+  			router.activeIndex = index;
+  		}
+  		// otherwise we need to preserve the current stack
+  	}
+  	else {
+  		router.stack = stacks[0];
+  		router.activeIndex = Math.max( 0, Math.min( targetIndex, stacks[0].length - 1 ) );
+  		if( router.modal ){
+  			router.modal.active = false;
   		}
   	}
-  	console.warn('Tab index not found for route: ' + route );
-  	return 0;
+
+  	if( stacks.length > 1 ){
+  		if( !router.modal ){
+  			router.modal = { stack: [], activeIndex: 0 };
+  		}
+  		router.modal.active = targetIndex >= 0;
+  		setStacksAndIndexes( router.modal, stacks.slice(1), targetIndex - stacks[0].length, routeData );
+  	}
   }
 
 
-  function mergeStacks( currentStack, candidateStack, routeHierarchy ){
-  	let nextStack = [];
-  	let i = 0;
-  	let sameRoot = true;
-  	let current = currentStack[0];
-  	let candidate = candidateStack[0];
+  function createStackItem ( route, location, routeData ){
+  	return {
+  		Screen: routeData.cb,
+  		route: route,
+  		isTabs: !!routeData.isTabs,
+  		isModal: !!routeData.isModal,
+  		location: location,
+  		path: getRoutePath( route, location.pathname ),
+  		key: generateKey()
+  	}
+  }
+
+  function getRoutePath( route, pathname ){
+  	var routeParts = route.split('/');
+  	var pathParts = pathname.split('/');
+  	var routePath = [];
+
+  	routeParts.forEach( (p, i) => {
+  		routePath.push( pathParts[i] || p );
+  	});
+
+  	return routePath.join('/');
+  }
+
+  function mergeStacks( currentStack, candidateStack, routeData ){
+  	var nextStack = [];
+  	var i = 0;
+  	var sameRoot = true;
+  	var current = currentStack[0];
+  	var candidate = candidateStack[0];
 
   	while ( current || candidate ) {
   		if (sameRoot && current && candidate) {
   			if (current.Screen === candidate.Screen) {
-  				nextStack.push( mergeItems( current, candidate, routeHierarchy ) );
+  				nextStack.push( mergeItems( current, candidate, routeData ) );
+  				if( current.path !== candidate.path ){
+  					// If the paths are not the same, some parameter might have changed
+  					// discard the rest of the current stack. We already have reused the id
+  					sameRoot = false;
+  				}
   			}
   			else {
   				sameRoot = false;
@@ -1311,46 +1523,85 @@
   	}
   }
 
-  function mergeItems( current, candidate, routeHierarchy ){
-  	let item = { ...candidate, key: current.key };
+  function mergeItems( current, candidate, routeData ){
+  	var item = { ...candidate, key: current.key };
   	if( item.tabs ){
-  		let nextIndex = candidate.tabs.index;
+  		var tabOrder = routeData[ current.route ].children;
+  		var toAdd = candidate.tabs.stack[0];
+  		var tabStack = current.tabs.stack.slice();
+  		var i = 0;
+  		var added = false;
+  		tabOrder.forEach( tab => {
+  			if( added ) return;
+
+  			var route = current.route + tab.path;
+  			var currentTab = tabStack[i];
+  			if( toAdd.route === route ){
+  				if( currentTab && currentTab.route === route ){
+  					toAdd.key = currentTab.key;
+  					tabStack[i] = toAdd;
+  				}
+  				else {
+  					tabStack.splice( i, 0, toAdd );
+  				}
+  				added = true;
+  			}
+  			else if( currentTab && currentTab.route === route ){
+  				i++;
+  			}
+  		});
+
   		item.tabs = {
-  			index: nextIndex,
-  			stack: current.tabs.stack.slice()
+  			stack: tabStack,
+  			activeIndex: i 
   		};
-  		item.tabs.stack[ nextIndex ].location = candidate.tabs.stack[ nextIndex ].location;
   	}
   	return item;
   }
 
-  function getHierarchy( routes, parentRoute = '' ){
-  	let h = {};
+  function getFirstTab( tabScreen ){
+  	var i = 0;
+  	var child;
+
+  	while( i < tabScreen.children.length ){
+  		child = tabScreen.children[i];
+  		if( !child.isTabs && !child.isModal ){
+  			return child;
+  		}
+  	}
+  	
+  	console.warn('Urlstack: Hit a tabs URL without any children: ' + tabScreen.path );
+  }
+
+  /**
+   * Transform the route definition for urlhub to an object where the keys are the absolute
+   * path of every route, this way we don't need to navigate through childrens to get
+   * the information of a router given its path.
+   * 
+   * @param {*} routes The route object for urlhub
+   * @param {*} parentRoute The path of the parent route to get the absolute path of children
+   */
+  function getRouteData( routes, parentRoute = '' ){
+  	var h = {};
 
   	routes.forEach( r => {
-  		let route = parentRoute + r.path;
-
-  		if( !r.children ) return (h[route] = false);
-
-  		let children = getHierarchy(r.children, r.path);
-  		h[route] = cleanChildrenHierarchy( route, r.children );
-  		h = { ...h, ...children };
+  		var route = parentRoute + r.path;
+  		h[route] = r;
+  		if( r.children ){
+  			var childrenData = getRouteData( r.children, route );
+  			h = { ...h, ...childrenData };
+  		}
   	});
 
   	return h
   }
 
-  function cleanChildrenHierarchy( parentRoute, routes ){
-  	let hierarchy = {};
-  	routes.forEach( r => {
-  		hierarchy[ parentRoute + r.path ] = r.cb;
-  	});
-  	return hierarchy
-  }
-
+  /**
+   * Generate a random key to identify a route
+   */
   function generateKey() {
-  	let number = Math.floor( Math.random() * 100000 );
-  	// Make sure it starts with a letter - j is first letter of my name :)
+  	var number = Math.floor( Math.random() * 100000 );
+  	// Make sure it starts with a varter - j is first varter of my name :)
   	return 'j' + number.toString(36);
   }
 
@@ -1381,6 +1632,15 @@
       return value;
     };
   }
+  function createId() {
+    return Math.round(Math.random() * 10000000).toString(36);
+  }
+  function nofn() {}
+  function bind(that, methods) {
+    methods.forEach(function (m) {
+      that[m] = that[m].bind(that);
+    });
+  }
 
   function TabTransitionDefault(indexes, layout) {
     var scroll = layout.width / 2;
@@ -1400,8 +1660,8 @@
     };
   }
 
-  function animatedStyles(transitionCreator, indexes, layout) {
-    var transition = transitionCreator(indexes, layout);
+  function animatedStyles(generator, indexes, layout) {
+    var transition = typeof generator === 'function' ? generator(indexes, layout) : generator;
     var styles = transition.styles || {};
     var animatedStyles = {};
     var transformStyles = [];
@@ -1435,6 +1695,8 @@
     return styleKeys[key] = 1;
   });
 
+  var Context = React__default.createContext();
+
   var ScreenWrapper =
   /*#__PURE__*/
   function (_Component) {
@@ -1446,6 +1708,7 @@
       _classCallCheck(this, ScreenWrapper);
 
       _this = _possibleConstructorReturn(this, _getPrototypeOf(ScreenWrapper).call(this, props));
+      _this.id = createId();
 
       _this.setAnimatedLayout(props.indexes, props.layout);
 
@@ -1455,10 +1718,23 @@
     _createClass(ScreenWrapper, [{
       key: "render",
       value: function render() {
+        var _this2 = this;
+
+        var item = this.props.item;
         var containerStyles = [styles.container, this.animatedStyles];
+        var contextValue = {
+          transition: this.props.transition,
+          indexes: this.props.indexes,
+          id: item.key
+        };
         return React__default.createElement(reactNative.Animated.View, {
-          style: containerStyles
-        }, this.renderScreen());
+          style: containerStyles,
+          onLayout: function onLayout() {
+            return _this2.props.onReady(item.key);
+          }
+        }, React__default.createElement(Context.Provider, {
+          value: contextValue
+        }, this.renderScreen()));
       }
     }, {
       key: "renderScreen",
@@ -1483,7 +1759,7 @@
             router: router,
             screenTransition: transition.tabTransition || TabTransitionDefault,
             stack: item.tabs.stack,
-            index: item.tabs.index
+            index: item.tabs.activeIndex
           }));
         }
 
@@ -1517,12 +1793,22 @@
         var _this$props2 = this.props,
             layout = _this$props2.layout,
             indexes = _this$props2.indexes;
-        return width !== layout.width || screen !== indexes.screen || relative !== indexes.relative;
+        return width !== layout.width || screen !== indexes.screen || relative !== indexes.relative || this.props.transition !== nextProps.transition;
+      }
+    }, {
+      key: "componentWillUnmount",
+      value: function componentWillUnmount() {
+        this.props.onUnmount(this.props.item.key);
       }
     }]);
 
     return ScreenWrapper;
   }(React.Component);
+
+  _defineProperty(ScreenWrapper, "defaultProps", {
+    onReady: nofn,
+    onUnmount: nofn
+  });
   var styles = reactNative.StyleSheet.create({
     container: {
       backgroundColor: '#eee',
@@ -1535,6 +1821,242 @@
       zIndex: 10
     }
   });
+
+  var Context$1 = React__default.createContext('sharedElement'); // We will be storing the mounted elements by routes
+
+  var mountedElements = {}; // When a shared element is mounted it calls to this function
+  // and we register it
+
+  function register(instance, props) {
+    var wrapper = props.wrapper.id;
+
+    if (!mountedElements[wrapper]) {
+      mountedElements[wrapper] = [];
+    }
+
+    mountedElements[wrapper].push(instance);
+    console.log("Mounting ".concat(wrapper), mountedElements[wrapper]);
+  } // When it's unmounted we delete the references to it
+
+
+  function unregister(instance) {
+    var wrapper = instance.props.wrapper.id;
+    var stack = mountedElements[wrapper];
+    if (!stack) return;
+
+    if (stack) {
+      var i = stack.length;
+
+      while (i-- > 0) {
+        if (stack[i] === instance) {
+          stack.splice(i, 1);
+        }
+      }
+    }
+
+    console.log("Unmounting ".concat(wrapper), mountedElements[wrapper]);
+  } // Layers registered callback to listen to transitions
+
+
+  var clbks = []; // This method is called just before starting the screen transition when the URL changes
+  // Screen stack is the one responsible of calling it through the context
+
+  function startTransition(prevIndexes, nextIndexes) {
+    // return console.log( 'Start transition');
+    var screens = {};
+    Object.keys(prevIndexes).forEach(function (id) {
+      if (prevIndexes[id].relative === 0) {
+        screens.fromScreen = {
+          id: id,
+          index: nextIndexes[id].relative
+        };
+      }
+    });
+    Object.keys(nextIndexes).forEach(function (id) {
+      if (nextIndexes[id].relative === 0) {
+        screens.toScreen = {
+          id: id,
+          index: prevIndexes[id].relative
+        };
+      }
+    }); // Call the layer callback to print out the shared element transitions
+
+    clbks.forEach(function (clbk) {
+      return clbk(screens);
+    });
+  }
+
+  var TransitionLayer =
+  /*#__PURE__*/
+  function (_Component) {
+    _inherits(TransitionLayer, _Component);
+
+    function TransitionLayer(props) {
+      var _this;
+
+      _classCallCheck(this, TransitionLayer);
+
+      _this = _possibleConstructorReturn(this, _getPrototypeOf(TransitionLayer).call(this, props));
+      _this.state = {
+        elements: []
+      };
+      _this.checkForTransitions = _this.checkForTransitions.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+      return _this;
+    }
+
+    _createClass(TransitionLayer, [{
+      key: "render",
+      value: function render() {
+        return React__default.createElement(reactNative.View, {
+          style: styles$1.container,
+          pointerEvents: "none"
+        }, this.state.elements);
+      }
+    }, {
+      key: "checkForTransitions",
+      value: function checkForTransitions(_ref) {
+        var _this2 = this;
+
+        var fromScreen = _ref.fromScreen,
+            toScreen = _ref.toScreen;
+        var couples = this.getTransitionCouples(fromScreen.id, toScreen.id);
+        console.log('Couples', couples);
+        if (!couples.length) return;
+        var elements = couples.map(function (couple) {
+          return _this2.renderElement(couple, toScreen.index);
+        });
+        this.setState({
+          elements: elements
+        });
+        this.setRemoveElements(elements);
+      }
+    }, {
+      key: "setRemoveElements",
+      value: function setRemoveElements(elements) {
+        var _this3 = this;
+
+        // Delete the elements from the state when the transition is over
+        setTimeout(function () {
+          var stateElements = _this3.state.elements.slice();
+
+          var i = stateElements.length;
+          var j = elements.length;
+
+          while (i-- > 0 && j > 0) {
+            while (j-- > 0 && elements[j] !== stateElements[i]) {// Pass
+            }
+
+            if (j >= 0) {
+              // We have a match
+              stateElements.splice(j, 1);
+            }
+          }
+
+          _this3.setState({
+            elements: stateElements
+          });
+        }, 500);
+      }
+    }, {
+      key: "renderElement",
+      value: function renderElement(_ref2, enteringFrom) {
+        var leaving = _ref2.leaving,
+            entering = _ref2.entering;
+        var SharedElement = leaving.SE;
+        return React__default.createElement(SharedElement, {
+          toIndex: enteringFrom,
+          fromBox: leaving.box,
+          toBox: entering.box,
+          fromProps: leaving.props,
+          toProps: entering.props,
+          style: leaving.props.style
+        }, leaving.props.children);
+      }
+    }, {
+      key: "cleanProps",
+      value: function cleanProps(props) {
+        var clean = {};
+        Object.keys(props).forEach(function (p) {
+          if (p !== 'se' && p !== 'wrapper' && p !== 'children' && p !== 'transitionStyles') {
+            clean[p] = props[p];
+          }
+        });
+        return clean;
+      }
+    }, {
+      key: "getTransitionCouples",
+      value: function getTransitionCouples(fromId, toId) {
+        var leaving = mountedElements[fromId];
+        var entering = mountedElements[toId];
+        if (!leaving || !entering) return [];
+        leaving = leaving.slice();
+        entering = entering.slice();
+        var couples = [];
+        var i = leaving.length;
+
+        while (i-- > 0) {
+          var id = leaving[i].props.sharedId;
+          var j = entering.length;
+
+          while (j-- > 0 && entering[j].props.sharedId !== id) {// Pass
+          }
+
+          if (j >= 0) {
+            // We have a match
+            couples.push({
+              leaving: leaving[i],
+              entering: entering[j]
+            });
+          }
+        }
+
+        return couples;
+      }
+    }, {
+      key: "componentDidMount",
+      value: function componentDidMount() {
+        // Start listening to transitions
+        clbks.push(this.checkForTransitions);
+      }
+    }, {
+      key: "componentWillUnmount",
+      value: function componentWillUnmount() {
+        var i = clbks.length;
+
+        while (i-- > 0) {
+          if (clbks[i] === this.checkForTransitions) {
+            // Remove the callback
+            clbks.splice(i, 1);
+          }
+        }
+      }
+    }]);
+
+    return TransitionLayer;
+  }(React.Component);
+
+  var styles$1 = reactNative.StyleSheet.create({
+    container: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      left: 0,
+      bottom: 0,
+      zIndex: 10000
+    }
+  });
+
+  var SharedElementWrapper = function SharedElementWrapper(props) {
+    return React__default.createElement(Context$1.Provider, {
+      value: {
+        register: register,
+        unregister: unregister,
+        startTransition: startTransition
+      }
+    }, props.children, React__default.createElement(TransitionLayer, {
+      router: props.router
+    }));
+  };
 
   var ScreenStack =
   /*#__PURE__*/
@@ -1556,7 +2078,11 @@
       _this.previousIndex = index; // memoize a couple of methods
 
       _this.calculateIndexes = memoize(_this.calculateIndexes.bind(_assertThisInitialized(_assertThisInitialized(_this))));
-      _this.updateRelativeIndexes = memoize(_this.updateRelativeIndexes.bind(_assertThisInitialized(_assertThisInitialized(_this))));
+      _this.updateRelativeIndexes = memoize(_this.updateRelativeIndexes.bind(_assertThisInitialized(_assertThisInitialized(_this)))); // Track the screens that are ready for transitions
+      // the one who have already a layout
+
+      _this.readyScreens = {};
+      bind(_assertThisInitialized(_assertThisInitialized(_this)), ['_onScreenReady', '_onScreenUnmount']);
       return _this;
     }
 
@@ -1568,11 +2094,11 @@
         var _this$props = this.props,
             stack = _this$props.stack,
             router = _this$props.router;
-        var containerStyles = [styles$1.container, this.animatedStyles];
+        var containerStyles = [styles$2.container, this.animatedStyles];
         return React__default.createElement(reactNative.Animated.View, {
           style: containerStyles
         }, React__default.createElement(reactNative.View, {
-          style: styles$1.stack,
+          style: styles$2.stack,
           onLayout: function onLayout(e) {
             return _this2.updateLayout(e);
           }
@@ -1590,9 +2116,7 @@
         if (!layout) return;
         var screens = [];
         stack.forEach(function (item) {
-          var Screen = item.Screen,
-              key = item.key,
-              location = item.location;
+          var key = item.key;
 
           if (!indexes[key]) {
             // We are probably rebuilding indexes after navigating
@@ -1603,9 +2127,11 @@
             item: item,
             ScreenStack: ScreenStack,
             router: router,
-            indexes: indexes[item.key],
+            indexes: indexes[key],
             layout: layout,
-            transition: _this3.props.screenTransition,
+            transition: item.Screen.transition || _this3.props.screenTransition,
+            onReady: _this3._onScreenReady,
+            onUnmount: _this3._onScreenUnmount,
             key: key
           }));
         });
@@ -1625,8 +2151,8 @@
         var _this$props2 = this.props,
             stack = _this$props2.stack,
             index = _this$props2.index,
-            stackTransition = _this$props2.stackTransition;
-        var indexes = this.calculateIndexes(this.state.indexes, stack, this.previousIndex); // Check if the indexes has changed
+            screenTransition = _this$props2.screenTransition;
+        var indexes = this.calculateIndexes(this.state.indexes, stack, this.previousIndex, screenTransition); // Check if the indexes has changed
 
         if (indexes !== this.state.indexes) {
           this.setState({
@@ -1637,10 +2163,8 @@
 
 
         if (this.needRelativeUpdate) {
-          this.needRelativeUpdate = false;
-          this.setState({
-            indexes: this.updateRelativeIndexes(indexes, stack, index)
-          });
+          var nextIndexes = this.updateRelativeIndexes(indexes, stack, index);
+          this.updateIndexesWhenReady(nextIndexes);
         } // If the pointer to the current screen has changed we need to start
         // the animations at the next tick, so raise the flag needRelativeUpdate
 
@@ -1684,7 +2208,6 @@
           delete indexes[key];
           updated = true;
         });
-        console.log(updated);
         return updated ? indexes : oldIndexes;
       }
       /**
@@ -1697,7 +2220,6 @@
       value: function updateRelativeIndexes(oldIndexes, stack, activeIndex) {
         var indexes = Object.assign({}, oldIndexes);
         var count = stack.length;
-        var transition = this.props.screenTransition;
         stack.forEach(function (_ref2, i) {
           var key = _ref2.key;
           var index = {
@@ -1706,19 +2228,84 @@
             relative: activeIndex - i,
             transition: indexes[key].transition
           };
+          indexes[key] = index;
+        });
+        return indexes;
+      }
+    }, {
+      key: "updateIndexesWhenReady",
+      value: function updateIndexesWhenReady(nextIndexes) {
+        var _this4 = this;
 
-          if (index.relative !== indexes[key].relative) {
-            reactNative.Animated.timing(index.transition, {
-              toValue: index.relative,
+        var allReady = true;
+        var stack = this.props.stack;
+        var i = stack.length;
+
+        while (i-- > 0 && allReady) {
+          allReady = this.readyScreens[stack[i].key];
+        }
+
+        if (allReady) {
+          this.needRelativeUpdate = false;
+          this.startTransition(this.state.indexes, nextIndexes);
+          this.setState({
+            indexes: nextIndexes
+          });
+        } else {
+          // Wait for the ready (onLayout) signal from the wrappers
+          setTimeout(function () {
+            return _this4.updateIndexesWhenReady(nextIndexes);
+          });
+        }
+      }
+    }, {
+      key: "startTransition",
+      value: function startTransition(prevIndexes, nextIndexes) {
+        var _this5 = this;
+
+        console.log('Transitions start');
+        var layout = this.state.layout; // Screen transitions
+
+        this.props.stack.forEach(function (_ref3) {
+          var key = _ref3.key,
+              Screen = _ref3.Screen;
+          var prevIndex = prevIndexes[key];
+          var nextIndex = nextIndexes[key];
+
+          if (prevIndex && nextIndex && prevIndex.relative !== nextIndex.relative) {
+            var transition = _this5.calculateScreenTransition(Screen.transition, nextIndex, layout);
+
+            reactNative.Animated.timing(nextIndex.transition, {
+              toValue: nextIndex.relative,
               easing: transition.easing,
               duration: transition.duration || 300,
               useNativeDriver: true
             }).start();
           }
+        }); // Signal for shared elements transition to start
 
-          indexes[key] = index;
-        });
-        return indexes;
+        this.context.startTransition(prevIndexes, nextIndexes);
+      }
+    }, {
+      key: "calculateScreenTransition",
+      value: function calculateScreenTransition(generator, indexes, layout) {
+        var g = generator || this.props.screenTransition;
+
+        if (typeof g === 'function') {
+          return g(indexes, layout);
+        }
+
+        return g;
+      }
+    }, {
+      key: "_onScreenReady",
+      value: function _onScreenReady(id) {
+        this.readyScreens[id] = 1;
+      }
+    }, {
+      key: "_onScreenUnmount",
+      value: function _onScreenUnmount(id) {
+        delete this.readyScreens[id];
       }
     }]);
 
@@ -1730,7 +2317,7 @@
     screenTransition: PropTypes.func,
     stackTransition: PropTypes.func,
     stackIndexes: PropTypes.object,
-    stack: PropTypes.object,
+    stack: PropTypes.array,
     index: PropTypes.number,
     layout: PropTypes.object
   });
@@ -1741,7 +2328,9 @@
     },
     stackIndexes: {}
   });
-  var styles$1 = reactNative.StyleSheet.create({
+
+  _defineProperty(ScreenStack, "contextType", Context$1);
+  var styles$2 = reactNative.StyleSheet.create({
     container: {
       backgroundColor: '#fff',
       flex: 1
@@ -1773,8 +2362,8 @@
     _createClass(ModalWrapper, [{
       key: "render",
       value: function render() {
-        var containerStyles = [styles$2.container, this.animatedStyles];
-        var item = this.getScreenItem(this.props.item);
+        var containerStyles = [styles$3.container, this.animatedStyles];
+        var item = this.props.stack[0];
         var content = item ? React__default.createElement(item.Screen, null) : React__default.createElement(reactNative.View, null);
         return React__default.createElement(reactNative.Animated.View, {
           style: containerStyles
@@ -1816,7 +2405,7 @@
 
     return ModalWrapper;
   }(React.Component);
-  var styles$2 = reactNative.StyleSheet.create({
+  var styles$3 = reactNative.StyleSheet.create({
     container: {
       backgroundColor: '#eee',
       overflow: 'hidden',
@@ -2930,6 +3519,15 @@
           outputRange: [0, 0, .5, .5]
         })
       };
+      var drawerMethods = {
+        open: function open() {
+          return _this.openDrawer();
+        },
+        close: function close() {
+          return _this.closeDrawer();
+        }
+      };
+      _this._drawerMethods = drawerMethods;
       return _this;
     }
 
@@ -2946,18 +3544,18 @@
 
         if (collapsible) {
           handle = React__default.createElement(reactNative.View, {
-            style: styles$3.handle
+            style: styles$4.handle
           });
           overlay = React__default.createElement(reactNative.Animated.View, {
-            style: [styles$3.overlay, this.overlayAnimStyle],
+            style: [styles$4.overlay, this.overlayAnimStyle],
             onClick: function onClick() {
               return _this2.closeDrawer();
             }
           });
         }
 
-        var containerStyles = [styles$3.container, collapsible && styles$3.collapsibleContainer, this.animatedStyles];
-        var drawerStyles = [styles$3.drawer, collapsible && styles$3.collapsibleDrawer];
+        var containerStyles = [styles$4.container, collapsible && styles$4.collapsibleContainer, this.animatedStyles];
+        var drawerStyles = [styles$4.drawer, collapsible && styles$4.collapsibleDrawer];
         var snapPoints = [{
           x: 0,
           id: 'closed'
@@ -2968,7 +3566,7 @@
         return React__default.createElement(reactNative.Animated.View, {
           style: containerStyles
         }, overlay, React__default.createElement(interactable_native.View, {
-          dragEnabled: collapsible,
+          dragEnabled: !!collapsible,
           ref: "drawer",
           horizontalOnly: true,
           snapPoints: snapPoints,
@@ -2986,7 +3584,8 @@
             return _this2.updateLayout(e);
           }
         }, React__default.createElement(Drawer, {
-          router: router
+          router: router,
+          drawer: this._drawerMethods
         }), handle)));
       }
     }, {
@@ -3051,7 +3650,7 @@
 
     return DrawerWrapper;
   }(React.Component);
-  var styles$3 = reactNative.StyleSheet.create({
+  var styles$4 = reactNative.StyleSheet.create({
     container: {
       flexDirection: 'row'
     },
@@ -3118,10 +3717,6 @@
         left: {
           inputRange: [-2, -1, 0, 1, 2],
           outputRange: [layout.width, layout.width, leftColumn, 0, 0]
-        },
-        opacity: {
-          inputRange: [-2, -.5, 0, 1, 1.5, 2],
-          outputRange: [0, 0, 1, 1, 0, 0]
         }
       },
       easing: reactNative.Easing.linear,
@@ -3225,8 +3820,10 @@
           width: width,
           height: height
         };
-        return React__default.createElement(reactNative.View, {
-          style: styles$4.container
+        return React__default.createElement(SharedElementWrapper, {
+          router: router
+        }, React__default.createElement(reactNative.View, {
+          style: styles$5.container
         }, React__default.createElement(DrawerWrapper, {
           router: router,
           transition: modalTransition.dock,
@@ -3243,11 +3840,12 @@
           layout: layout
         }), React__default.createElement(ModalWrapper, {
           router: router,
-          item: this.getModalItem(router.stack),
+          stack: router.modal.stack,
+          index: router.modal.stack,
           transition: modalTransition.modal,
           indexes: indexes.modal,
           layout: layout
-        }));
+        })));
       }
     }, {
       key: "getCurrentTransition",
@@ -3300,15 +3898,6 @@
           stack: stack,
           index: index
         };
-      }
-    }, {
-      key: "getModalItem",
-      value: function getModalItem(routerStack) {
-        var i = routerStack.length;
-
-        while (i-- > 0) {
-          if (routerStack[i].isModal) return routerStack[i];
-        }
       }
     }, {
       key: "startRouter",
@@ -3377,8 +3966,7 @@
     }, {
       key: "detectModal",
       value: function detectModal() {
-        var item = this.router.stack[this.router.activeIndex];
-        return item && item.isModal;
+        return this.router.modal.active;
       }
     }, {
       key: "updateModalIndexes",
@@ -3452,7 +4040,7 @@
       800: TransitionNarrowDefault
     }
   });
-  var styles$4 = reactNative.StyleSheet.create({
+  var styles$5 = reactNative.StyleSheet.create({
     container: {
       flex: 1,
       flexDirection: 'row',
@@ -3460,7 +4048,200 @@
     }
   });
 
+  var boxAttrs = {
+    x: 'left',
+    y: 'top',
+    width: 'width',
+    height: 'height'
+  };
+
+  var SharedElement =
+  /*#__PURE__*/
+  function (_Component) {
+    _inherits(SharedElement, _Component);
+
+    function SharedElement(props) {
+      var _this;
+
+      _classCallCheck(this, SharedElement);
+
+      _this = _possibleConstructorReturn(this, _getPrototypeOf(SharedElement).call(this, props));
+
+      if (props.fromProps) {
+        // We are in the transition layer, prepare the animation
+        console.log('Amazing we got it!', props);
+        _this.animatedLeaving = new reactNative.Animated.Value(0);
+        _this.animatedEntering = new reactNative.Animated.Value(-props.toIndex);
+      } else if (props.wrapper) {
+        // We are mounted by the user, register the shared element
+        props.se.register(_assertThisInitialized(_assertThisInitialized(_this)), props);
+        _this.registered = true;
+      }
+
+      _this.SE = SharedElement;
+      return _this;
+    }
+
+    _createClass(SharedElement, [{
+      key: "render",
+      value: function render() {
+        var _this2 = this;
+
+        if (this.animatedLeaving) {
+          return this.renderTransition();
+        }
+
+        var viewStyles = [this.props.style];
+
+        if (this.animatedLeaving) {
+          viewStyles = viewStyles.concat([styles$6.position, this.props.fromBox, this.getTransitionStyle()]);
+        } // console.log('Shared', this.props.se, this.props.wrapper );
+
+
+        return React__default.createElement(reactNative.Animated.View, {
+          style: this.props.style,
+          onLayout: function onLayout(e) {
+            return _this2._setBox(e);
+          },
+          pointerEvents: "auto"
+        }, this.props.children);
+      }
+    }, {
+      key: "renderTransition",
+      value: function renderTransition() {
+        var viewStyles = this.getTransitionStyle();
+        return React__default.createElement(reactNative.Animated.View, {
+          style: viewStyles.container,
+          pointerEvents: "auto"
+        }, React__default.createElement(reactNative.Animated.View, {
+          style: viewStyles.leaving
+        }, this.props.fromProps.children), React__default.createElement(reactNative.Animated.View, {
+          style: viewStyles.entering
+        }, this.props.toProps.children));
+      }
+    }, {
+      key: "getTransitionStyle",
+      value: function getTransitionStyle() {
+        if (this.transitionStyles) return this.transitionStyles;
+        var _this$props = this.props,
+            transitionStyle = _this$props.transitionStyle,
+            fromBox = _this$props.fromBox,
+            toBox = _this$props.toBox,
+            fromProps = _this$props.fromProps,
+            toProps = _this$props.toProps,
+            toIndex = _this$props.toIndex;
+        var st = {};
+        var fb = this.boxToStyle(fromBox);
+        var tb = this.boxToStyle(toBox);
+        var containerStyles = transitionStyle ? transitionStyle(this.animatedLeaving, toIndex, fromBox, toBox, fromProps, toProps) : this.boxInterpolator();
+        st.container = [styles$6.transition, this.props.style, fb, containerStyles];
+        var leavingStyles = {};
+
+        if (fromProps.contentTransition) {
+          leavingStyles = fromProps.contentTransition(this.animatedLeaving, 0, toIndex, fb);
+        }
+
+        st.leaving = [styles$6.transition, fb, leavingStyles];
+        var enteringStyles = {};
+
+        if (fromProps.contentTransition) {
+          enteringStyles = fromProps.contentTransition(this.animatedEntering, -toIndex, 0, tb);
+        }
+
+        st.entering = [styles$6.transition, tb, enteringStyles];
+        return this.transitionStyles = st;
+      }
+    }, {
+      key: "boxToStyle",
+      value: function boxToStyle(box) {
+        return {
+          left: box.x,
+          top: box.y,
+          width: box.width,
+          height: box.height
+        };
+      }
+    }, {
+      key: "_setBox",
+      value: function _setBox(e) {
+        this.props.wrapper && console.log('Setting box', this.props.wrapper.id);
+        this.box = e.nativeEvent.layout;
+      }
+    }, {
+      key: "boxInterpolator",
+      value: function boxInterpolator(animatedLeaving, fromIndex, toIndex, fromBox, toBox) {
+        var _this3 = this;
+
+        var styles = {};
+        var props = this.props;
+        ['x', 'y', 'width', 'height'].forEach(function (attr) {
+          styles[boxAttrs[attr]] = _this3.interpolator(animatedLeaving || _this3.animatedLeaving, fromIndex || props.fromIndex, toIndex || props.toIndex, (fromBox || props.fromBox)[attr], (toBox || props.toBox)[attr]);
+        });
+        return styles;
+      }
+    }, {
+      key: "interpolator",
+      value: function interpolator(animatedLeaving, fromIndex, toIndex, fromValue, toValue) {
+        if (fromValue === toValue) return fromValue;
+        var inverted = fromValue > toValue;
+        return animatedLeaving.interpolate({
+          inputRange: inverted ? [toIndex, toIndex, fromIndex, fromIndex] : [fromIndex, fromIndex, toIndex, toIndex],
+          outputRange: inverted ? [toValue, toValue, fromValue, fromValue] : [fromValue, fromValue, toValue, toValue]
+        });
+      }
+    }, {
+      key: "componentDidMount",
+      value: function componentDidMount() {
+        this.props.wrapper && console.log('Mounted', this.props.wrapper.id);
+
+        if (this.animatedLeaving) {
+          // We are in the transition layer, start the animation
+          reactNative.Animated.timing(this.animatedLeaving, {
+            toValue: this.props.toIndex,
+            duration: 500
+          }).start();
+          reactNative.Animated.timing(this.animatedEntering, {
+            toValue: 0,
+            duration: 500
+          }).start();
+        }
+      }
+    }, {
+      key: "componentWillUnmount",
+      value: function componentWillUnmount() {
+        if (this.registered) {
+          this.props.se.unregister(this);
+        }
+      }
+    }]);
+
+    return SharedElement;
+  }(React.Component);
+
+  var styles$6 = reactNative.StyleSheet.create({
+    transition: {
+      position: 'absolute',
+      overflow: 'hidden'
+    }
+  });
+
+  function ContextConsumerHOC(Component) {
+    return function SharedElementHOC(props) {
+      return React__default.createElement(Context$1.Consumer, null, function (se) {
+        return React__default.createElement(Context.Consumer, null, function (wrapper) {
+          return React__default.createElement(Component, _extends({}, props, {
+            se: se,
+            wrapper: wrapper
+          }));
+        });
+      });
+    };
+  }
+
+  var SharedElementWithContext = ContextConsumerHOC(SharedElement);
+
   exports.Navigator = Navigator;
+  exports.SharedElement = SharedElementWithContext;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
