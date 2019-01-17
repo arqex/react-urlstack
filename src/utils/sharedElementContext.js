@@ -198,6 +198,5 @@ const SharedElementWrapper = props => (
 
 export {
 	Context,
-	SharedElementWrapper,
-	ContextProvider
+	SharedElementWrapper
 }
