@@ -1,7 +1,7 @@
 /*!
  * *//* eslint-disable */
 /*!
- * react-urlstack v0.2.0
+ * react-urlstack v0.2.2
  * (c) 2018-present Javier Marquez
  * Released under the MIT License.
  */
@@ -1269,7 +1269,7 @@
 
   function create( routes, options ){
   	var strategy;
-  	if( typeof window === 'undefined' ){
+  	if( typeof document === 'undefined' ){
   		strategy = nodeStrategy_1;
   	}
   	else if( options && options.strategy === 'hash' ){

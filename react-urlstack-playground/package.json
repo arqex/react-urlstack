@@ -42,7 +42,7 @@
     "react-app-polyfill": "^0.2.0",
     "react-dev-utils": "^7.0.1",
     "react-native": "^0.57.8",
-    "react-urlstack": "^0.2.0",
+    "react-urlstack": "^0.2.1",
     "resolve": "1.8.1",
     "terser-webpack-plugin": "1.1.0",
     "url-loader": "1.1.1",
