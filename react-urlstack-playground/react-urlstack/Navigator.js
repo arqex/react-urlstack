@@ -18,6 +18,11 @@ export default class Navigator extends Component {
 		this.state = this.getDimensionData();
 		this.getCurrentTransition = memoize( this.getCurrentTransition )
 		this.getScreenStack = memoize( this.getScreenStack )
+
+		this.drawer = {
+			open: () => this.drawerInstance.openDrawer(),
+			close: () => this.drawerInstance.closeDrawer(),
+		}
 	}
 
 	static propTypes = {
@@ -43,27 +48,31 @@ export default class Navigator extends Component {
 		let { stack, index } = this.getScreenStack( router.stack, router.activeIndex )
 		let layout = { width, height }
 
+
 		return (
 			<SharedElementWrapper router={router}>
 				<View style={styles.container}>
-					<DrawerWrapper router={router}
+					<DrawerWrapper ref={ component => this.drawerInstance = component }
+						router={router}
 						transition={modalTransition.dock}
 						indexes={indexes.stack}
-						collapsible={transition({}, {}).collapsibleDrawer}
-						Drawer={DrawerComponent} />
+						collapsible={ transition({}, {}).collapsibleDrawer }
+						Drawer={ DrawerComponent } />
 					<ScreenStack router={router}
 						screenTransition={transition}
 						stackTransition={modalTransition.stack}
 						stackIndexes={indexes.stack}
 						stack={stack}
 						index={index}
-						layout={layout} />
+						layout={layout}
+						drawer={this.drawer} />
 					<ModalWrapper router={router}
 						stack={router.modal.stack}
 						index={router.modal.stack}
 						transition={modalTransition.modal}
 						indexes={indexes.modal}
-						layout={layout} />
+						layout={layout}
+						drawer={this.drawer} />
 				</View>
 			</SharedElementWrapper>
 		)
@@ -145,6 +154,7 @@ export default class Navigator extends Component {
 			this.showingModal = showModal;
 			this.updateModalIndexes( showModal );
 		}
+		console.log( this.drawerInstance )
 	}
 
 	detectModal(){

@@ -1,3 +1,7 @@
+## v0.2.3
+* Updates react-interactable to work ok in react native
+* Removes the playground from the npm package 
+
 ## v0.2.1
 * Updates urlstack version to work ok in react native 
 

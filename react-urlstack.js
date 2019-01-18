@@ -1,3 +1,2 @@
-import Navigator from './src/Navigator';
-import SharedElement from './src/SharedElement';
+import {Navigator, SharedElement} from './react-urlstack-playground/react-urlstack'
 export {Navigator, SharedElement};

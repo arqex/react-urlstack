@@ -87,6 +87,7 @@ export default class ScreenStack extends Component {
 					transition={ item.Screen.transition || this.props.screenTransition }
 					onReady={ this._onScreenReady }
 					onUnmount={ this._onScreenUnmount }
+					drawer={ this.props.drawer }
 					key={ key } />
 			)
 		})

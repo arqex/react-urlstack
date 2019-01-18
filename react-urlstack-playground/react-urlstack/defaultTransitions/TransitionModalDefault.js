@@ -25,7 +25,7 @@ export default {
 			styles: {
 				translateY: {
 					inputRange: [ 0, 1 ],
-					outputRange: [ '100%', '0%' ]
+					outputRange: [ layout.height, 0 ]
 				}
 			},
 			easing: Easing.linear,
