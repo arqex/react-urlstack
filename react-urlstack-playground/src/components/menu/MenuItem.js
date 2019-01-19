@@ -7,7 +7,7 @@ const MenuItem = ({
 }) => (
 	<Hoverable style={ [styles.container, active && styles.activeContainer] }
 		hoverStyle={ [styles.hover] }
-		onPress={ () => router.navigate( route ) }>
+		onPress={ () => console.log( pressed ) || router.navigate( route ) }>
 			<Text style={ [styles.text, active && styles.active] }>{ children }</Text>
 	</Hoverable>
 );

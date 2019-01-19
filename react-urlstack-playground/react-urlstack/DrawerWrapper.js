@@ -3,6 +3,8 @@ import { StyleSheet, Animated, View } from 'react-native'
 import animatedStyles from './utils/animatedStyles'
 import Interactable from 'react-interactable'
 
+let handleWidth = 30
+
 export default class DrawerWrapper extends Component {
 	constructor(props){
 		super(props)
@@ -10,7 +12,10 @@ export default class DrawerWrapper extends Component {
 
 		this.drawerPos = new Animated.Value(0);
 		this.calculateDrawerIndex();
-		this.open = false;
+	
+		this.state = {
+			open: false
+		}
 
 		this.overlayAnimStyle = {
 			transform: [{translateX: this.drawerIndex.interpolate({
@@ -41,9 +46,12 @@ export default class DrawerWrapper extends Component {
 			</Animated.View>
 			)
 		}
+		let width = this.state.open ? this.drawerWidth * 2 : this.drawerWidth + handleWidth;
+
 		let containerStyles = [
 			styles.container,
 			collapsible && styles.collapsibleContainer,
+			collapsible && {width, left: handleWidth - this.drawerWidth},
 			this.animatedStyles
 		]
 
@@ -53,7 +61,7 @@ export default class DrawerWrapper extends Component {
 		]
 
 		let snapPoints = [
-			{ x: 0, id: 'closed' }, {x: this.drawerWidth, id: 'open'}
+			{ x: 0, id: 'closed' }, {x: this.drawerWidth - handleWidth - 10, id: 'open'}
 		];
 
 		return (
@@ -62,8 +70,8 @@ export default class DrawerWrapper extends Component {
 				<Interactable.View dragEnabled={ !!collapsible }
 					ref="drawer"
 					horizontalOnly={ true } snapPoints={ snapPoints }
-					boundaries={{right: this.drawerWidth, bounce: 0.5}}
-					onSnapStart={ e => this.onSnap( e ) }
+					boundaries={{right: this.drawerWidth - handleWidth, bounce: 0}}
+					onDrag={ e => this.onDrag( e ) }
 					animatedValueX={ this.drawerPos }>
 					<View style={ drawerStyles } onLayout={ e => this.updateLayout(e) }>
 						<Drawer router={ router } drawer={ this._drawerMethods } />
@@ -86,7 +94,6 @@ export default class DrawerWrapper extends Component {
 	componentDidUpdate( prevProps ){
 		if( prevProps.collapsible && !this.props.collapsible ){
 			this.drawerPos.setValue(0);
-			console.log('Resetting position')
 			this.forceUpdate()
 		}
 	}
@@ -111,6 +118,7 @@ export default class DrawerWrapper extends Component {
 		if( !this.props.collapsible || this.open ) return;
 
 		let drawer = this.refs.drawer
+		this.setState({open: true})
 		drawer && drawer.setVelocity({x: 2000})
 	}
 
@@ -118,12 +126,19 @@ export default class DrawerWrapper extends Component {
 		if( !this.props.collapsible || !this.open ) return;
 
 		let drawer = this.refs.drawer
+		this.setState({open: false})
 		drawer && drawer.setVelocity({x: -2000})
 	}
 
-	onSnap( e ){
+	onDrag( e ){
 		if( e.nativeEvent ) e = e.nativeEvent
-		this.open = e.id === 'open';
+		
+		if( e.state === 'start' ){
+			this.setState({open: true})
+		}
+		else if( e.state === 'end' && e.targetSnapPointId === 'closed' ){
+			this.setState({open: false})
+		}
 	}
 }
 
@@ -133,26 +148,22 @@ let styles = StyleSheet.create({
 	},
 	collapsibleContainer: {
     position: 'absolute',
-		top: 0, bottom: 0, left: '-100%',
-		width: '100%',
-    flexDirection: 'row-reverse',
+		top: 0, bottom: 0,
 		zIndex: 2000,
-		backgroundColor: '#e0e0e0',
 	},
 	drawer: {
     // position: 'absolute',
 		top: 0, left: 0,
 		height: '100%', width: '100%',
-		flex: 1,
-		zIndex: 20000
+		flex: 1
 	},
 	collapsibleDrawer: {
     left: 0,
     width: '100%',
     flex: 1,
-		backgroundColor: '#e0e0e0',
 		position: 'relative',
-		zIndex: 20000
+		zIndex: 20000,
+		paddingRight: handleWidth
 	},
 	handle: {
 		width: 40,
@@ -164,9 +175,8 @@ let styles = StyleSheet.create({
 	overlay: {
 		backgroundColor: 'black',
 		height: '100%',
-		width: '100%',
-		position: 'absolute',
-		left: '100%'
+		width: '400%',
+		position: 'absolute'
 	},
 	expander: {
 		position: 'absolute',

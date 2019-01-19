@@ -9,6 +9,7 @@ import Tab2 from './screens/Tab2'
 import Tab3 from './screens/Tab3'
 import SimpleScreen from './screens/SimpleScreen'
 import Screen404 from './screens/Screen404'
+import Interactable from './screens/Interactable'
 
 export default [
 	{ path: '/', cb: Welcome },

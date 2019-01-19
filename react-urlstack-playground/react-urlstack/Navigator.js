@@ -52,12 +52,6 @@ export default class Navigator extends Component {
 		return (
 			<SharedElementWrapper router={router}>
 				<View style={styles.container}>
-					<DrawerWrapper ref={ component => this.drawerInstance = component }
-						router={router}
-						transition={modalTransition.dock}
-						indexes={indexes.stack}
-						collapsible={ transition({}, {}).collapsibleDrawer }
-						Drawer={ DrawerComponent } />
 					<ScreenStack router={router}
 						screenTransition={transition}
 						stackTransition={modalTransition.stack}
@@ -66,6 +60,12 @@ export default class Navigator extends Component {
 						index={index}
 						layout={layout}
 						drawer={this.drawer} />
+					<DrawerWrapper ref={ component => this.drawerInstance = component }
+						router={router}
+						transition={modalTransition.dock}
+						indexes={indexes.stack}
+						collapsible={ transition({}, {}).collapsibleDrawer }
+						Drawer={ DrawerComponent } />
 					<ModalWrapper router={router}
 						stack={router.modal.stack}
 						index={router.modal.stack}

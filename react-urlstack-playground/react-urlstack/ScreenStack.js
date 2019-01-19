@@ -245,7 +245,9 @@ export default class ScreenStack extends Component {
 let styles = StyleSheet.create({
 	container: {
 		backgroundColor: '#fff',
-		flex: 1
+		flex: 1,
+		position: 'relative',
+		zIndex: 1
 	},
 	drawer: {},
 	stack: {
