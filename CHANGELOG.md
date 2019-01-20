@@ -1,3 +1,7 @@
+## v0.2.4
+* Refactors drawer wrapper to work in native apps
+* Updates react-interactable to not to capture drag events too fast
+
 ## v0.2.3
 * Updates react-interactable to work ok in react native
 * Removes the playground from the npm package 

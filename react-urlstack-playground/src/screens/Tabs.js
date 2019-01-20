@@ -3,7 +3,7 @@ import {View, Text, TouchableOpacity, StyleSheet} from 'react-native'
 
 class TestTabs extends Component {
 	render(){	
-		console.log( this.props.router.location )
+		// console.log( this.props.router.location )
 		return (
 			<View style={ styles.container }>
 				<View style={ styles.content }>{ this.props.children }</View>
