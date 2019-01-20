@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import createRouter from 'urlstack'
-import { Dimensions, View, StyleSheet, Animated, Platform, StatusBar } from 'react-native'
+import { Dimensions, View, StyleSheet, Animated, Platform, StatusBar, BackHandler } from 'react-native'
 import ScreenStack from './ScreenStack'
 import ModalWrapper from './ModalWrapper'
 import DrawerWrapper from './DrawerWrapper'
@@ -18,11 +18,14 @@ export default class Navigator extends Component {
 		this.state = this.getWindowSize();
 		this.getCurrentTransition = memoize( this.getCurrentTransition )
 		this.getScreenStack = memoize( this.getScreenStack )
+		this._onBack = this._onBack.bind( this )
 
 		this.drawer = {
 			open: () => this.drawerInstance.openDrawer(),
 			close: () => this.drawerInstance.closeDrawer(),
 		}
+
+		BackHandler.addEventListener( 'hardwareBackPress', this._onBack )
 	}
 
 	static propTypes = {
@@ -142,6 +145,7 @@ export default class Navigator extends Component {
 	componentWillUnmount() {
 		this.fu = () => {}
 		Dimensions.removeEventListener( 'change', this.onResize )
+		BackHandler.removeEventListener( 'hardwareBackPress', this._onBack )
 	}
 
 	componentDidUpdate(){
@@ -155,6 +159,29 @@ export default class Navigator extends Component {
 	_onLayout( layout ){
 		console.log( layout )
 		this.setState( layout )
+	}
+
+	_onBack(){
+		let router = this.router;
+		let stack = router.stack;
+		let nextRoute;
+		if( router.modal.active ){
+			if( router.modal.stack.length > 1 ){
+				nextRoute = router.modal.stack[ router.modal.stack.length - 2 ].path
+			}
+			else {
+				nextRoute = stack[ stack.length - 1 ].location
+				nextRoute = nextRoute.pathname + nextRoute.search
+			}
+		}
+		else if( stack.length > 1 ){
+			nextRoute = stack[ stack.length - 2 ].path
+		}
+
+		if( nextRoute ){
+			router.navigate( nextRoute )
+			return true; // Prevents getting out of the app
+		}
 	}
 
 	detectModal(){
