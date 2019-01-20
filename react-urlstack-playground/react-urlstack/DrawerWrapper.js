@@ -115,7 +115,7 @@ export default class DrawerWrapper extends Component {
 	}
 
 	openDrawer(){
-		if( !this.props.collapsible || this.open ) return;
+		if( !this.props.collapsible || this.state.open ) return;
 
 		let drawer = this.refs.drawer
 		this.setState({open: true})
@@ -123,7 +123,7 @@ export default class DrawerWrapper extends Component {
 	}
 
 	closeDrawer(){
-		if( !this.props.collapsible || !this.open ) return;
+		if( !this.props.collapsible || !this.state.open ) return;
 
 		let drawer = this.refs.drawer
 		this.setState({open: false})

@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import createRouter from 'urlstack'
-import { Dimensions, View, StyleSheet, Animated } from 'react-native'
+import { Dimensions, View, StyleSheet, Animated, Platform, StatusBar } from 'react-native'
 import ScreenStack from './ScreenStack'
 import ModalWrapper from './ModalWrapper'
 import DrawerWrapper from './DrawerWrapper'
@@ -15,7 +15,7 @@ export default class Navigator extends Component {
 	constructor( props ){
 		super( props )
 
-		this.state = this.getDimensionData();
+		this.state = this.getWindowSize();
 		this.getCurrentTransition = memoize( this.getCurrentTransition )
 		this.getScreenStack = memoize( this.getScreenStack )
 
@@ -51,28 +51,30 @@ export default class Navigator extends Component {
 
 		return (
 			<SharedElementWrapper router={router}>
-				<View style={styles.container}>
-					<ScreenStack router={router}
-						screenTransition={transition}
-						stackTransition={modalTransition.stack}
-						stackIndexes={indexes.stack}
-						stack={stack}
-						index={index}
-						layout={layout}
-						drawer={this.drawer} />
-					<DrawerWrapper ref={ component => this.drawerInstance = component }
-						router={router}
-						transition={modalTransition.dock}
-						indexes={indexes.stack}
-						collapsible={ transition({}, {}).collapsibleDrawer }
-						Drawer={ DrawerComponent } />
-					<ModalWrapper router={router}
-						stack={router.modal.stack}
-						index={router.modal.stack}
-						transition={modalTransition.modal}
-						indexes={indexes.modal}
-						layout={layout}
-						drawer={this.drawer} />
+				<View style={ styles.windowWrapper }>
+					<View style={styles.container} onLayout={ e => this._onLayout( e.nativeEvent.layout ) }>
+						<ScreenStack router={router}
+							screenTransition={transition}
+							stackTransition={modalTransition.stack}
+							stackIndexes={indexes.stack}
+							stack={stack}
+							index={index}
+							layout={layout}
+							drawer={this.drawer} />
+						<DrawerWrapper ref={ component => this.drawerInstance = component }
+							router={router}
+							transition={modalTransition.dock}
+							indexes={indexes.stack}
+							collapsible={ transition({}, {}).collapsibleDrawer }
+							Drawer={ DrawerComponent } />
+						<ModalWrapper router={router}
+							stack={router.modal.stack}
+							index={router.modal.stack}
+							transition={modalTransition.modal}
+							indexes={indexes.modal}
+							layout={layout}
+							drawer={this.drawer} />
+					</View>
 				</View>
 			</SharedElementWrapper>
 		)
@@ -128,19 +130,13 @@ export default class Navigator extends Component {
 		this.updateModalIndexes( this.showingModal )
 	}
 
-	listenToResize(){
-		this.onResize = () => this.setState( this.getDimensionData() );
-		Dimensions.addEventListener( 'change', this.onResize );
-	}
-
-	getDimensionData(){
+	getWindowSize(){
 		let { width, height } = Dimensions.get('window')
 		return { width, height }
 	}
 
 	componentDidMount() {
 		this.startRouter(this.props.routes);
-		this.listenToResize()
 	}
 
 	componentWillUnmount() {
@@ -154,7 +150,11 @@ export default class Navigator extends Component {
 			this.showingModal = showModal;
 			this.updateModalIndexes( showModal );
 		}
-		console.log( this.drawerInstance )
+	}
+
+	_onLayout( layout ){
+		console.log( layout )
+		this.setState( layout )
 	}
 
 	detectModal(){
@@ -201,9 +201,14 @@ export default class Navigator extends Component {
 }
 
 let styles = StyleSheet.create({
+	windowWrapper: {
+		paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+		flex: 1,
+	},
+
 	container: {
 		flex: 1,
 		flexDirection: 'row',
 		overflow: 'hidden'
-	}
+	},
 })

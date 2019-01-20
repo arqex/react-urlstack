@@ -8,11 +8,15 @@ export default class SideMenu extends Component {
   constructor( props ){
     super( props )
     this._lastRoute = this.getRoute()
+    this.onRouteUpdate = this.onRouteUpdate.bind( this );
+    props.router.onChange( this.onRouteUpdate );
   }
+
   getRoute(){
     let l = this.props.router.location
     return l.pathname + l.search;
   }
+  
   render() {
     let router = this.props.router;
     let currentRoute = router.location.pathname;
@@ -33,9 +37,9 @@ export default class SideMenu extends Component {
     )
   }
 
-  componentDidUpdate(){
-    let nextRoute = this.getRoute()
-    if( nextRoute !== this._lastRoute ){
+  onRouteUpdate(){
+    let nextRoute = this.getRoute();
+    if( this._lastRoute !== nextRoute ){
       this._lastRoute = nextRoute
       this.props.drawer.close()
     }

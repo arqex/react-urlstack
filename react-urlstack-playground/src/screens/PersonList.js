@@ -28,6 +28,7 @@ class TestList extends Component {
 			<View style={styles.container}>
 				<ScreenHeader title="Person list" />
 				<FlatList data={items}
+					keyExtractor={ item => item.id + '' }
 					renderItem={({ item }) => this.renderItem(item)} />
 			</View>
 		)
@@ -62,8 +63,6 @@ class TestList extends Component {
 
 	openAddArticle() {
 		let { queue } = this.props.data;
-		console.log(this.props);
-		console.log('Open the modal here');
 		this.props.navigation.push('addArticle', { queueId: queue.id })
 	}
 }
