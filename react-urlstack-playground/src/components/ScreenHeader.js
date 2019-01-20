@@ -5,7 +5,7 @@ import {SharedElement} from '../../react-urlstack';
 function contentTransition( animatedValue, fromIndex, toIndex, box ){
 	let translation = animatedValue.interpolate({
 		inputRange: [-1, 0, 1],
-		outputRange: ['-100%', '0%', '100%']
+		outputRange: [ 0-box.width, 0, box.width ]
 	});
 
 	return {

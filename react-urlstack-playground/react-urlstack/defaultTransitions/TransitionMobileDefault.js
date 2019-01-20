@@ -3,7 +3,7 @@ import {Easing} from 'react-native'
 export default function TransitionMobileDefault( indexes, layout ){
 	return {
 		styles: {
-			left: {
+			translateX: {
 				inputRange: [ -2, -1, 0, 1 ],
 				outputRange: [ layout.width, layout.width, 0, 0 ]
 			},
