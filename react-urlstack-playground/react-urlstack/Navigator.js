@@ -15,7 +15,10 @@ export default class Navigator extends Component {
 	constructor( props ){
 		super( props )
 
-		this.state = this.getWindowSize();
+		this.state = {
+			layout: this.getWindowSize()
+		};
+
 		this.getCurrentTransition = memoize( this.getCurrentTransition )
 		this.getScreenStack = memoize( this.getScreenStack )
 		this._onBack = this._onBack.bind( this )
@@ -44,18 +47,22 @@ export default class Navigator extends Component {
 		if( !router ) return null;
 		
 		let { DrawerComponent, transitions } = this.props
-		let { width, height, indexes } = this.state
+		let { layout, indexes } = this.state
 		
-		let transition = this.getCurrentTransition( transitions, width, height )
+		let transition = this.getCurrentTransition( transitions, layout )
 		let modalTransition = this.getModalTransitions( transition )
 		let { stack, index } = this.getScreenStack( router.stack, router.activeIndex )
-		let layout = { width, height }
-
 
 		return (
-			<SharedElementWrapper router={router}>
+			<SharedElementWrapper router={router} layout={layout}>
 				<View style={ styles.windowWrapper }>
 					<View style={styles.container} onLayout={ e => this._onLayout( e.nativeEvent.layout ) }>
+						<DrawerWrapper ref={ component => this.drawerInstance = component }
+							router={router}
+							transition={modalTransition.dock}
+							indexes={indexes.stack}
+							collapsible={ transition({}, {}).collapsibleDrawer }
+							Drawer={ DrawerComponent } />
 						<ScreenStack router={router}
 							screenTransition={transition}
 							stackTransition={modalTransition.stack}
@@ -64,12 +71,6 @@ export default class Navigator extends Component {
 							index={index}
 							layout={layout}
 							drawer={this.drawer} />
-						<DrawerWrapper ref={ component => this.drawerInstance = component }
-							router={router}
-							transition={modalTransition.dock}
-							indexes={indexes.stack}
-							collapsible={ transition({}, {}).collapsibleDrawer }
-							Drawer={ DrawerComponent } />
 						<ModalWrapper router={router}
 							stack={router.modal.stack}
 							index={router.modal.stack}
@@ -83,12 +84,12 @@ export default class Navigator extends Component {
 		)
 	}
 
-	getCurrentTransition( transitions, width, height ){
+	getCurrentTransition( transitions, layout ){
 		let breakPoints = Object.keys( transitions )
 		let i = breakPoints.length
 		
 		while( i-- > 0 ){
-			if( width >= parseInt( breakPoints[i]) ){
+			if( layout.width >= parseInt( breakPoints[i]) ){
 				return transitions[ breakPoints[i] ]
 			}
 		}
@@ -135,7 +136,9 @@ export default class Navigator extends Component {
 
 	getWindowSize(){
 		let { width, height } = Dimensions.get('window')
-		return { width, height }
+		return { 
+			width, height, x: 0, y: 0
+		}
 	}
 
 	componentDidMount() {
@@ -144,7 +147,6 @@ export default class Navigator extends Component {
 
 	componentWillUnmount() {
 		this.fu = () => {}
-		Dimensions.removeEventListener( 'change', this.onResize )
 		BackHandler.removeEventListener( 'hardwareBackPress', this._onBack )
 	}
 
@@ -158,7 +160,7 @@ export default class Navigator extends Component {
 
 	_onLayout( layout ){
 		console.log( layout )
-		this.setState( layout )
+		this.setState( {layout} )
 	}
 
 	_onBack(){
@@ -166,16 +168,16 @@ export default class Navigator extends Component {
 		let stack = router.stack;
 		let nextRoute;
 		if( router.modal.active ){
-			if( router.modal.stack.length > 1 ){
-				nextRoute = router.modal.stack[ router.modal.stack.length - 2 ].path
+			if( router.modal.activeIndex ){
+				nextRoute = router.modal.stack[ router.modal.activeIndex - 1 ].path
 			}
 			else {
-				nextRoute = stack[ stack.length - 1 ].location
+				nextRoute = stack[ router.activeIndex ].location
 				nextRoute = nextRoute.pathname + nextRoute.search
 			}
 		}
-		else if( stack.length > 1 ){
-			nextRoute = stack[ stack.length - 2 ].path
+		else if( router.activeIndex ){
+			nextRoute = stack[ router.activeIndex - 1 ].path
 		}
 
 		if( nextRoute ){
@@ -227,9 +229,15 @@ export default class Navigator extends Component {
 	}
 }
 
+let statusBarHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 0
+if( Platform.OS === 'web' ){
+	// Hack to try styles with a status bar in the web
+	statusBarHeight = 20;
+}
+
 let styles = StyleSheet.create({
 	windowWrapper: {
-		paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+		paddingTop: statusBarHeight,
 		flex: 1,
 	},
 

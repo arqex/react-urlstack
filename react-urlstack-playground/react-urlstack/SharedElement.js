@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Animated, StyleSheet } from 'react-native';
 import { Context } from './utils/sharedElementContext';
 import WrapperContext from './utils/wrapperContext';
+import animatedStyles from './utils/animatedStyles';
 
 const boxAttrs = {
 	x: 'left',
@@ -16,7 +17,6 @@ class SharedElement extends Component {
 		
 		if( props.fromProps ){
 			// We are in the transition layer, prepare the animation
-			console.log('Amazing we got it!', props )
 			this.animatedLeaving = new Animated.Value( 0 )
 			this.animatedEntering = new Animated.Value( -props.toIndex )
 		}
@@ -43,7 +43,6 @@ class SharedElement extends Component {
 			])
 		}
 
-		// console.log('Shared', this.props.se, this.props.wrapper );
 
 		return (
 			<Animated.View style={ this.props.style }
@@ -122,36 +121,43 @@ class SharedElement extends Component {
 	}
 
 	_setBox( e ){
-		this.props.wrapper && console.log( 'Setting box',  this.props.wrapper.id )
+		this.props.wrapper
 		this.box = e.nativeEvent.layout
 	}
 
 	boxInterpolator( animatedLeaving, fromIndex, toIndex, fromBox, toBox ){
-		let styles = {};
 		let props = this.props;
-		['x', 'y', 'width', 'height'].forEach( attr => {
-			styles[ boxAttrs[attr] ] = this.interpolator(
-				animatedLeaving || this.animatedLeaving,
-				fromIndex || props.fromIndex,
-				toIndex || props.toIndex,
-				(fromBox || props.fromBox)[attr],
-				(toBox || props.toBox)[attr]
-				)
-		});
+		let getArgs = attr => ([
+			animatedLeaving || this.animatedLeaving,
+			fromIndex || props.fromIndex || 0,
+			toIndex || props.toIndex || 0,
+			(fromBox || props.fromBox)[attr],
+			(toBox || props.toBox)[attr]
+		])
+
+		let styles = {
+			width: this.interpolator.apply( this, getArgs('width') ),
+			height: this.interpolator.apply( this, getArgs('height') ),
+			transform: [
+				{translateX: this.interpolator.apply( this, getArgs('x') )},
+				{translateY: this.interpolator.apply( this, getArgs('y') )},
+			]
+		}
+
 		return styles;
 	}
 
 	interpolator( animatedLeaving, fromIndex, toIndex, fromValue, toValue ){
 		if( fromValue === toValue ) return fromValue;
-		let inverted = fromValue > toValue;
+		let inverted = fromIndex > toIndex;
 		return animatedLeaving.interpolate({
-			inputRange: inverted ? [toIndex, toIndex, fromIndex, fromIndex] : [fromIndex, fromIndex, toIndex, toIndex],
-			outputRange: inverted ? [toValue, toValue, fromValue, fromValue] : [fromValue, fromValue, toValue, toValue]
+			inputRange: inverted ? [ toIndex, fromIndex ] : [ fromIndex, toIndex ],
+			outputRange: inverted ? [ toValue, fromValue ] : [ fromValue, toValue ]
 		})
 	}
 
 	componentDidMount(){
-		this.props.wrapper && console.log('Mounted', this.props.wrapper.id );
+		this.props.wrapper;
 		
 		if( this.animatedLeaving ){
 			// We are in the transition layer, start the animation

@@ -69,8 +69,16 @@ class TransitionLayer extends Component {
 	}
 
 	render(){
+		let layout = this.props.layout;
+		let box = {
+			top: layout.y || 0,
+			right: (layout.x || 0) + layout.width,
+			left: layout.x || 0,
+			bottom: (layout.y || 0) + layout.height
+		}
+		
 		return (
-			<View style={ styles.container } pointerEvents="none">
+			<View style={ [styles.container, box] } pointerEvents="none">
 				{ this.state.elements }
 			</View>
 		)
@@ -78,7 +86,7 @@ class TransitionLayer extends Component {
 
 	checkForTransitions({fromScreen, toScreen}){
 		let couples = this.getTransitionCouples( fromScreen.id, toScreen.id )
-		console.log('Couples', couples)
+		
 		if( !couples.length ) return;
 
 		let elements = couples.map( couple => (
@@ -184,7 +192,6 @@ class TransitionLayer extends Component {
 const styles = StyleSheet.create({
 	container: {
 		position: 'absolute',
-		top: 0, right: 0, left: 0, bottom: 0,
 		zIndex: 10000
 	}
 })
@@ -192,7 +199,7 @@ const styles = StyleSheet.create({
 const SharedElementWrapper = props => (
 	<Context.Provider value={{ register, unregister, startTransition }}>
 		{ props.children }
-		<TransitionLayer router={ props.router } />
+		<TransitionLayer router={ props.router } layout={ props.layout } />
 	</Context.Provider>
 );
 

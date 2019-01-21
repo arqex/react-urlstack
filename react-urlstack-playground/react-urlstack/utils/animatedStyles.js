@@ -6,7 +6,7 @@ export default function animatedStyles( generator, indexes, layout ){
 	let transformStyles = []
 
 	if( indexes.count ){
-		animatedStyles.zIndex = indexes.count - Math.abs(indexes.relative)
+		animatedStyles.zIndex = indexes.screen
 	}
 
 	Object.keys( styles ).forEach( key => {
@@ -17,9 +17,16 @@ export default function animatedStyles( generator, indexes, layout ){
 			animatedStyles[ key ] = indexes.transition.interpolate( styles[key] )
 		}
 		else if( transformKeys[key] ){
-			if( typeof styles[key] !== transformKeys[key] ){
-				console.log(`react-urlstack: Even if it works in web, react-native only accepts type "${transformKeys[key]}" for "${key}". Given "${styles[key]}".`);
-			}
+			// Check values
+			let type = transformKeys[key];
+			let warned = false;
+			styles[key].outputRange.forEach( value =>{
+				if( !warned && typeof value !== type ){
+					warned = true;
+					console.warn(`react-urlstack: Even if it works in web, react-native only accepts type "${transformKeys[key]}" for "${key}". Given "${ value }".`);
+				}
+			})
+
 			transformStyles.push({
 				[key]: indexes.transition.interpolate( styles[key] )
 			})
