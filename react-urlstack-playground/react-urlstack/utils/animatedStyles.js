@@ -11,12 +11,21 @@ export default function animatedStyles( generator, indexes, layout ){
 
 	Object.keys( styles ).forEach( key => {
 		if( styleKeys[key] ){
+			if( warnKeys[key] ){
+				console.warn(`react-urlstack: It's possible in web, but react-native won't animate the property "${key}"`)
+			}
 			animatedStyles[ key ] = indexes.transition.interpolate( styles[key] )
 		}
-		if( transformKeys[key] ){
+		else if( transformKeys[key] ){
+			if( typeof styles[key] !== transformKeys[key] ){
+				console.log(`react-urlstack: Even if it works in web, react-native only accepts type "${transformKeys[key]}" for "${key}". Given "${styles[key]}".`);
+			}
 			transformStyles.push({
 				[key]: indexes.transition.interpolate( styles[key] )
 			})
+		}
+		else {
+			console.warn(`react-urlstack: Unknown property to animate "${key}"`)
 		}
 	})
 
@@ -27,13 +36,22 @@ export default function animatedStyles( generator, indexes, layout ){
 	return animatedStyles
 }
 
-let transformKeys = {};
-[	'perspective', 'rotate', 'rotateX', 'rotateY', 'rotateZ', 
-	'scale', 'scaleX', 'scaleY', 'translateX', 'translateY',
-	'skewX', 'skewY'
-].forEach( key => transformKeys[key] = 1 )
 
 let styleKeys = {};
-[ 'left', 'right', 'top', 'bottom',
-	'width', 'height', 'opacity', 'backgroundColor'
-].forEach( key => styleKeys[key] = 1 )
+let warnKeys = {};
+['left', 'right', 'top', 'bottom'].forEach( key => {
+	styleKeys[key] = 1;
+	warnKeys[key] = 1;
+});
+['width', 'height', 'opacity', 'backgroundColor'].forEach( key => {
+	styleKeys[key] = 1 
+})
+
+let n = 'number', s = 'string';
+let transformKeys = {
+	perspective: n,
+	rotate: s, rotateX: s, rotateY: s, rotateZ: s,
+	scale: n, scaleX: n, scaleY: n,
+	translateX: n, translateY: n,
+	skeyX: s, skewY: s
+};
