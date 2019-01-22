@@ -18,7 +18,7 @@ export default function TestDetails( props ){
 
 	return (
 		<View>
-			<ScreenHeader title="Person details" />
+			<ScreenHeader title="Person details" active={ props.breakPoint === 0 } />
 			{ list }
 			<TouchableHighlight onPress={ () => props.router.navigate( props.router.location.pathname + '/moreInfo') }>
 				<Text>More details</Text>

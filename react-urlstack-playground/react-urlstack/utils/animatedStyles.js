@@ -1,6 +1,8 @@
-export default function animatedStyles( generator, indexes, layout ){
-	let transition = typeof generator === 'function' ? generator( indexes, layout ) : generator;
-	let styles = transition.styles || {}
+export default function animatedStyles( transition, indexes, layout ){
+	let styles = typeof transition.styles === 'function' ? transition.styles( indexes, layout ) : transition.styles;
+	if( !styles ){
+		styles = {}
+	}
 
 	let animatedStyles = {}
 	let transformStyles = []

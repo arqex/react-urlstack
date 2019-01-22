@@ -43,20 +43,23 @@ let clbks = []
 function startTransition( prevIndexes, nextIndexes ){
 	// return console.log( 'Start transition');
 
-	let screens = {};
+	let fromScreen, toScreen;
 	Object.keys( prevIndexes ).forEach( id => {
 		if( prevIndexes[id].relative === 0 ){
-			screens.fromScreen = {id, index: nextIndexes[id].relative};
+			fromScreen = {id, index: nextIndexes[id].relative};
 		}
 	})
 	Object.keys( nextIndexes ).forEach( id => {
 		if( nextIndexes[id].relative === 0 ){
-			screens.toScreen = {id, index: prevIndexes[id].relative};
+			toScreen = {id, index: prevIndexes[id].relative};
 		}
 	})
 	
 	// Call the layer callback to print out the shared element transitions
-	clbks.forEach( clbk => clbk(screens) )
+	// only when we have both screens
+	if( fromScreen && toScreen ){
+		clbks.forEach( clbk => clbk( fromScreen, toScreen ) )
+	}
 }
 
 class TransitionLayer extends Component {
@@ -84,7 +87,7 @@ class TransitionLayer extends Component {
 		)
 	}
 
-	checkForTransitions({fromScreen, toScreen}){
+	checkForTransitions( fromScreen, toScreen ){
 		let couples = this.getTransitionCouples( fromScreen.id, toScreen.id )
 		
 		if( !couples.length ) return;

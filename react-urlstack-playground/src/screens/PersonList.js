@@ -26,7 +26,7 @@ class TestList extends Component {
 
 		return (
 			<View style={styles.container}>
-				<ScreenHeader title="Person list" />
+				<ScreenHeader title="Person list" active={ this.props.breakPoint === 0 } />
 				<FlatList data={items}
 					keyExtractor={ item => item.id + '' }
 					renderItem={({ item }) => this.renderItem(item)} />

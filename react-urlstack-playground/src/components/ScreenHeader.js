@@ -16,7 +16,7 @@ function contentTransition( animatedValue, fromIndex, toIndex, box ){
 export default class ScreenHeader extends Component {
 	render(){
 		return (
-			<SharedElement style={ styles.bar } contentTransition={ contentTransition }>
+			<SharedElement style={ styles.bar } contentTransition={ contentTransition } active={ this.props.active }>
 				<Text style={ styles.text }>{ this.props.title }</Text>
 			</SharedElement>
 		);

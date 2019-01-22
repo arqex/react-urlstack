@@ -6,9 +6,9 @@ import ScreenStack from './ScreenStack'
 import ModalWrapper from './ModalWrapper'
 import DrawerWrapper from './DrawerWrapper'
 import { SharedElementWrapper } from './utils/sharedElementContext'
-import TransitionDesktopDefault from './defaultTransitions/TransitionDesktopDefault'
-import TransitionMobileDefault from './defaultTransitions/TransitionMobileDefault'
-import TransitionModalDefault from './defaultTransitions/TransitionModalDefault'
+import desktopTransition from './defaultTransitions/desktopTransition'
+import mobileTransition from './defaultTransitions/mobileTransition'
+import modalTransition from './defaultTransitions/modalTransition'
 import {memoize} from './utils/utils'
 
 export default class Navigator extends Component {
@@ -19,7 +19,8 @@ export default class Navigator extends Component {
 			layout: this.getWindowSize()
 		};
 
-		this.getCurrentTransition = memoize( this.getCurrentTransition )
+		this.calculateTransition( props.transitions, this.state.layout.width )
+
 		this.getScreenStack = memoize( this.getScreenStack )
 		this._onBack = this._onBack.bind( this )
 
@@ -37,8 +38,8 @@ export default class Navigator extends Component {
 
 	static defaultProps = {
 		transitions: {
-			0: TransitionMobileDefault,
-			800: TransitionDesktopDefault
+			0: mobileTransition,
+			800: desktopTransition
 		}
 	}
 
@@ -49,7 +50,8 @@ export default class Navigator extends Component {
 		let { DrawerComponent, transitions } = this.props
 		let { layout, indexes } = this.state
 		
-		let transition = this.getCurrentTransition( transitions, layout )
+		let transition = this.currentTransition
+		let breakPoint = this.currentBreakpoint
 		let modalTransition = this.getModalTransitions( transition )
 		let { stack, index } = this.getScreenStack( router.stack, router.activeIndex )
 
@@ -59,14 +61,16 @@ export default class Navigator extends Component {
 					<View style={styles.container} onLayout={ e => this._onLayout( e.nativeEvent.layout ) }>
 						<DrawerWrapper ref={ component => this.drawerInstance = component }
 							router={router}
-							transition={modalTransition.dock}
+							transition={modalTransition.drawer}
+							breakPoint={ breakPoint }
 							indexes={indexes.stack}
-							collapsible={ transition({}, {}).collapsibleDrawer }
+							collapsible={ transition.collapsibleDrawer }
 							Drawer={ DrawerComponent } />
 						<ScreenStack router={router}
 							screenTransition={transition}
 							stackTransition={modalTransition.stack}
 							stackIndexes={indexes.stack}
+							breakPoint={ breakPoint }
 							stack={stack}
 							index={index}
 							layout={layout}
@@ -75,6 +79,7 @@ export default class Navigator extends Component {
 							stack={router.modal.stack}
 							index={router.modal.stack}
 							transition={modalTransition.modal}
+							breakPoint={ breakPoint }
 							indexes={indexes.modal}
 							layout={layout}
 							drawer={this.drawer} />
@@ -84,27 +89,25 @@ export default class Navigator extends Component {
 		)
 	}
 
-	getCurrentTransition( transitions, layout ){
-		let breakPoints = Object.keys( transitions )
+	calculateTransition( transitions, width ){
+		let breakPoints = Object.keys( transitions ).sort( (a,b) => a - b )
 		let i = breakPoints.length
 		
 		while( i-- > 0 ){
-			if( layout.width >= parseInt( breakPoints[i]) ){
-				return transitions[ breakPoints[i] ]
+			if( width >= parseInt( breakPoints[i]) ){
+				this.currentTransition = transitions[ breakPoints[i] ]
+				this.currentBreakpoint = breakPoints[i];
+				return;
 			}
 		}
-
-		return transitions[ breakPoints[0] ]
+		
+		this.currentTransition = transitions[ breakPoints[0] ]
+		this.currentBreakpoint = breakPoints[0];
 	}
 
 	getModalTransitions( transition ){
-		let t = transition
-		if( !t ){
-			let { transitions } = this.props
-			let { width, height } = this.state
-			t = this.getCurrentTransition( transitions, width, height )
-		}
-		return t.modalTransition || TransitionModalDefault
+		let t = transition || this.currentTransition;
+		return t.modalTransition || modalTransition
 	}
 
 	// Takes the modal screens out of the stack
@@ -150,16 +153,21 @@ export default class Navigator extends Component {
 		BackHandler.removeEventListener( 'hardwareBackPress', this._onBack )
 	}
 
-	componentDidUpdate(){
+	componentDidUpdate( prevProps ){
 		let showModal = this.detectModal()
 		if( this.showingModal !== showModal ){
 			this.showingModal = showModal;
 			this.updateModalIndexes( showModal );
 		}
+
+		if( prevProps.transistions !== this.props.transistions ){
+			this.calculateTransition( this.props.transitions, this.state.layout.width )
+		}
 	}
 
 	_onLayout( layout ){
 		console.log( layout )
+		this.calculateTransition( this.props.transitions, layout.width )
 		this.setState( {layout} )
 	}
 
@@ -200,10 +208,7 @@ export default class Navigator extends Component {
 			}
 		}
 		else {
-			let {width, height} = this.state
 			let transitions = this.getModalTransitions()
-			let modalTransition = transitions.modal( indexes.modal, {width, height} )
-			let stackTransition = transitions.stack( indexes.stack, {width, height} )
 
 			indexes = {
 				modal: {showing: !!showModal, transition: indexes.modal.transition },
@@ -212,15 +217,15 @@ export default class Navigator extends Component {
 
 			Animated.timing( indexes.modal.transition, {
 				toValue: showModal ? 1 : 0,
-				easing: modalTransition.easing,
-				duration: modalTransition.duration || 300,
+				easing: transitions.modal.easing,
+				duration: transitions.modal.duration || 300,
 				useNativeDriver: true
 			}).start()
 
 			Animated.timing( indexes.stack.transition, {
 				toValue: showModal ? 0 : 1,
-				easing: stackTransition.easing,
-				duration: stackTransition.duration || 300,
+				easing: transitions.stack.easing,
+				duration: transitions.stack.duration || 300,
 				useNativeDriver: true
 			}).start()
 		}

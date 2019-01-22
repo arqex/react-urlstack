@@ -9,8 +9,8 @@ import {Context} from './utils/sharedElementContext'
 export default class ScreenStack extends Component {
 	static propTypes = {
 		router: PropTypes.object,
-		screenTransition: PropTypes.func,
-		stackTransition: PropTypes.func,
+		screenTransition: PropTypes.object,
+		stackTransition: PropTypes.object,
 		stackIndexes: PropTypes.object,
 		stack: PropTypes.array,
 		index: PropTypes.number,
@@ -18,7 +18,7 @@ export default class ScreenStack extends Component {
 	}
 
 	static defaultProps = {
-		stackTransition: () => ({}),
+		stackTransition: {},
 		stackIndexes: {} 
 	}
 
@@ -35,6 +35,7 @@ export default class ScreenStack extends Component {
 		}
 
 		this.previousIndex = index;
+		this.previousScreen = stack[index].key;
 
 		// memoize a couple of methods
 		this.calculateIndexes = memoize( this.calculateIndexes.bind( this ) )
@@ -117,9 +118,10 @@ export default class ScreenStack extends Component {
 
 		// If the pointer to the current screen has changed we need to start
 		// the animations at the next tick, so raise the flag needRelativeUpdate
-		if( index !== this.previousIndex ){
+		if( index !== this.previousIndex || stack[index].key !== this.previousScreen ){
 			this.needRelativeUpdate = true;
 			this.previousIndex = index;
+			this.previousScreen = stack[index].key;
 			this.forceUpdate();
 		}
 	}

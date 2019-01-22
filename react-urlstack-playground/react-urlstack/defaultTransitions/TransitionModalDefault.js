@@ -1,6 +1,6 @@
 import {Easing} from 'react-native'
 
-let stackAndDock = function( indexes, layout ){
+let stackAndDrawer = function( indexes, layout ){
 	return {
 		styles: {
 			translateY: {
@@ -18,8 +18,8 @@ let stackAndDock = function( indexes, layout ){
 }
 
 export default {
-	stack: stackAndDock,
-	dock: stackAndDock,
+	stack: stackAndDrawer,
+	drawer: stackAndDrawer,
 	modal: function( indexes, layout ) {
 		return {
 			styles: {

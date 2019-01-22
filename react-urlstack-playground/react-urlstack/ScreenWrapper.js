@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import { StyleSheet, Animated } from 'react-native'
-import TransitionTabDefault from './defaultTransitions/TransitionTabDefault'
+import tabTransition from './defaultTransitions/tabTransition'
 import animatedStyles from './utils/animatedStyles'
 import Context from './utils/wrapperContext'
 import {createId, nofn} from './utils/utils'
@@ -52,7 +52,7 @@ export default class ScreenWrapper extends Component {
 					layout={layout}
 					drawer= { drawer } >
 					<ScreenStack router={ router }
-						screenTransition={ transition.tabTransition || TransitionTabDefault }
+						screenTransition={ transition.tabTransition || tabTransition }
 						stack={ item.tabs.stack }
 						index={ item.tabs.activeIndex } />
 				</Screen>
