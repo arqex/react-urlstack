@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Animated, StyleSheet } from 'react-native';
 import { Context } from './utils/sharedElementContext';
 import WrapperContext from './utils/wrapperContext';
-import animatedStyles from './utils/animatedStyles';
+import PropTypes from 'prop-types'
 
 const boxAttrs = {
 	x: 'left',
@@ -12,6 +12,14 @@ const boxAttrs = {
 }
 
 class SharedElement extends Component {
+	static popTypes = {
+		active: PropTypes.boolean
+	}
+
+	static defaultTypes = {
+		active: true
+	}
+	
 	constructor(props) {
 		super(props);
 		

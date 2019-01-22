@@ -89,6 +89,7 @@ export default class ScreenStack extends Component {
 					onReady={ this._onScreenReady }
 					onUnmount={ this._onScreenUnmount }
 					drawer={ this.props.drawer }
+					breakPoint={ this.props.breakPoint }
 					key={ key } />
 			)
 		})

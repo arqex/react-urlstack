@@ -96,13 +96,13 @@ export default class Navigator extends Component {
 		while( i-- > 0 ){
 			if( width >= parseInt( breakPoints[i]) ){
 				this.currentTransition = transitions[ breakPoints[i] ]
-				this.currentBreakpoint = breakPoints[i];
+				this.currentBreakpoint = parseInt(breakPoints[i]);
 				return;
 			}
 		}
 		
 		this.currentTransition = transitions[ breakPoints[0] ]
-		this.currentBreakpoint = breakPoints[0];
+		this.currentBreakpoint = parseInt(breakPoints[0]);
 	}
 
 	getModalTransitions( transition ){

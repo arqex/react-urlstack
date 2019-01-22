@@ -41,7 +41,7 @@ export default class ScreenWrapper extends Component {
 	}
 
 	renderScreen(){
-		let { item, ScreenStack, router, transition, indexes, layout, drawer } = this.props;
+		let { item, ScreenStack, router, transition, indexes, layout, drawer, breakPoint } = this.props;
 		let { Screen, location } = item;
 
 		if( item.isTabs ){
@@ -50,11 +50,13 @@ export default class ScreenWrapper extends Component {
 					location={location}
 					indexes={indexes}
 					layout={layout}
-					drawer= { drawer } >
+					drawer= { drawer }
+					breakPoint={ breakPoint } >
 					<ScreenStack router={ router }
 						screenTransition={ transition.tabTransition || tabTransition }
 						stack={ item.tabs.stack }
-						index={ item.tabs.activeIndex } />
+						index={ item.tabs.activeIndex }
+						breakPoint={ breakPoint } />
 				</Screen>
 			)
 		}
@@ -64,7 +66,8 @@ export default class ScreenWrapper extends Component {
 				location={location}
 				indexes={indexes}
 				layout={layout}
-				drawer= { drawer } />
+				drawer= { drawer }
+				breakPoint={ breakPoint } />
 		)
 	}
 	

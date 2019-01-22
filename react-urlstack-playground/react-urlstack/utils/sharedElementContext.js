@@ -160,9 +160,12 @@ class TransitionLayer extends Component {
 
 		let i = leaving.length;
 		while(i-- > 0){
+			// Both elements must be active
+			if( !leaving[i].props.active ) continue;
+
 			let id = leaving[i].props.sharedId;
 			let j = entering.length;
-			while( j-- > 0 && entering[j].props.sharedId !== id ){
+			while( j-- > 0 && entering[j].props.sharedId !== id && !entering[j].props.active ){
 				// Pass
 			}
 			if( j >= 0 ){
