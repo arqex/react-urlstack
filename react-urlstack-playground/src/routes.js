@@ -9,7 +9,9 @@ import Tab2 from './screens/Tab2'
 import Tab3 from './screens/Tab3'
 import SimpleScreen from './screens/SimpleScreen'
 import Screen404 from './screens/Screen404'
-import Interactable from './screens/Interactable'
+
+import ContactList from './screens/transitionExamples/contacts/ContactList'
+import ContactDetails from './screens/transitionExamples/contacts/ContactDetails'
 
 export default [
 	{ path: '/', cb: Welcome },
@@ -30,5 +32,10 @@ export default [
 	]},
 	{ path: '/simpleScreen', cb: SimpleScreen },
 	{ path: '/modal', cb: Modal, isModal: true },
+
+	{ path: '/contacts', cb: ContactList, children: [
+		{ path: '/:id', cb: ContactDetails }
+	]},
+
 	{ path: '/*', cb: Screen404 }
 ]

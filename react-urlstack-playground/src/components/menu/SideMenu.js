@@ -32,6 +32,10 @@ export default class SideMenu extends Component {
             <MenuItem router={router} active={ currentRoute.slice(0,6) === '/modal'} route="/modal">Modal</MenuItem>
             <MenuItem router={router} active={ currentRoute.slice(0,8) === '/unknown'} route="/unknown">Unexistant route</MenuItem>
           </MenuGroup>
+          
+          <MenuGroup title="Transition examples">
+            <MenuItem router={router} active={ currentRoute.slice(0,5) === '/contact'} route="/contacts">Contact list</MenuItem>
+          </MenuGroup>
         </View>
       </View>
     )
