@@ -96,6 +96,7 @@ module.exports = {
     // the line below with these two lines if you prefer the stock client:
     // require.resolve('webpack-dev-server/client') + '?/',
     // require.resolve('webpack/hot/dev-server'),
+    "@babel/polyfill",
     require.resolve('react-dev-utils/webpackHotDevClient'),
     // Finally, this is your app's code:
     paths.appIndexJs,
@@ -217,13 +218,19 @@ module.exports = {
           // The preset includes JSX, Flow, and some ESnext features.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
-            include: path.join( __dirname, '../..' ),
-            exclude: /node_modules/,
+            include: [
+              path.join( __dirname, '../src' ),
+              path.join( __dirname, '../react-urlstack' ),
+              path.join( __dirname, '../node_modules/react-native-elements'),
+              path.join( __dirname, '../node_modules/react-native-vector-icons'),
+              path.join( __dirname, '../node_modules/@expo/vector-icons'),
+              path.join( __dirname, '../node_modules/expo-react-native-adapter'),
+            ],
             loader: require.resolve('babel-loader'),
             options: { 
               "presets": [
                 "@babel/react",
-                "@babel/env"
+                ["@babel/env", {"targets": {"browsers": [ "last 2 versions" ] }} ]
               ],             
               plugins: [
                 ['@babel/plugin-proposal-class-properties'],
