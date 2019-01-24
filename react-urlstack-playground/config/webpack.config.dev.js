@@ -221,10 +221,7 @@ module.exports = {
             include: [
               path.join( __dirname, '../src' ),
               path.join( __dirname, '../react-urlstack' ),
-              path.join( __dirname, '../node_modules/react-native-elements'),
               path.join( __dirname, '../node_modules/react-native-vector-icons'),
-              path.join( __dirname, '../node_modules/@expo/vector-icons'),
-              path.join( __dirname, '../node_modules/expo-react-native-adapter'),
             ],
             loader: require.resolve('babel-loader'),
             options: { 
@@ -326,7 +323,14 @@ module.exports = {
               'sass-loader'
             ),
           },
+          
           */
+         
+          {
+            test: /\.ttf$/,
+            loader: "file-loader", // or directly file-loader
+            include: path.resolve(__dirname, "node_modules/react-native-vector-icons"),
+          },
           // "file" loader makes sure those assets get served by WebpackDevServer.
           // When you `import` an asset, you get its (virtual) filename.
           // In production, they would get copied to the `build` folder.

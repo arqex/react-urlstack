@@ -3,6 +3,7 @@ import {StyleSheet, View, Text} from 'react-native'
 import {Navigator} from '../react-urlstack'
 import routes from './routes'
 import SideMenu from './components/menu/SideMenu'
+import './utils/loadIconFont'
 
 export default function StackApp(props){
   return (

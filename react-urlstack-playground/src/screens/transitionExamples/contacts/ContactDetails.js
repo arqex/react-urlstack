@@ -1,7 +1,7 @@
 import React from 'react'
-import {View, Text, Image, Button} from 'react-native'
+import {View, Text, Image, Button, StyleSheet} from 'react-native'
 import data from './contactData'
-import { Ionicons } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function ContactDetails( props ){
 	let contact = data[ props.location.params.id ];
@@ -14,19 +14,21 @@ export default function ContactDetails( props ){
 
 	return (
 		<View>
-			<View style={ styles.imageWrapper }>
-				<Image source={ contact.image } style={ styles.image } />
+			<View style={ styles.headWrapper }>
+				<View style={ styles.imageWrapper }>
+					<Image source={ contact.image } style={ styles.image } />
+				</View>
 				<View style={ styles.textWrapper }>
 					<View>
-						<Text style={ styles.title }>{ props.data.name }</Text>
+						<Text style={ styles.title }>{ contact.name }</Text>
 					</View>
 					<View>
-						<Text style={ styles.subtitle }>{ props.data.job }</Text>
+						<Text style={ styles.subtitle }>{ contact.job }</Text>
 					</View>
 				</View>
 			</View>
 			<View style={ styles.editButton }>
-				<Ionicons name="md-checkmark-circle" size={32} color="green" />
+				<Icon name="rocket" size={30} color="#900" />
 			</View>
 			<Text>{ JSON.stringify( contact ) }</Text>
 		</View>
@@ -43,8 +45,31 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
 	},
 
+	headWrapper: {
+		width: '100%', height: 200,
+		justifyContent: 'flex-end',
+		padding: 20
+	},
+
+	imageWrapper: {
+		position: 'absolute',
+		top: 0, left: 0, bottom: 0, right: 0
+	},
+
+	editButton: {
+		position: 'absolute',
+		top: 180, right: 20,
+		background: '#fff',
+		width: 40, height: 40,
+		borderRadius: 20,
+		overflow: 'hidden',
+		flex: 1,
+		justifyContent: 'center'
+	},
+
 	image: {
-		width: '100%', height: '100%',
+		flex: 1,
+		resizeMode: 'cover'
 	},
 
   title: {
