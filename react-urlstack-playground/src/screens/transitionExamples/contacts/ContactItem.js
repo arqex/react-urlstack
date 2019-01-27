@@ -7,7 +7,7 @@ export default function ContactItem( props ){
 		<TouchableHighlight onPress={ props.onPress  }>
 			<View style={ styles.container }>
 				<View style={ styles.imageWrapper }>
-					<Image source={ props.data.image } style={ styles.image } />
+					<Image source={ {uri: props.data.image } } style={ styles.image } />
 				</View>
 				<View style={ styles.textWrapper }>
 					<View>

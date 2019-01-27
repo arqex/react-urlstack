@@ -16,7 +16,7 @@ export default function ContactDetails( props ){
 		<View>
 			<View style={ styles.headWrapper }>
 				<View style={ styles.imageWrapper }>
-					<Image source={ contact.image } style={ styles.image } />
+					<Image source={ {uri: contact.image} } style={ styles.image } />
 				</View>
 				<View style={ styles.textWrapper }>
 					<View>
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
 	editButton: {
 		position: 'absolute',
 		top: 180, right: 20,
-		background: '#fff',
+		backgroundColor: '#fff',
 		width: 40, height: 40,
 		borderRadius: 20,
 		overflow: 'hidden',
