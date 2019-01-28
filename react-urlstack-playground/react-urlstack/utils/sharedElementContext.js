@@ -38,6 +38,13 @@ function unregister(instance) {
 // Layers registered callback to listen to transitions
 let clbks = []
 
+// Needs to force all the shared element to measure themselves in order to get
+// the rights coords to start the shared element transitions
+// This is called by the ScreenStack when the transition has just been required
+function reMeasure(){
+
+}
+
 // This method is called just before starting the screen transition when the URL changes
 // Screen stack is the one responsible of calling it through the context
 function startTransition( prevIndexes, nextIndexes ){
@@ -92,12 +99,41 @@ class TransitionLayer extends Component {
 		
 		if( !couples.length ) return;
 
-		let elements = couples.map( couple => (
-			this.renderElement( couple, toScreen.index )
-		));
+		this.measureCouples( couples, () => {
+			let elements = couples.map( couple => (
+				this.renderElement( couple, toScreen.index )
+			));
+	
+			this.setState({elements})
+			this.setRemoveElements( elements )
+		});
 
-		this.setState({elements})
-		this.setRemoveElements( elements )
+		couples[0].entering.refs.el.measure( function( cx, cy, width, height, x, y ) {
+			console.log( arguments );
+		})
+
+	}
+
+	measureCouples( couples, clbk ){
+		let called = false;
+
+		function measure( element ){
+			element.refs.el.measure( function( cx, cy, width, height, x, y ){
+				element.box = {width, height, x, y};
+				if( !called ){
+					called = true
+					setTimeout( clbk )
+				}
+			})
+		}
+
+		couples.forEach( c => {
+			c.entering.box = false;
+			c.leaving.box = false;
+
+			measure( c.entering )
+			measure( c.leaving )
+		})
 	}
 
 	setRemoveElements( elements ){
@@ -165,7 +201,7 @@ class TransitionLayer extends Component {
 
 			let id = leaving[i].props.sharedId;
 			let j = entering.length;
-			while( j-- > 0 && entering[j].props.sharedId !== id && !entering[j].props.active ){
+			while( j-- > 0 && (entering[j].props.sharedId !== id || !entering[j].props.active) ){
 				// Pass
 			}
 			if( j >= 0 ){
@@ -203,7 +239,7 @@ const styles = StyleSheet.create({
 })
 
 const SharedElementWrapper = props => (
-	<Context.Provider value={{ register, unregister, startTransition }}>
+	<Context.Provider value={{ register, unregister, startTransition, reMeasure }}>
 		{ props.children }
 		<TransitionLayer router={ props.router } layout={ props.layout } />
 	</Context.Provider>

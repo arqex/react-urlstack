@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Animated, StyleSheet } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
 import { Context } from './utils/sharedElementContext';
 import WrapperContext from './utils/wrapperContext';
 import PropTypes from 'prop-types'
@@ -42,22 +42,13 @@ class SharedElement extends Component {
 			return this.renderTransition();
 		} 
 
-		let viewStyles = [this.props.style];
-		if( this.animatedLeaving ){
-			viewStyles = viewStyles.concat([
-				styles.position,
-				this.props.fromBox,
-				this.getTransitionStyle()
-			])
-		}
-
-
 		return (
-			<Animated.View style={ this.props.style }
+			<View style={ this.props.style }
+				ref="el"
 				onLayout={ e => this._setBox(e) }
 				pointerEvents="auto">
 				{ this.props.children }
-			</Animated.View>
+			</View>
 		);
 	}
 
@@ -129,7 +120,7 @@ class SharedElement extends Component {
 	}
 
 	_setBox( e ){
-		this.props.wrapper
+		console.log( e.nativeEvent.layout )
 		this.box = e.nativeEvent.layout
 	}
 

@@ -9,7 +9,7 @@ export default {
 				outputRange: [ 0, 0, layout.width - leftColumn, 400, 0, 0]
 			},
 			
-			left: {
+			translateX: {
 				inputRange: [ -2, -1, 0, 1, 2 ],
 				outputRange: [ layout.width, layout.width, leftColumn, 0, 0]
 			}

@@ -6,9 +6,9 @@ export default function ContactItem( props ){
 	return (
 		<TouchableHighlight onPress={ props.onPress  }>
 			<View style={ styles.container }>
-				<View style={ styles.imageWrapper }>
+				<SharedElement sharedId={ `avatar_${ props.data.id }` } style={ styles.imageWrapper } active>
 					<Image source={ {uri: props.data.image } } style={ styles.image } />
-				</View>
+				</SharedElement>
 				<View style={ styles.textWrapper }>
 					<View>
 						<Text style={ styles.title }>{ props.data.name }</Text>
@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
 		marginRight: 20
 	},
 	image: {
-		width: 48, height: 48,
+		flex: 1,
+		resizeMode: 'cover'
 	}
 })

@@ -8,7 +8,7 @@ export default function animatedStyles( transition, indexes, layout ){
 	let transformStyles = []
 
 	if( indexes.count ){
-		animatedStyles.zIndex = indexes.screen
+		animatedStyles.zIndex = indexes.count - Math.abs(indexes.relative)
 	}
 
 	Object.keys( styles ).forEach( key => {

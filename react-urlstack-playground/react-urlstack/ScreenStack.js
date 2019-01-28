@@ -85,7 +85,7 @@ export default class ScreenStack extends Component {
 					router={ router }
 					indexes={ indexes[ key ] }
 					layout={ layout }
-					transition={ item.Screen.transition || this.props.screenTransition }
+					transition={ this.getScreenTransition( item.Screen ) }
 					onReady={ this._onScreenReady }
 					onUnmount={ this._onScreenUnmount }
 					drawer={ this.props.drawer }
@@ -94,6 +94,16 @@ export default class ScreenStack extends Component {
 			)
 		})
 		return screens;
+	}
+
+	getScreenTransition( Screen ){
+		if( typeof Screen.getTransition === 'function' ){
+			let transition = Screen.getTransition( this.props.breakPoint );
+			if( transition === false ) return;
+			if( transition ) return transition;
+		}
+
+		return this.props.screenTransition;
 	}
 
 	updateLayout( e ){

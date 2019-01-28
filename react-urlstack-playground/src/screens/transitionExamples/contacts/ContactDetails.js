@@ -2,6 +2,7 @@ import React from 'react'
 import {View, Text, Image, TouchableHighlight, StyleSheet} from 'react-native'
 import data from './contactData'
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {SharedElement} from '../../../../react-urlstack'
 
 const icons = {
 	phone: 'phone',
@@ -35,9 +36,9 @@ export default function ContactDetails( props ){
 						<Icon name="arrow-left" color="#222" size={ 26 } />
 					</View>
 				</TouchableHighlight>
-				<View style={ styles.imageWrapper }>
+				<SharedElement sharedId={ `avatar_${ contact.id }` } style={ styles.imageWrapper } active>
 					<Image source={ {uri: contact.image} } style={ styles.image } />
-				</View>
+				</SharedElement>
 				<View style={ styles.textWrapper }>
 					<View>
 						<Text style={ styles.title }>{ contact.name }</Text>
@@ -59,6 +60,22 @@ export default function ContactDetails( props ){
 	)
 }
 
+
+ContactDetails.getTransition = function( breakPoint ){
+	// Not returning anything means apply the default transition for other breakPoints
+	// If we want to not animate the transitions just return false
+	if( breakPoint !== 0 ) return;
+
+	return {
+		styles: {
+			opacity: {
+				inputRange: [-1, -0.3, 0, .3, 1],
+				outputRange: [0, 0, 1, 0, 0]
+			}
+		},
+		duration: 700
+	}
+}
 
 const styles = StyleSheet.create({
 	container: {
@@ -126,7 +143,8 @@ const styles = StyleSheet.create({
 
 	detailList: {
 		maxWidth: 500,
-		width: '90%'
+		width: '100%',
+		paddingLeft: 20, paddingRight: 20
 	},
 
 	detailItem: {

@@ -72,7 +72,8 @@ export default class ScreenWrapper extends Component {
 	}
 	
 	setAnimatedLayout( indexes, layout ){
-		this.animatedStyles = animatedStyles( this.props.transition, indexes, layout )
+		let transition = this.props.transition;
+		this.animatedStyles = transition ? animatedStyles( transition, indexes, layout ) : {};
 	}
 
 	componentWillReceiveProps( nextProps ){
