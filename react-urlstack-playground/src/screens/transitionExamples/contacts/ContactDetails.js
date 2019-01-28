@@ -1,10 +1,16 @@
 import React from 'react'
-import {View, Text, Image, Button, StyleSheet} from 'react-native'
+import {View, Text, Image, TouchableHighlight, StyleSheet} from 'react-native'
 import data from './contactData'
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+const icons = {
+	phone: 'phone',
+	email: 'envelope-o',
+	location: 'home'
+}
+
 export default function ContactDetails( props ){
-	let contact = data[ props.location.params.id ];
+	let contact = data[ parseInt(props.location.params.id) - 1 ];
 
 	if( !contact ){
 		return (
@@ -12,9 +18,23 @@ export default function ContactDetails( props ){
 		)
 	}
 
+	let list = ['phone', 'email', 'location'].map ( key => (
+		<View style={ styles.detailItem } key={ key }>
+			<View style={ styles.detailIcon }>
+				<Icon name={ icons[key] } size={ 24 } color="#555" />
+			</View>
+			<Text style={ styles.detailText }>{ contact[key] }</Text>
+		</View>
+	))
+
 	return (
 		<View>
 			<View style={ styles.headWrapper }>
+				<TouchableHighlight style={ styles.back } onClick={ () => props.router.navigate('/contacts') }>
+					<View>
+						<Icon name="arrow-left" color="#222" size={ 26 } />
+					</View>
+				</TouchableHighlight>
 				<View style={ styles.imageWrapper }>
 					<Image source={ {uri: contact.image} } style={ styles.image } />
 				</View>
@@ -28,9 +48,13 @@ export default function ContactDetails( props ){
 				</View>
 			</View>
 			<View style={ styles.editButton }>
-				<Icon name="rocket" size={30} color="#900" />
+				<Icon name="pencil" size={20} color="#fff" />
 			</View>
-			<Text>{ JSON.stringify( contact ) }</Text>
+			<View style={ styles.detailContainer }>
+				<View style={ styles.detailList }>
+					{ list }
+				</View>
+			</View>
 		</View>
 	)
 }
@@ -48,7 +72,15 @@ const styles = StyleSheet.create({
 	headWrapper: {
 		width: '100%', height: 200,
 		justifyContent: 'flex-end',
-		padding: 20
+		padding: 20,
+		position: 'relative'
+	},
+
+	back: {
+		position: 'absolute',
+		top: 10, left: 20,
+		width: 40, height: 40,
+		zIndex: 12
 	},
 
 	imageWrapper: {
@@ -58,13 +90,15 @@ const styles = StyleSheet.create({
 
 	editButton: {
 		position: 'absolute',
-		top: 180, right: 20,
-		backgroundColor: '#fff',
-		width: 40, height: 40,
-		borderRadius: 20,
+		top: 175, right: 20,
+		backgroundColor: '#34c',
+		width: 50, height: 50,
+		borderRadius: 25,
 		overflow: 'hidden',
 		flex: 1,
-		justifyContent: 'center'
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center'
 	},
 
 	image: {
@@ -74,13 +108,41 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 20,
-    fontWeight: '400',
-    color: '#fff'
+    fontWeight: '500',
+    color: '#222'
 	},
 	
   subtitle: {
     fontSize: 16,
-    fontWeight: '300',
-    color: '#fff'
+    fontWeight: '400',
+    color: '#222'
 	},
+
+	detailContainer: {
+		justifyContent: 'center',
+		flexDirection: 'row',
+		marginTop: 20
+	},
+
+	detailList: {
+		maxWidth: 500,
+		width: '90%'
+	},
+
+	detailItem: {
+		flexDirection: 'row',
+		marginBottom: 15
+	},
+
+	detailIcon: {
+		width: 30,
+		flexDirection: 'row',
+		justifyContent: 'center'
+	},
+
+	detailText: {
+		color: '#444',
+		marginLeft: 10,
+		fontSize: 18
+	}
 })
