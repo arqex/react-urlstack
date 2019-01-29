@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
+import { Animated, StyleSheet, View, Platform } from 'react-native';
 import { Context } from './utils/sharedElementContext';
 import WrapperContext from './utils/wrapperContext';
 import PropTypes from 'prop-types'
+
+const isWeb = Platform.OS === 'web';
 
 const boxAttrs = {
 	x: 'left',
@@ -39,13 +41,13 @@ class SharedElement extends Component {
 
 	render() {
 		if( this.animatedLeaving ) {
-			return this.renderTransition();
+			return this.renderTransition();	
 		} 
 
 		return (
 			<View style={ this.props.style }
 				ref="el"
-				onLayout={ e => this._setBox(e) }
+				onLayout={ () => this._onLayout() }
 				pointerEvents="auto">
 				{ this.props.children }
 			</View>
@@ -126,11 +128,6 @@ class SharedElement extends Component {
 		}
 	}
 
-	_setBox( e ){
-		console.log( e.nativeEvent.layout )
-		this.box = e.nativeEvent.layout
-	}
-
 	boxInterpolator( animatedLeaving, fromIndex, toIndex, fromBox, toBox ){
 		let props = this.props;
 		let getArgs = attr => ([
@@ -156,6 +153,7 @@ class SharedElement extends Component {
 	interpolator( animatedLeaving, fromIndex, toIndex, fromValue, toValue ){
 		if( fromValue === toValue ) return fromValue;
 		let inverted = fromIndex > toIndex;
+		console.log( 'Interpolating', fromValue, toValue )
 		return animatedLeaving.interpolate({
 			inputRange: inverted ? [ toIndex, fromIndex ] : [ fromIndex, toIndex ],
 			outputRange: inverted ? [ toValue, fromValue ] : [ fromValue, toValue ]
@@ -175,6 +173,8 @@ class SharedElement extends Component {
 				duration: 500
 			}).start();
 		}
+
+		this.mounted = true;
 	}
 	
 	componentWillUnmount(){
@@ -184,6 +184,13 @@ class SharedElement extends Component {
 	}
 
 	measure( offset ){
+		this.box = false;
+		if( !isWeb && !this.layouted ){
+			// We need the layout to calculate the measures properly in native
+			console.log('skipping')
+			return setTimeout( () => this.measure( offset ) );
+		}
+		
 		this.refs.el && this.refs.el.measure( ( cx, cy, width, height, x, y ) => {
 			this.box = {
 				width, height,
@@ -193,6 +200,10 @@ class SharedElement extends Component {
 			
 			console.log('measured' );
 		})
+	}
+
+	_onLayout(){
+		this.layouted = true;
 	}
 }
 

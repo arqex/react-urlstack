@@ -107,10 +107,24 @@ class TransitionLayer extends Component {
 		let couples = this.getTransitionCouples( fromScreen.id, toScreen.id )
 		
 		if( !couples.length ) return;
+
+		this.waitForReadyAndRender( couples, toScreen.index );
+	}
+
+	waitForReadyAndRender( couples, toIndex ){
+		// Check if the boxes are already calculated
+		let i = couples.length;
+		while( i-- > 0 ){
+			if( !couples[i].leaving.box || !couples[i].entering.box ){
+				// oops! retry
+				return setTimeout( () => this.waitForReadyAndRender( couples, toIndex ) );
+			}
+		}
 		
-		let elements = couples.map( couple => (
-			this.renderElement( couple, toScreen.index )
-		));
+		let elements = couples.map( (couple, i) => {
+			console.log( `from ${JSON.stringify(couple.leaving.box)} to ${JSON.stringify(couple.entering.box)}` )
+			return this.renderElement( couple, toIndex,  `se${i}` )
+		});
 
 		this.setState({elements})
 		this.setRemoveElements( elements )
@@ -136,11 +150,12 @@ class TransitionLayer extends Component {
 		}, 500)
 	}
 
-	renderElement( {leaving, entering}, enteringFrom ){
+	renderElement( {leaving, entering}, enteringFrom, key ){
 		let SharedElement = leaving.SE;
 
 		return (
-			<SharedElement toIndex={ enteringFrom }
+			<SharedElement key={ key }
+				toIndex={ enteringFrom }
 				fromBox={ leaving.box }
 				toBox={ entering.box }
 				fromProps={ leaving.props }
