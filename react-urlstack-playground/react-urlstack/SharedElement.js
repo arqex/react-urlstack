@@ -54,7 +54,13 @@ class SharedElement extends Component {
 
 	renderTransition(){
 		let viewStyles = this.getTransitionStyle();
-
+		
+		return (
+			<Animated.View style={ viewStyles.container } pointerEvents="auto">
+				{ this.props.fromProps.children }
+			</Animated.View>
+		)
+		/*
 		return (
 			<Animated.View style={ viewStyles.container } pointerEvents="auto">
 				<Animated.View style={ viewStyles.leaving }>
@@ -65,6 +71,7 @@ class SharedElement extends Component {
 				</Animated.View>
 			</Animated.View>
 		)
+		*/
 	}
 
 	getTransitionStyle(){
@@ -112,8 +119,8 @@ class SharedElement extends Component {
 
 	boxToStyle( box ){
 		return {
-			left: box.x,
-			top: box.y,
+			left: 0,
+			top: 0,
 			width: box.width,
 			height: box.height
 		}
@@ -156,8 +163,6 @@ class SharedElement extends Component {
 	}
 
 	componentDidMount(){
-		this.props.wrapper;
-		
 		if( this.animatedLeaving ){
 			// We are in the transition layer, start the animation
 			Animated.timing( this.animatedLeaving, {
@@ -176,6 +181,18 @@ class SharedElement extends Component {
 		if( this.registered ){
 			this.props.se.unregister( this );
 		}
+	}
+
+	measure( offset ){
+		this.refs.el && this.refs.el.measure( ( cx, cy, width, height, x, y ) => {
+			this.box = {
+				width, height,
+				x: x - offset.x,
+				y: y - offset.y
+			};
+			
+			console.log('measured' );
+		})
 	}
 }
 

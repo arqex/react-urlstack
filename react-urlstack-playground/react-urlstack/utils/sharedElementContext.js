@@ -14,7 +14,6 @@ function register(instance, props ) {
 		mountedElements[wrapper] = []
 	}
 	mountedElements[wrapper].push(instance);
-	console.log( `Mounting ${wrapper}`, mountedElements[ wrapper ] );
 }
 
 // When it's unmounted we delete the references to it
@@ -31,8 +30,6 @@ function unregister(instance) {
 			}
 		}
 	}
-
-	console.log(`Unmounting ${wrapper}`, mountedElements[ wrapper ]);
 }
 
 // Layers registered callback to listen to transitions
@@ -41,8 +38,16 @@ let clbks = []
 // Needs to force all the shared element to measure themselves in order to get
 // the rights coords to start the shared element transitions
 // This is called by the ScreenStack when the transition has just been required
-function reMeasure(){
+function reMeasure( layout ){
+	let screens = Object.keys( mountedElements );
+	if( screens.length < 2 ) return;
 
+	let offset = { x: layout.x, y: layout.y };
+	screens.forEach( key => {
+		mountedElements[key].forEach( el => {
+			el.measure( offset );
+		})
+	})
 }
 
 // This method is called just before starting the screen transition when the URL changes
@@ -86,6 +91,10 @@ class TransitionLayer extends Component {
 			left: layout.x || 0,
 			bottom: (layout.y || 0) + layout.height
 		}
+
+		if( this.state.elements.length > 0 ){
+			console.log( 'couples found, rendering', this.state.elements.length )
+		}
 		
 		return (
 			<View style={ [styles.container, box] } pointerEvents="none">
@@ -98,42 +107,13 @@ class TransitionLayer extends Component {
 		let couples = this.getTransitionCouples( fromScreen.id, toScreen.id )
 		
 		if( !couples.length ) return;
+		
+		let elements = couples.map( couple => (
+			this.renderElement( couple, toScreen.index )
+		));
 
-		this.measureCouples( couples, () => {
-			let elements = couples.map( couple => (
-				this.renderElement( couple, toScreen.index )
-			));
-	
-			this.setState({elements})
-			this.setRemoveElements( elements )
-		});
-
-		couples[0].entering.refs.el.measure( function( cx, cy, width, height, x, y ) {
-			console.log( arguments );
-		})
-
-	}
-
-	measureCouples( couples, clbk ){
-		let called = false;
-
-		function measure( element ){
-			element.refs.el.measure( function( cx, cy, width, height, x, y ){
-				element.box = {width, height, x, y};
-				if( !called ){
-					called = true
-					setTimeout( clbk )
-				}
-			})
-		}
-
-		couples.forEach( c => {
-			c.entering.box = false;
-			c.leaving.box = false;
-
-			measure( c.entering )
-			measure( c.leaving )
-		})
+		this.setState({elements})
+		this.setRemoveElements( elements )
 	}
 
 	setRemoveElements( elements ){
@@ -184,6 +164,7 @@ class TransitionLayer extends Component {
 	}
 	
 	getTransitionCouples( fromId, toId ){
+		if( fromId === toId ) return [];
 		
 		let leaving = mountedElements[fromId]
 		let entering = mountedElements[toId]

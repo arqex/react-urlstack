@@ -123,8 +123,17 @@ export default class ScreenStack extends Component {
 		// If the flag needRelativeUpdate is up, we need to update the relative
 		// indexes to start the animations
 		if (this.needRelativeUpdate) {
+			
+			// All the shared elements have been mounted, measure them
+			this.context.reMeasure( this.props.layout );
 			let nextIndexes = this.updateRelativeIndexes(indexes, stack, index);
-			this.updateIndexesWhenReady( nextIndexes )
+
+			// At the next tick we can update the indexes and start the animations
+			setTimeout( () => {
+				this.needRelativeUpdate = false;
+				this.startTransition( this.state.indexes, nextIndexes );
+				this.setState({ indexes: nextIndexes })
+			})
 		}
 
 		// If the pointer to the current screen has changed we need to start
@@ -191,25 +200,6 @@ export default class ScreenStack extends Component {
 		})
 
 		return indexes;
-	}
-
-	updateIndexesWhenReady( nextIndexes ){
-		let allReady = true;
-		let stack = this.props.stack;
-		let i = stack.length;
-		while( i-- > 0 && allReady ){
-			allReady = this.readyScreens[ stack[i].key ]
-		}
-
-		if( allReady ){
-			this.needRelativeUpdate = false;
-			this.startTransition( this.state.indexes, nextIndexes );
-			this.setState({ indexes: nextIndexes })
-		}
-		else {
-			// Wait for the ready (onLayout) signal from the wrappers
-			setTimeout( () => this.updateIndexesWhenReady( nextIndexes ) );
-		}
 	}
 
 	startTransition( prevIndexes, nextIndexes ){

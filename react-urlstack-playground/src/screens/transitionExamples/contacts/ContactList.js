@@ -33,6 +33,6 @@ ContactList.getTransition = function( breakPoint ){
 				outputRange: [0, 0, 1, 0, 0]
 			}
 		},
-		duration: 700
+		duration: 1000
 	}
 }
