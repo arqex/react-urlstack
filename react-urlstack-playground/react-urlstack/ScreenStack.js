@@ -216,9 +216,6 @@ export default class ScreenStack extends Component {
 	}
 
 	startTransition( prevIndexes, nextIndexes ){
-		console.log('Transitions start')
-		let layout = this.state.layout
-
 		// Screen transitions
 		this.props.stack.forEach( ({key, Screen}) => {
 			let prevIndex = prevIndexes[key];
