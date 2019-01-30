@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
-import {Animated, View, StyleSheet, Text} from 'react-native'
+import TransitionElement from '../TransitionElement'
+import {View, StyleSheet} from 'react-native'
 
 const Context = React.createContext('sharedElement');
 
@@ -35,12 +36,19 @@ function unregister(instance) {
 // Layers registered callback to listen to transitions
 let clbks = []
 
+// Here we will be store the current breakPoint and screenIndexes when
+// the shared elements are measured
+let breakPoint, screenIndexes;
+
 // Needs to force all the shared element to measure themselves in order to get
 // the rights coords to start the shared element transitions
 // This is called by the ScreenStack when the transition has just been required
-function reMeasure( layout ){
+function reMeasure( layout, bp, indexes ){
 	let screens = Object.keys( mountedElements );
 	if( screens.length < 2 ) return;
+
+	breakPoint = bp
+	screenIndexes = indexes
 
 	let offset = { x: layout.x, y: layout.y };
 	screens.forEach( key => {
@@ -123,7 +131,7 @@ class TransitionLayer extends Component {
 		
 		let elements = couples.map( (couple, i) => {
 			console.log( `from ${JSON.stringify(couple.leaving.box)} to ${JSON.stringify(couple.entering.box)}` )
-			return this.renderElement( couple, toIndex,  `se${i}` )
+			return this.renderElement( couple, `se${i}` )
 		});
 
 		this.setState({elements})
@@ -147,23 +155,17 @@ class TransitionLayer extends Component {
 			}
 			
 			this.setState({ elements: stateElements})
-		}, 500)
+		}, 1000)
 	}
 
-	renderElement( {leaving, entering}, enteringFrom, key ){
-		let SharedElement = leaving.SE;
-
+	renderElement( {leaving, entering}, key ){
 		return (
-			<SharedElement key={ key }
-				toIndex={ enteringFrom }
-				fromBox={ leaving.box }
-				toBox={ entering.box }
-				fromProps={ leaving.props }
-				toProps={ entering.props }
-				style={ leaving.props.style }>
-					{ leaving.props.children }	
-			</SharedElement>
-		);
+			<TransitionElement key={ key }
+				leaving={ leaving }
+				entering={ entering }
+				breakPoint={ breakPoint }
+				screenIndexes={ screenIndexes } />
+		)
 	}
 
 	cleanProps( props ){

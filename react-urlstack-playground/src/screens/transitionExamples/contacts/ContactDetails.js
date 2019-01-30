@@ -10,6 +10,7 @@ const icons = {
 	location: 'home'
 }
 
+
 export default function ContactDetails( props ){
 	let contact = data[ parseInt(props.location.params.id) - 1 ];
 
@@ -59,7 +60,6 @@ export default function ContactDetails( props ){
 		</View>
 	)
 }
-
 
 ContactDetails.getTransition = function( breakPoint ){
 	// Not returning anything means apply the default transition for other breakPoints

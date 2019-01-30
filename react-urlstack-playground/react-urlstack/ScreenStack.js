@@ -124,8 +124,17 @@ export default class ScreenStack extends Component {
 		// indexes to start the animations
 		if (this.needRelativeUpdate) {
 			
-			// All the shared elements have been mounted, measure them
-			this.context.reMeasure( this.props.layout );
+			// All the shared elements have been mounted, measure them ASAP
+			this.context.reMeasure(
+				this.props.layout,
+				this.props.breakPoint,
+				this.transitionIndexes
+			);
+
+			// Unset the transitionIndexes now
+			this.transitionIndexes = false;
+
+			// Calculate next indexes
 			let nextIndexes = this.updateRelativeIndexes(indexes, stack, index);
 
 			// At the next tick we can update the indexes and start the animations
@@ -139,6 +148,10 @@ export default class ScreenStack extends Component {
 		// If the pointer to the current screen has changed we need to start
 		// the animations at the next tick, so raise the flag needRelativeUpdate
 		if( index !== this.previousIndex || stack[index].key !== this.previousScreen ){
+			this.transitionIndexes = {
+				leaving: this.previousIndex,
+				entering: index
+			}
 			this.needRelativeUpdate = true;
 			this.previousIndex = index;
 			this.previousScreen = stack[index].key;
@@ -212,7 +225,7 @@ export default class ScreenStack extends Component {
 			let nextIndex = nextIndexes[key];
 
 			if( prevIndex && nextIndex && prevIndex.relative !== nextIndex.relative) {
-				let transition = this.calculateScreenTransition( Screen.transition, nextIndex, layout );
+				let transition = this.getScreenTransition( Screen );
 				Animated.timing( nextIndex.transition, {
 					toValue: nextIndex.relative,
 					easing: transition.easing,
@@ -224,16 +237,6 @@ export default class ScreenStack extends Component {
 
 		// Signal for shared elements transition to start
 		this.context.startTransition( prevIndexes, nextIndexes );
-	}
-
-	calculateScreenTransition( generator, indexes, layout ){
-		let g = generator || this.props.screenTransition
-
-		if( typeof g === 'function' ) {
-			return g( indexes, layout )
-		}
-
-		return g
 	}
 
 	_onScreenReady( id ){
