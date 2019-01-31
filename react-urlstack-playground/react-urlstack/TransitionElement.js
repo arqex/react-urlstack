@@ -129,7 +129,7 @@ export default class TransitionElement extends Component {
 			Animated.timing( this.animatedValue, {
 				toValue: this.indexes.entering,
 				duration: this.transition.duration || defaultDuration,
-				useNativeDriver: !isWeb
+				// useNativeDriver: !isWeb // Native driver is not animating width and height
 			}).start( () => this.props.onTransitionEnd() );
 		}
 	}
