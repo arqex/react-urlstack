@@ -52,7 +52,7 @@ let warnKeys = {};
 	styleKeys[key] = 1;
 	warnKeys[key] = 1;
 });
-['width', 'height', 'opacity', 'backgroundColor'].forEach( key => {
+['width', 'height', 'opacity', 'backgroundColor', 'borderRadius'].forEach( key => {
 	styleKeys[key] = 1 
 })
 

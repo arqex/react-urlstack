@@ -1,12 +1,13 @@
 import React from 'react'
 import {View, Text, Image, StyleSheet, TouchableHighlight} from 'react-native'
 import {SharedElement} from '../../../../react-urlstack'
+import avatarTransition from './avatarTransition'
 
 export default function ContactItem( props ){
 	return (
 		<TouchableHighlight onPress={ props.onPress  }>
 			<View style={ styles.container }>
-				<SharedElement sharedId={ `avatar_${ props.data.id }` } style={ styles.imageWrapper } active>
+				<SharedElement sharedId={ `avatar_${ props.data.id }` } style={ styles.imageWrapper } transitionState={ 1 } transition={ avatarTransition }>
 					<Image source={ {uri: props.data.image } } style={ styles.image } />
 				</SharedElement>
 				<View style={ styles.textWrapper }>

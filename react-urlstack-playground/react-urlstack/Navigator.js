@@ -11,6 +11,8 @@ import mobileTransition from './defaultTransitions/mobileTransition'
 import modalTransition from './defaultTransitions/modalTransition'
 import {memoize} from './utils/utils'
 
+const isWeb = Platform.OS === 'web'
+
 export default class Navigator extends Component {
 	constructor( props ){
 		super( props )
@@ -219,14 +221,14 @@ export default class Navigator extends Component {
 				toValue: showModal ? 1 : 0,
 				easing: transitions.modal.easing,
 				duration: transitions.modal.duration || 300,
-				useNativeDriver: true
+				useNativeDriver: !isWeb
 			}).start()
 
 			Animated.timing( indexes.stack.transition, {
 				toValue: showModal ? 0 : 1,
 				easing: transitions.stack.easing,
 				duration: transitions.stack.duration || 300,
-				useNativeDriver: true
+				useNativeDriver: !isWeb
 			}).start()
 		}
 

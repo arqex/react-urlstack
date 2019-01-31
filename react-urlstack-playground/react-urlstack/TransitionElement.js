@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Animated, StyleSheet } from 'react-native';
+import { Animated, StyleSheet, Platform } from 'react-native';
 import animatedStyles from './utils/animatedStyles';
 import PropTypes from 'prop-types'
 
+const isWeb = Platform.OS === 'web';
 const defaultDuration = 500;
 
 export default class TransitionElement extends Component {
@@ -61,7 +62,7 @@ export default class TransitionElement extends Component {
 	}
 
 	getTransition(){
-		let transitionStyle = this.props.leaving.props.transitionStyle;
+		let transitionStyle = this.props.leaving.props.transition;
 		let defaultTransition = this.getDefaultTransition()
 
 		let transition
@@ -89,8 +90,8 @@ export default class TransitionElement extends Component {
 
 	getIndexes(){
 		return {
-			entering: this.props.entering.props.transitionIndex || this.props.screenIndexes.entering,
-			leaving: this.props.leaving.props.transitionIndex || this.props.screenIndexes.leaving,
+			entering: this.props.entering.props.transitionState || this.props.screenIndexes.entering,
+			leaving: this.props.leaving.props.transitionState || this.props.screenIndexes.leaving,
 		}
 	}
 
@@ -127,8 +128,9 @@ export default class TransitionElement extends Component {
 			// Start the animation
 			Animated.timing( this.animatedValue, {
 				toValue: this.indexes.entering,
-				duration: this.transition.duration || defaultDuration
-			}).start();
+				duration: this.transition.duration || defaultDuration,
+				useNativeDriver: !isWeb
+			}).start( () => this.props.onTransitionEnd() );
 		}
 	}
 }

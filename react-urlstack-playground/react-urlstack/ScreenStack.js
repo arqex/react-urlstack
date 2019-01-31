@@ -1,10 +1,12 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import {Animated, View, StyleSheet} from 'react-native'
+import {Animated, View, StyleSheet, Platform} from 'react-native'
 import {memoize, bind} from './utils/utils'
 import ScreenWrapper from './ScreenWrapper'
 import animatedStyles from './utils/animatedStyles'
 import {Context} from './utils/sharedElementContext'
+
+const isWeb = Platform.OS === 'web'
 
 export default class ScreenStack extends Component {
 	static propTypes = {
@@ -227,7 +229,7 @@ export default class ScreenStack extends Component {
 					toValue: nextIndex.relative,
 					easing: transition.easing,
 					duration: transition.duration || 300,
-					useNativeDriver: true,
+					useNativeDriver: !isWeb,
 				}).start()
 			}
 		})

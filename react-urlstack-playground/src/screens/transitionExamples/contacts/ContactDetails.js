@@ -1,8 +1,9 @@
-import React from 'react'
-import {View, Text, Image, TouchableHighlight, StyleSheet} from 'react-native'
+import React, {Component} from 'react'
+import {View, Text, Image, TouchableHighlight, StyleSheet, Animated} from 'react-native'
 import data from './contactData'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {SharedElement} from '../../../../react-urlstack'
+import avatarTransition from './avatarTransition'
 
 const icons = {
 	phone: 'phone',
@@ -10,55 +11,85 @@ const icons = {
 	location: 'home'
 }
 
+export default class ContactDetails extends Component {
+	constructor( props ){
+		super(props)
 
-export default function ContactDetails( props ){
-	let contact = data[ parseInt(props.location.params.id) - 1 ];
+		this.buttonAnimatedStyles = {
+			transform: [{scale: props.indexes.transition.interpolate({
+				inputRange: [-1, -.2, -.1, 0, 1 ],
+				outputRange: [0, 0, 1.2, 1, 1]
+			})}]
+		}
 
-	if( !contact ){
-		return (
-			<View><Text>No contact found for this id</Text></View>
-		)
+		this.headerAnimatedStyles = {
+			opacity: props.indexes.transition.interpolate({
+				inputRange: [-1, -.2, -.18, 0 ],
+				outputRange: [0, 0, 1, 1]
+			})
+		}
+
+		this.detailsAnimatedStyles = {
+			opacity: props.indexes.transition.interpolate({
+				inputRange: [-1, -.3, -.1, 0 ],
+				outputRange: [0, 0, 1, 1]
+			})
+		}
 	}
 
-	let list = ['phone', 'email', 'location'].map ( key => (
-		<View style={ styles.detailItem } key={ key }>
-			<View style={ styles.detailIcon }>
-				<Icon name={ icons[key] } size={ 24 } color="#555" />
+	render() {
+		let props= this.props;
+		let contact = data[ parseInt(props.location.params.id) - 1 ];
+	
+		console.log( props.indexes )
+	
+		if( !contact ){
+			return (
+				<View><Text>No contact found for this id</Text></View>
+			)
+		}
+	
+		let list = ['phone', 'email', 'location'].map ( key => (
+			<View style={ styles.detailItem } key={ key }>
+				<View style={ styles.detailIcon }>
+					<Icon name={ icons[key] } size={ 24 } color="#555" />
+				</View>
+				<Text style={ styles.detailText }>{ contact[key] }</Text>
 			</View>
-			<Text style={ styles.detailText }>{ contact[key] }</Text>
-		</View>
-	))
+		))
+	
+		return (
+			<View>
+				<Animated.View style={ [styles.headWrapper, this.headerAnimatedStyles] }>
+					<TouchableHighlight style={ styles.back } onClick={ () => props.router.navigate('/contacts') }>
+						<View>
+							<Icon name="arrow-left" color="#222" size={ 26 } />
+						</View>
+					</TouchableHighlight>
+					<SharedElement sharedId={ `avatar_${ contact.id }` } style={ styles.imageWrapper } transitionState={2} transition={ avatarTransition }>
+						<Image source={ {uri: contact.image} } style={ [styles.image] } />
+					</SharedElement>
+					<View style={ styles.textWrapper }>
+						<View>
+							<Text style={ styles.title }>{ contact.name }</Text>
+						</View>
+						<View>
+							<Text style={ styles.subtitle }>{ contact.job }</Text>
+						</View>
+					</View>
+				</Animated.View>
+				<Animated.View style={ [styles.editButton, this.buttonAnimatedStyles] }>
+					<Icon name="pencil" size={20} color="#fff" />
+				</Animated.View>
+				<Animated.View style={ styles.detailContainer }>
+					<View style={ styles.detailList }>
+						{ list }
+					</View>
+				</Animated.View>
+			</View>
+		)
 
-	return (
-		<View>
-			<View style={ styles.headWrapper }>
-				<TouchableHighlight style={ styles.back } onClick={ () => props.router.navigate('/contacts') }>
-					<View>
-						<Icon name="arrow-left" color="#222" size={ 26 } />
-					</View>
-				</TouchableHighlight>
-				<SharedElement sharedId={ `avatar_${ contact.id }` } style={ styles.imageWrapper } active>
-					<Image source={ {uri: contact.image} } style={ styles.image } />
-				</SharedElement>
-				<View style={ styles.textWrapper }>
-					<View>
-						<Text style={ styles.title }>{ contact.name }</Text>
-					</View>
-					<View>
-						<Text style={ styles.subtitle }>{ contact.job }</Text>
-					</View>
-				</View>
-			</View>
-			<View style={ styles.editButton }>
-				<Icon name="pencil" size={20} color="#fff" />
-			</View>
-			<View style={ styles.detailContainer }>
-				<View style={ styles.detailList }>
-					{ list }
-				</View>
-			</View>
-		</View>
-	)
+	}
 }
 
 ContactDetails.getTransition = function( breakPoint ){
@@ -69,8 +100,8 @@ ContactDetails.getTransition = function( breakPoint ){
 	return {
 		styles: {
 			opacity: {
-				inputRange: [-1, -0.3, 0, .3, 1],
-				outputRange: [0, 0, 1, 0, 0]
+				inputRange: [-1, -0.5, -0.2, 0.2, .5, 1],
+				outputRange: [0, 0, 1, 1, 0, 0]
 			}
 		},
 		duration: 1000

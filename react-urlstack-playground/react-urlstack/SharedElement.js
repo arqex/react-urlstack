@@ -9,7 +9,7 @@ const isWeb = Platform.OS === 'web';
 class SharedElement extends Component {
 	static propTypes = {
 		// These properties are used by the TransitionElement
-		transitionStyle: PropTypes.oneOf([ PropTypes.object, PropTypes.func ]),
+		transition: PropTypes.oneOf([ PropTypes.object, PropTypes.func ]),
 		transitionRender: PropTypes.func,
 		transitionState: PropTypes.number,
 

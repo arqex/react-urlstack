@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import TransitionElement from '../TransitionElement'
 import {View, StyleSheet} from 'react-native'
+import {createId} from './utils'
 
 const Context = React.createContext('sharedElement');
 
@@ -100,13 +101,16 @@ class TransitionLayer extends Component {
 			bottom: (layout.y || 0) + layout.height
 		}
 
-		if( this.state.elements.length > 0 ){
-			console.log( 'couples found, rendering', this.state.elements.length )
+		let elements = this.state.elements;
+		let list = Object.keys( elements ).map( id => elements[id] );
+
+		if( list.length > 0 ){
+			console.log( 'couples found, rendering', list.length )
 		}
 		
 		return (
 			<View style={ [styles.container, box] } pointerEvents="none">
-				{ this.state.elements }
+				{ list }
 			</View>
 		)
 	}
@@ -129,43 +133,31 @@ class TransitionLayer extends Component {
 			}
 		}
 		
-		let elements = couples.map( (couple, i) => {
-			console.log( `from ${JSON.stringify(couple.leaving.box)} to ${JSON.stringify(couple.entering.box)}` )
-			return this.renderElement( couple, `se${i}` )
+		let elements = {}
+		couples.forEach( couple => {
+			let id = createId()
+			// console.log( `from ${JSON.stringify(couple.leaving.box)} to ${JSON.stringify(couple.entering.box)}` )
+			elements[ id ] = this.renderElement( couple, id )
 		});
 
 		this.setState({elements})
-		this.setRemoveElements( elements )
 	}
 
-	setRemoveElements( elements ){
-		// Delete the elements from the state when the transition is over
-		setTimeout( () => {
-			let stateElements = this.state.elements.slice();
-			let i = stateElements.length;
-			let j = elements.length;
-			while( i-- > 0 && j > 0 ){
-				while( j-- > 0 && elements[j] !== stateElements[i] ){
-					// Pass
-				}
-				if( j >= 0 ){
-					// We have a match
-					stateElements.splice( j, 1 );
-				}
-			}
-			
-			this.setState({ elements: stateElements})
-		}, 1000)
-	}
-
-	renderElement( {leaving, entering}, key ){
+	renderElement( {leaving, entering}, id ){
 		return (
-			<TransitionElement key={ key }
+			<TransitionElement key={ id }
 				leaving={ leaving }
 				entering={ entering }
 				breakPoint={ breakPoint }
-				screenIndexes={ screenIndexes } />
+				screenIndexes={ screenIndexes }
+				onTransitionEnd={ () => this.removeElement(id) } />
 		)
+	}
+
+	removeElement( id ){
+		let elements = { ...this.state.elements }
+		delete elements[id]
+		this.setState({elements})
 	}
 
 	cleanProps( props ){
@@ -194,12 +186,9 @@ class TransitionLayer extends Component {
 
 		let i = leaving.length;
 		while(i-- > 0){
-			// Both elements must be active
-			if( !leaving[i].props.active ) continue;
-
 			let id = leaving[i].props.sharedId;
 			let j = entering.length;
-			while( j-- > 0 && (entering[j].props.sharedId !== id || !entering[j].props.active) ){
+			while( j-- > 0 && entering[j].props.sharedId !== id ){
 				// Pass
 			}
 			if( j >= 0 ){
