@@ -13,6 +13,9 @@ import Screen404 from './screens/Screen404'
 import ContactList from './screens/transitionExamples/contacts/ContactList'
 import ContactDetails from './screens/transitionExamples/contacts/ContactDetails'
 
+import CheckList from './screens/transitionExamples/checks/CheckList'
+import CheckDetails from './screens/transitionExamples/checks/CheckDetails'
+
 export default [
 	{ path: '/', cb: Welcome },
 	{ path: '/tabs', cb: Tabs, isTabs: true, children: [
@@ -35,6 +38,10 @@ export default [
 
 	{ path: '/contacts', cb: ContactList, children: [
 		{ path: '/:id', cb: ContactDetails }
+	]},
+	
+	{ path: '/checks', cb: CheckList, children: [
+		{ path: '/:id', cb: CheckDetails }
 	]},
 
 	{ path: '/*', cb: Screen404 }
