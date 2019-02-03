@@ -12,26 +12,40 @@ export default function animatedStyles( transition, indexes, layout ){
 	}
 
 	Object.keys( styles ).forEach( key => {
+		let value = styles[key];
+
 		if( styleKeys[key] ){
 			if( warnKeys[key] ){
 				console.warn(`react-urlstack: It's possible in web, but react-native won't animate the property "${key}"`)
 			}
-			animatedStyles[ key ] = indexes.transition.interpolate( styles[key] )
+			if( value && value.inputRange ){
+				animatedStyles[ key ] = indexes.transition.interpolate( value )
+			}
+			else {
+				animatedStyles[ key ] = value
+			}
 		}
 		else if( transformKeys[key] ){
 			// Check values
 			let type = transformKeys[key];
 			let warned = false;
-			styles[key].outputRange.forEach( value =>{
-				if( !warned && typeof value !== type ){
-					warned = true;
-					console.warn(`react-urlstack: Even if it works in web, react-native only accepts type "${transformKeys[key]}" for "${key}". Given "${ value }".`);
-				}
-			})
+			if( value && value.outputRange ){
+				styles[key].outputRange.forEach( value =>{
+					if( !warned && typeof value !== type ){
+						warned = true;
+						console.warn(`react-urlstack: Even if it works in web, react-native only accepts type "${transformKeys[key]}" for "${key}". Given "${ value }".`);
+					}
+				})
 
-			transformStyles.push({
-				[key]: indexes.transition.interpolate( styles[key] )
-			})
+				transformStyles.push({
+					[key]: indexes.transition.interpolate( value )
+				})
+			}
+			else {
+				transformStyles.push({
+					[key]: value
+				})
+			}
 		}
 		else {
 			console.warn(`react-urlstack: Unknown property to animate "${key}"`)

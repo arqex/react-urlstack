@@ -10,7 +10,16 @@ export default function CheckList( props ){
 
 	let renderTransactions = function({item}){
 		return (
-			<Text>{ JSON.stringify(item) }</Text>
+			<View key={ item.id } style={ styles.transContainer }>
+				<View style={ styles.transLeft }>
+					<Text style={ styles.transTitle }>{ item.title }</Text>
+					<Text style={ styles.transDesc }>{ item.description }</Text>
+				</View>
+				<View style={ styles.transRight }>
+					<Text style={ styles.transPrice}>{ item.price }</Text>
+					<Icon name="chevron-right" color="#aaa" size={ 18 } />
+				</View>
+			</View>
 		)
 	}
 
@@ -27,7 +36,7 @@ export default function CheckList( props ){
 			</View>
 			<View style={ styles.body }>
 				<View style={ styles.card }>
-					<CheckItem data={ check } />
+					<CheckItem data={ check } transitionState={ 2 } />
 				</View>
 				<FlatList data={ check.transactions }
 					renderItem={ renderTransactions }
@@ -118,4 +127,31 @@ const styles = StyleSheet.create({
 	footerIconRight: {
 		backgroundColor: '#247aff',
 	},
+
+	transContainer: {
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+		padding: 10
+	},
+
+	transLeft:{
+		flex: 1
+	},
+	transRight: {
+		flexDirection: 'row',
+		alignItems: 'center'
+	},
+
+	transTitle: {
+		fontWeight: '500'
+	},
+	transDesc: {
+		color: '#aaa'
+	},
+	transPrice: {
+		fontWeight: '600',
+		fontSize: 16,
+		marginRight: 10
+	}
 })

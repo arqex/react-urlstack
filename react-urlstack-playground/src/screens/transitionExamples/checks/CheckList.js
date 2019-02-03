@@ -1,15 +1,27 @@
 import React from 'react'
-import {View, Text, FlatList, StyleSheet} from 'react-native'
+import {View, Text, FlatList, StyleSheet, Animated} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CheckItem from './CheckItem';
 import data from './checkData'
 
 export default function CheckList( props ){
+	let checkScale = {
+		transform: [
+			{scale: props.indexes.transition.interpolate({
+				inputRange: [ -1, -0.5, 0, 0.5, 1],
+				outputRange: [ .5, .5 , 2, .5, .5]
+			})}
+		]
+	}
+
 	let renderCheckItem = function({item}){
 		return (
-			<CheckItem key={ 'i' + item.id } data={ item }
-				onPress={ () => props.router.navigate(`/checks/${item.id}`) }
-				active={ item.id === props.location.params.id } />
+			<Animated.View styles={ checkScale }>
+				<CheckItem key={ 'i' + item.id } data={ item }
+					transitionState={ 1 }
+					onPress={ () => props.router.navigate(`/checks/${item.id}`) }
+					active={ item.id === props.location.params.id } />
+			</Animated.View>
 		)
 	}
 
@@ -72,7 +84,7 @@ const styles = StyleSheet.create({
 	headerControls: {
 		width: 90,
 		flexDirection: 'row',
-		alignItems: 'right'
+		alignItems: 'flex-end'
 	},
 
 	icon: {
