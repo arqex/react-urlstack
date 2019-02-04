@@ -150,6 +150,7 @@ class TransitionLayer extends Component {
 				entering={ entering }
 				breakPoint={ breakPoint }
 				screenIndexes={ screenIndexes }
+				wrapperTransition={ leaving.props.transition }
 				onTransitionEnd={ () => this.removeElement(id) } />
 		)
 	}
