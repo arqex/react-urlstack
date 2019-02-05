@@ -1,4 +1,6 @@
-export default function animatedStyles( transition, indexes, layout ){
+import { Animated } from 'react-native';
+
+export function animatedStyles( transition, indexes, layout ){
 	let styles = typeof transition.styles === 'function' ? transition.styles( indexes, layout ) : transition.styles;
 	if( !styles ){
 		styles = {}
@@ -78,3 +80,36 @@ let transformKeys = {
 	translateX: n, translateY: n,
 	skeyX: s, skewY: s
 };
+
+
+export function stagger( animatedValue, gap, times, styles ){
+	let follower = new Animated.Value( animatedValue._value );
+	Animated.timing( follower, {duration: 0, toValue: animatedValue} ).start();
+	
+	let stagged = [ animatedStyles({styles}, {transition: follower}) ];
+
+	for( let i = 1; i < times; i++ ){
+		let stage = {};
+		Object.keys( styles ).forEach( attr => {
+			let val = styles[attr];
+			if( val && val.inputRange ){
+				let shifted = {
+					inputRange: [],
+					outputRange: val.outputRange
+				}
+				val.inputRange.forEach( inputValue => {
+					shifted.inputRange.push( inputValue + (i * gap) )
+				})
+				stage[attr] = shifted;
+			}
+			else {
+				stage[attr] = val;
+			}
+		})
+
+		let animated = animatedStyles({styles: stage}, {transition: follower});
+		stagged.push( animated );
+	}
+
+	return stagged;
+}

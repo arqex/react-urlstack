@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Animated, StyleSheet, Platform } from 'react-native';
-import animatedStyles from './utils/animatedStyles';
+import {animatedStyles} from './utils/animatedStyles';
 import PropTypes from 'prop-types'
 
 const isWeb = Platform.OS === 'web';

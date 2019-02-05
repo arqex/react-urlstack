@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import { StyleSheet, Animated, View, Text } from 'react-native'
-import animatedStyles from './utils/animatedStyles'
+import {animatedStyles} from './utils/animatedStyles'
 
 
 export default class ModalWrapper extends Component {

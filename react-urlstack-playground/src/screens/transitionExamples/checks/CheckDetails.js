@@ -3,13 +3,15 @@ import {View, Text, FlatList, StyleSheet, Animated} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CheckItem from './CheckItem';
 import data from './checkData'
+import {stagger} from '../../../../react-urlstack'
 
 export default function CheckList( props ){
-	
+	let animatedValue = props.indexes.transition
+
 	let check = data[ parseInt(props.location.params.id) - 1 ];
 	let headerStyles = [{
 		transform: [{
-			translateY: props.indexes.transition.interpolate({
+			translateY: animatedValue.interpolate({
 				inputRange: [-1, -0.4, 0, 1],
 				outputRange: [-500, -500, 0, 0]
 			})
@@ -18,15 +20,30 @@ export default function CheckList( props ){
 	]
 
 	let cardStyles = [{
-		opacity: props.indexes.transition.interpolate({
+		opacity: animatedValue.interpolate({
 			inputRange: [-1, -0.4, 0, 1],
 			outputRange: [0, 0, 1, 1]
 		})
 	}, styles.card ]
 
+
+	let stages = stagger(animatedValue, .05, 5, {
+		opacity: {
+			inputRange: [-1, -0.35, -0.2, 0],
+			outputRange: [0, 0, 1, 1]
+		},
+		translateX: {
+			inputRange: [-1, -0.35, -0.2, 0],
+			outputRange: [-50, -50, 0, 0]
+		}
+	})
+
+	let i = 0
+	console.log( stages );
+
 	let renderTransactions = function({item}){
 		return (
-			<View key={ item.id } style={ styles.transContainer }>
+			<Animated.View key={ item.id } style={ [styles.transContainer, stages[i++]] }>
 				<View style={ styles.transLeft }>
 					<Text style={ styles.transTitle }>{ item.title }</Text>
 					<Text style={ styles.transDesc }>{ item.description }</Text>
@@ -35,9 +52,16 @@ export default function CheckList( props ){
 					<Text style={ styles.transPrice}>{ item.price }</Text>
 					<Icon name="chevron-right" color="#aaa" size={ 18 } />
 				</View>
-			</View>
+			</Animated.View>
 		)
 	}
+
+	let buttonStages = stagger( animatedValue, .1, 2, {
+		translateY: {
+			inputRange: [ -1, -.3, -.1, 0 ],
+			outputRange: [ 100, 100, 0, 0 ]
+		}
+	})
 
 	return (
 		<View style={ styles.container }>
@@ -59,12 +83,12 @@ export default function CheckList( props ){
 				/>
 			</View>
 			<View style={ styles.footer }>
-				<View style={ [styles.footerIcon, styles.footerIconLeft] }>
+				<Animated.View style={ [styles.footerIcon, styles.footerIconLeft, buttonStages[1]] }>
 					<Icon name="comment" size={ 22 } color="white" />
-				</View>
-				<View style={ [styles.footerIcon, styles.footerIconRight] }>
+				</Animated.View>
+				<Animated.View style={ [styles.footerIcon, styles.footerIconRight, buttonStages[0]] }>
 					<Icon name="credit-card" size={ 22 } color="white" />
-				</View>
+				</Animated.View>
 			</View>
 		</View>
 	)

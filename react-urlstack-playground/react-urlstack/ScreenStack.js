@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {Animated, View, StyleSheet, Platform} from 'react-native'
 import {memoize, bind} from './utils/utils'
 import ScreenWrapper from './ScreenWrapper'
-import animatedStyles from './utils/animatedStyles'
+import {animatedStyles} from './utils/animatedStyles'
 import {Context} from './utils/sharedElementContext'
 
 const isWeb = Platform.OS === 'web'

@@ -1,3 +1,4 @@
 import Navigator from './Navigator';
 import SharedElement from './SharedElement';
-export {Navigator, SharedElement};
+import {animatedStyles, stagger} from './utils/animatedStyles'
+export {Navigator, SharedElement, animatedStyles, stagger};
