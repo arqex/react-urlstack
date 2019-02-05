@@ -19,7 +19,7 @@ export default function CheckList( props ){
 			<Animated.View style={ checkScale }>
 				<CheckItem key={ 'i' + item.id } data={ item }
 					transitionState={ 1 }
-					onPress={ () => props.router.navigate(`/checks/${item.id}`) }
+					onPress={ () => props.router.navigate(`/checks/money/${item.id}`) }
 					active={ item.id === props.location.params.id } />
 			</Animated.View>
 		)
@@ -55,7 +55,7 @@ CheckList.getTransition = function( breakPoint ){
 				outputRange: [0, 0, 1, 0, 0]
 			}
 		},
-		duration: 1000
+		duration: 800
 	}
 }
 

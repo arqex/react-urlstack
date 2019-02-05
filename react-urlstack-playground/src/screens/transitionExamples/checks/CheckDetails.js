@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, Text, FlatList, StyleSheet, Animated} from 'react-native'
+import {View, Text, FlatList, StyleSheet, Animated, TouchableHighlight} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CheckItem from './CheckItem';
 import data from './checkData'
@@ -66,9 +66,13 @@ export default function CheckList( props ){
 	return (
 		<View style={ styles.container }>
 			<Animated.View style={ headerStyles }>
-				<View style={ styles.titleWrapper }>
-					<Icon name="arrow-left" size={ 22 } color="white" />
-					<Text style={ styles.title }>Back</Text>
+				<View style={styles.titleWrapper}>
+					<TouchableHighlight onPress={() => props.router.navigate('/checks')}>
+						<View style={styles.titleWrapper}>
+							<Icon name="arrow-left" size={22} color="white" />
+							<Text style={styles.title}>Back</Text>
+						</View>
+					</TouchableHighlight>
 				</View>
 				<View style={ styles.headerControls }>
 					<Icon name="barcode" size={ 22 } color="white" />
@@ -106,7 +110,7 @@ CheckList.getTransition = function( breakPoint ){
 				outputRange: [0, 0, 1, 0, 0]
 			}
 		},
-		duration: 1000
+		duration: 800
 	}
 }
 
@@ -126,7 +130,8 @@ const styles = StyleSheet.create({
 
 	titleWrapper: {
 		flexGrow: 1,
-		flexDirection: 'row'
+		flexDirection: 'row',
+		alignItems: 'flex-start'
 	},
 
 	title: {

@@ -35,7 +35,7 @@ export default class SideMenu extends Component {
           
           <MenuGroup title="Transition examples">
             <MenuItem router={router} active={ currentRoute.slice(0,5) === '/contact'} route="/contacts">Contact list</MenuItem>
-            <MenuItem router={router} active={ currentRoute.slice(0,5) === '/check'} route="/checks">Check list</MenuItem>
+            <MenuItem router={router} active={ currentRoute.slice(0,5) === '/check'} route="/checks/money">Check list</MenuItem>
           </MenuGroup>
         </View>
       </View>

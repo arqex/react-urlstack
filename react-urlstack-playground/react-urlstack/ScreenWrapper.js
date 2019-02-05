@@ -104,7 +104,6 @@ export default class ScreenWrapper extends Component {
 
 let styles = StyleSheet.create({
 	container: {
-		backgroundColor: '#eee',
 		overflow: 'hidden',
 		position: 'absolute',
 		width: '100%', height: '100%',

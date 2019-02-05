@@ -15,6 +15,8 @@ import ContactDetails from './screens/transitionExamples/contacts/ContactDetails
 
 import CheckList from './screens/transitionExamples/checks/CheckList'
 import CheckDetails from './screens/transitionExamples/checks/CheckDetails'
+import CheckTabs from './screens/transitionExamples/checks/CheckTabs'
+import CheckEmpty from './screens/transitionExamples/checks/CheckEmpty'
 
 export default [
 	{ path: '/', cb: Welcome },
@@ -40,8 +42,14 @@ export default [
 		{ path: '/:id', cb: ContactDetails }
 	]},
 	
-	{ path: '/checks', cb: CheckList, children: [
-		{ path: '/:id', cb: CheckDetails }
+	{ path: '/checks', cb: CheckTabs, isTabs: true, children: [
+		{ path: '/inbox', cb: CheckEmpty },
+		{ path: '/currencies', cb: CheckEmpty },
+		{ path: '/money', cb: CheckList, children: [
+			{ path: '/:id', cb: CheckDetails }
+		]},
+		{ path: '/share', cb: CheckEmpty },
+		{ path: '/settings', cb: CheckEmpty },
 	]},
 
 	{ path: '/*', cb: Screen404 }

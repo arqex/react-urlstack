@@ -26,5 +26,6 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 1,
+    backgroundColor: '#eee'
   }
 })
