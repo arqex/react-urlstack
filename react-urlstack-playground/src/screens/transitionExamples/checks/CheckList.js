@@ -9,14 +9,14 @@ export default function CheckList( props ){
 		transform: [
 			{scale: props.indexes.transition.interpolate({
 				inputRange: [ -1, -0.5, 0, 0.5, 1],
-				outputRange: [ .5, .5 , 2, .5, .5]
+				outputRange: [ 1, .5 , 1, .5, 1]
 			})}
 		]
 	}
 
 	let renderCheckItem = function({item}){
 		return (
-			<Animated.View styles={ checkScale }>
+			<Animated.View style={ checkScale }>
 				<CheckItem key={ 'i' + item.id } data={ item }
 					transitionState={ 1 }
 					onPress={ () => props.router.navigate(`/checks/${item.id}`) }

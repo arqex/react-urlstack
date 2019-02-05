@@ -20,7 +20,7 @@ export default function CheckItem( props ){
 	return (
 		<TouchableHighlight onPress={ props.onPress }>
 			<View>
-				<SharedElement sharedId={ `avatar_${ props.data.id }` } transitionState={ props.transitionState }>
+				<SharedElement sharedId={ `avatar_${ props.data.id }` } transitionState={ props.transitionState } transition={ checkTransition }>
 					<View style={ styles.container }>
 						<View style={ styles.titleBar }>
 							<View style={ styles.logo }>

@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, Text, FlatList, StyleSheet} from 'react-native'
+import {View, Text, FlatList, StyleSheet, Animated} from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CheckItem from './CheckItem';
 import data from './checkData'
@@ -7,6 +7,22 @@ import data from './checkData'
 export default function CheckList( props ){
 	
 	let check = data[ parseInt(props.location.params.id) - 1 ];
+	let headerStyles = [{
+		transform: [{
+			translateY: props.indexes.transition.interpolate({
+				inputRange: [-1, -0.4, 0, 1],
+				outputRange: [-500, -500, 0, 0]
+			})
+		}]},
+		styles.header
+	]
+
+	let cardStyles = [{
+		opacity: props.indexes.transition.interpolate({
+			inputRange: [-1, -0.4, 0, 1],
+			outputRange: [0, 0, 1, 1]
+		})
+	}, styles.card ]
 
 	let renderTransactions = function({item}){
 		return (
@@ -25,7 +41,7 @@ export default function CheckList( props ){
 
 	return (
 		<View style={ styles.container }>
-			<View style={ styles.header }>
+			<Animated.View style={ headerStyles }>
 				<View style={ styles.titleWrapper }>
 					<Icon name="arrow-left" size={ 22 } color="white" />
 					<Text style={ styles.title }>Back</Text>
@@ -33,11 +49,11 @@ export default function CheckList( props ){
 				<View style={ styles.headerControls }>
 					<Icon name="barcode" size={ 22 } color="white" />
 				</View>
-			</View>
+			</Animated.View>
 			<View style={ styles.body }>
-				<View style={ styles.card }>
+				<Animated.View style={ cardStyles }>
 					<CheckItem data={ check } transitionState={ 2 } />
-				</View>
+				</Animated.View>
 				<FlatList data={ check.transactions }
 					renderItem={ renderTransactions }
 				/>

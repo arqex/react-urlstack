@@ -47,7 +47,7 @@ export default class DrawerWrapper extends Component {
 			)
 		}
 		let width = this.state.open ? this.drawerWidth * 2 : this.drawerWidth + handleWidth;
-
+		
 		let containerStyles = [
 			styles.container,
 			collapsible && styles.collapsibleContainer,
@@ -73,7 +73,7 @@ export default class DrawerWrapper extends Component {
 					boundaries={{right: this.drawerWidth - handleWidth, bounce: 0}}
 					onDrag={ e => this.onDrag( e ) }
 					animatedValueX={ this.drawerPos }>
-					<View style={ drawerStyles } onLayout={ e => this.updateLayout(e) }>
+					<View style={ drawerStyles } ref="layout" onLayout={ e => this.updateLayout(e) }>
 						<Drawer router={ router } drawer={ this._drawerMethods } />
 						{ handle }
 					</View>
@@ -84,17 +84,21 @@ export default class DrawerWrapper extends Component {
 	
 	updateLayout( e ){
 		let {layout} = e.nativeEvent;
-
+		
 		this.animatedStyles = animatedStyles(this.props.transition, this.props.indexes, layout );
 		this.drawerWidth = layout.width;
 		this.calculateDrawerIndex();
 		this.forceUpdate();
 	}
 
-	componentDidUpdate( prevProps ){
-		if( prevProps.collapsible && !this.props.collapsible ){
+	componentDidUpdate(prevProps) {
+		if( prevProps.collapsible !== this.props.collapsible ){
 			this.drawerPos.setValue(0);
-			this.forceUpdate()
+		}
+		if( prevProps.breakPoint !== this.props.breakPoint ){
+			this.refs.layout.measure( (dx, dy, width, height, x, y) => {
+				this.updateLayout({ nativeEvent: {layout: {width, height, x, y}}});
+			})
 		}
 	}
 
@@ -166,8 +170,8 @@ let styles = StyleSheet.create({
 		paddingRight: handleWidth
 	},
 	handle: {
-		width: 40,
-		top: 0, bottom: 0, right: -20,
+		width: handleWidth,
+		top: 0, bottom: 0, right: 0,
 		// backgroundColor: 'green',
 		position: 'absolute',
 		zIndex: 10

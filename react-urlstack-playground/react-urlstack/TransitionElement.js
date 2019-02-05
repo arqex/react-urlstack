@@ -66,6 +66,7 @@ export default class TransitionElement extends Component {
 		let defaultTransition = this.getDefaultTransition()
 
 		let transition
+		
 		if( typeof transitionStyle === 'function' ){
 			let props = this.props
 			transition = transitionStyle( {
@@ -85,7 +86,27 @@ export default class TransitionElement extends Component {
 		else if( transition === undefined ){
 			return defaultTransition
 		}
-		return transition
+
+		// Let's fill the gaps in the transitions
+		if( !transition.duration ){
+			transition.duration = defaultTransition.duration;
+		}
+		
+		let styles = transition.styles;
+		let defaultStyles = defaultTransition.styles;
+
+		if( !styles ){
+			styles = {}
+			transition.style = styles
+		}
+
+		Object.keys(defaultStyles).forEach(key => {
+			if (styles[key] === undefined) {
+				styles[key] = defaultStyles[key]
+			}
+		})
+
+		return transition;
 	}
 
 	getIndexes(){
@@ -138,5 +159,5 @@ export default class TransitionElement extends Component {
 
 
 const styles = StyleSheet.create({
-	container: { position: 'absolute', overflow: 'hidden' }
+	container: { position: 'absolute', overflow: 'hidden', top: 0, left: 0 }
 })
