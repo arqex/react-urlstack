@@ -39,7 +39,6 @@ export default function CheckList( props ){
 	})
 
 	let i = 0
-	console.log( stages );
 
 	let renderTransactions = function({item}){
 		return (

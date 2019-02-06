@@ -40,6 +40,6 @@
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
     "react-interactable": "^0.6.4",
-    "urlstack": "^0.5.1"
+    "urlstack": "^0.6.0"
   }
 }

@@ -20,7 +20,6 @@ export default function TabSelector( props ){
 	)
 }
 
-
 let styles = StyleSheet.create({
 	container: {
 		flex: 1,
