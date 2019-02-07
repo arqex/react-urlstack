@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		marginBottom: 10,
 		elevation: 10,
+		height: 145
 	},
 
 	titleBar:{
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
 	},
 
 	logo: {
-		width: 40, height: 40
+		width: 48, height: 48
 	},
 
 	image: {

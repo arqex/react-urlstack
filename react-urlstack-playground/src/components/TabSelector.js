@@ -24,7 +24,6 @@ let styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		flexDirection: 'row',
-		justifyContent: 'stretch',
 		backgroundColor: '#f6f6f6',
 		borderTopWidth: 3,
 		borderTopColor: '#f0f0f0'

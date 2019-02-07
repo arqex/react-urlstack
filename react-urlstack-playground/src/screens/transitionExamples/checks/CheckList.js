@@ -16,8 +16,8 @@ export default function CheckList( props ){
 
 	let renderCheckItem = function({item}){
 		return (
-			<Animated.View style={ checkScale }>
-				<CheckItem key={ 'i' + item.id } data={ item }
+			<Animated.View style={ checkScale } key={ 'i' + item.id }>
+				<CheckItem data={ item }
 					transitionState={ 1 }
 					onPress={ () => props.router.navigate(`/checks/money/${item.id}`) }
 					active={ item.id === props.location.params.id } />
