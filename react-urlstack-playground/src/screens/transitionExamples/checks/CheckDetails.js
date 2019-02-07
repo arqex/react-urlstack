@@ -5,7 +5,7 @@ import CheckItem from './CheckItem';
 import data from './checkData'
 import {stagger} from '../../../../react-urlstack'
 
-export default function CheckList( props ){
+export default function CheckDetails( props ){
 	let animatedValue = props.indexes.transition
 
 	let check = data[ parseInt(props.location.params.id) - 1 ];
@@ -66,7 +66,7 @@ export default function CheckList( props ){
 		<View style={ styles.container }>
 			<Animated.View style={ headerStyles }>
 				<View style={styles.titleWrapper}>
-					<TouchableHighlight onPress={() => props.router.navigate('/checks')}>
+					<TouchableHighlight onPress={() => props.router.navigate('/checks/money')}>
 						<View style={styles.titleWrapper}>
 							<Icon name="arrow-left" size={22} color="white" />
 							<Text style={styles.title}>Back</Text>
@@ -97,7 +97,7 @@ export default function CheckList( props ){
 	)
 }
 
-CheckList.getTransition = function( breakPoint ){
+CheckDetails.getTransition = function( breakPoint ){
 	// Not returning anything means apply the default transition for other breakPoints
 	// If we want to not animate the transitions just return false
 	if( breakPoint !== 0 ) return;

@@ -7,7 +7,7 @@ import data from './checkData'
 export default function CheckList( props ){
 	let checkScale = {
 		transform: [
-			{scale: props.indexes.transition.interpolate({
+			{scale: props.indexes.parent.transition.interpolate({
 				inputRange: [ -1, -0.5, 0, 0.5, 1],
 				outputRange: [ 1, .5 , 1, .5, 1]
 			})}
@@ -41,22 +41,6 @@ export default function CheckList( props ){
 			/>
 		</View>
 	)
-}
-
-CheckList.getTransition = function( breakPoint ){
-	// Not returning anything means apply the default transition for other breakPoints
-	// If we want to not animate the transitions just return false
-	if( breakPoint !== 0 ) return;
-
-	return {
-		styles: {
-			opacity: {
-				inputRange: [-1, -0.3, 0, .3, 1],
-				outputRange: [0, 0, 1, 0, 0]
-			}
-		},
-		duration: 800
-	}
 }
 
 const styles = StyleSheet.create({

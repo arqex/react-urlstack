@@ -171,7 +171,7 @@ export default class ScreenStack extends Component {
 		let unusedIndexes = { ...oldIndexes }
 		let updated = false;
 
-		stack.forEach( ({ Screen, key }, i) => {
+		stack.forEach( ({ key }, i) => {
 			if( unusedIndexes[key] ){
 				return delete unusedIndexes[key]
 			}
@@ -183,6 +183,7 @@ export default class ScreenStack extends Component {
 				count: count,
 				relative: activeIndex - i,
 				transition: new Animated.Value( activeIndex - i ),
+				parent: this.props.parentIndexes
 			}
 		})
 
@@ -209,6 +210,7 @@ export default class ScreenStack extends Component {
 				count: count,
 				relative: activeIndex - i,
 				transition: indexes[key].transition,
+				parent: this.props.parentIndexes
 			}
 
 			indexes[key] = index;
@@ -218,10 +220,22 @@ export default class ScreenStack extends Component {
 	}
 
 	startTransition( prevIndexes, nextIndexes ){
+		let prevItem, nextItem, toIndex;
+
 		// Screen transitions
-		this.props.stack.forEach( ({key, Screen}) => {
+		this.props.stack.forEach( item  => {
+			let { key, Screen } = item;
+
 			let prevIndex = prevIndexes[key];
 			let nextIndex = nextIndexes[key];
+
+			if( prevIndex.relative === 0 ){
+				prevItem = item;
+			}
+			if( nextIndex.relative === 0 ){
+				nextItem = item;
+				toIndex = prevIndex.relative;
+			}
 
 			if( prevIndex && nextIndex && prevIndex.relative !== nextIndex.relative) {
 				let transition = this.getScreenTransition( Screen );
@@ -235,7 +249,27 @@ export default class ScreenStack extends Component {
 		})
 
 		// Signal for shared elements transition to start
-		this.context.startTransition( prevIndexes, nextIndexes );
+		if (prevItem && nextItem) {
+			this.context.startTransition(
+				this.getActiveScreens(prevItem),
+				this.getActiveScreens(nextItem),
+				toIndex,
+				prevItem.Screen.getTransition
+			);
+		}
+	}
+
+	getActiveScreens( item ){
+		let keys = [item.key]
+		let tabs = item.tabs
+
+		if( tabs ){
+			keys = keys.concat(
+				this.getActiveScreens( tabs.stack[tabs.activeIndex] )
+			)
+		}
+
+		return keys;
 	}
 
 	_onScreenReady( id ){

@@ -1,8 +1,21 @@
 import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Animated, StyleSheet } from 'react-native'
 import TabSelector from '../../../components/TabSelector'
 
-class TestTabs extends Component {
+class CheckTabs extends Component {
+	constructor( props ){
+		super( props )
+		this.tabStyles = {
+			transform: [
+				{
+					translateY: props.indexes.transition.interpolate({
+						inputRange: [-1, -0.5, 0, 0.5, 1],
+						outputRange: [100, 100, 0, 100, 100]
+					})
+				}
+			]
+		}
+	}
 	render() {
 		let tabItems = [
 			{ id: 'inbox', label: 'Inbox', icon: 'inbox' },
@@ -16,28 +29,18 @@ class TestTabs extends Component {
 		return (
 			<View style={styles.container}>
 				<View style={styles.content}>{this.props.children}</View>
-				<View style={styles.tabs}>
+				<Animated.View style={[styles.tabs, this.tabStyles]}>
 					<TabSelector items={ tabItems }
 						onItemPress={ id => this.props.router.navigate('/checks/' + id ) } />
-				</View>
+				</Animated.View>
 			</View>
 		)
 	}
-	switchTab(tab) {
-		let router = this.props.router
-		let location = router.location
-		let i = location.matches.length;
-		while (i-- > 0) {
-			if (location.matches[i] === TestTabs) {
-				return router.navigate(location.matchIds[i] + '/' + tab)
-			}
-		}
-	}
 }
 
-TestTabs.navigationOptions = {};
+CheckTabs.navigationOptions = {};
 
-export default TestTabs;
+export default CheckTabs;
 
 let styles = StyleSheet.create({
 	container: {
@@ -60,3 +63,20 @@ let styles = StyleSheet.create({
 
 
 })
+
+
+CheckTabs.getTransition = function (breakPoint) {
+	// Not returning anything means apply the default transition for other breakPoints
+	// If we want to not animate the transitions just return false
+	if (breakPoint !== 0) return;
+
+	return {
+		styles: {
+			opacity: {
+				inputRange: [-1, -0.3, 0, .3, 1],
+				outputRange: [0, 0, 1, 0, 0]
+			}
+		},
+		duration: 800
+	}
+}

@@ -53,9 +53,12 @@ export default class ScreenWrapper extends Component {
 					drawer= { drawer }
 					breakPoint={ breakPoint } >
 					<ScreenStack router={ router }
+						isTabs={ true }
 						screenTransition={ transition.tabTransition || tabTransition }
 						stack={ item.tabs.stack }
 						index={ item.tabs.activeIndex }
+						parentIndexes={ indexes }
+						layout={ layout }
 						breakPoint={ breakPoint } />
 				</Screen>
 			)

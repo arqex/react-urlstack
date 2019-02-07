@@ -121,7 +121,7 @@ export default class TransitionElement extends Component {
 		let {leaving, entering} = this.indexes;
 		let leavingBox = this.props.leaving.box;
 		let enteringBox = this.props.entering.box;
-		let wrapperTransition = this.props.leaving.props.wrapper.transition
+		let leavingTransition = this.props.leavingTransition
 
 		return {
 			styles: {
@@ -130,7 +130,7 @@ export default class TransitionElement extends Component {
 				translateX: this.getInterpolation( leaving, entering, leavingBox.x, enteringBox.x ),
 				translateY: this.getInterpolation( leaving, entering, leavingBox.y, enteringBox.y ),
 			},
-			duration: (wrapperTransition && wrapperTransition.duration) || defaultDuration
+			duration: (leavingTransition && leavingTransition.duration) || defaultDuration
 		}
 	}
 

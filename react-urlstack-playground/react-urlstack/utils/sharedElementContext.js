@@ -61,26 +61,8 @@ function reMeasure( layout, bp, indexes ){
 
 // This method is called just before starting the screen transition when the URL changes
 // Screen stack is the one responsible of calling it through the context
-function startTransition( prevIndexes, nextIndexes ){
-	// return console.log( 'Start transition');
-
-	let fromScreen, toScreen;
-	Object.keys( prevIndexes ).forEach( id => {
-		if( prevIndexes[id].relative === 0 ){
-			fromScreen = {id, index: nextIndexes[id].relative};
-		}
-	})
-	Object.keys( nextIndexes ).forEach( id => {
-		if( nextIndexes[id].relative === 0 ){
-			toScreen = {id, index: prevIndexes[id].relative};
-		}
-	})
-	
-	// Call the layer callback to print out the shared element transitions
-	// only when we have both screens
-	if( fromScreen && toScreen ){
-		clbks.forEach( clbk => clbk( fromScreen, toScreen ) )
-	}
+function startTransition( leavingKeys, enteringKeys, toIndex, leavingTransition ){
+	clbks.forEach( clbk => clbk( leavingKeys, enteringKeys, toIndex, leavingTransition ) )
 }
 
 class TransitionLayer extends Component {
@@ -115,12 +97,14 @@ class TransitionLayer extends Component {
 		)
 	}
 
-	checkForTransitions( fromScreen, toScreen ){
-		let couples = this.getTransitionCouples( fromScreen.id, toScreen.id )
-		
-		if( !couples.length ) return;
+	checkForTransitions(enteringKeys, leavingKeys, toIndex, leavingTransition) {
+		let couples = this.getTransitionCouples( enteringKeys, leavingKeys )
 
-		this.waitForReadyAndRender( couples, toScreen.index );
+		if (!couples.length) return;
+
+		this.leavingTransition = leavingTransition;
+
+		this.waitForReadyAndRender(couples, toIndex );
 	}
 
 	waitForReadyAndRender( couples, toIndex ){
@@ -150,7 +134,7 @@ class TransitionLayer extends Component {
 				entering={ entering }
 				breakPoint={ breakPoint }
 				screenIndexes={ screenIndexes }
-				wrapperTransition={ leaving.props.transition }
+				leavingTransition={ this.leavingTransition && this.leavingTransition( breakPoint ) }
 				onTransitionEnd={ () => this.removeElement(id) } />
 		)
 	}
@@ -173,33 +157,27 @@ class TransitionLayer extends Component {
 		return clean;
 	}
 	
-	getTransitionCouples( fromId, toId ){
-		if( fromId === toId ) return [];
-		
-		let leaving = mountedElements[fromId]
-		let entering = mountedElements[toId]
-		if( !leaving || !entering ) return [];
+	getTransitionCouples( fromIds, toIds ){
+		let leaving = {};
+		let couples = [];
 
-		leaving = leaving.slice()
-		entering = entering.slice()
+		fromIds.forEach( id => {
+			mountedElements[id] && mountedElements[id].forEach( el => {
+				leaving[ el.props.sharedId ] = el;
+			})
+		})
 
-		let couples = []
+		toIds.forEach( id => {
+			mountedElements[id] && mountedElements[id].forEach( el => {
+				if ( leaving[el.props.sharedId] ){
+					couples.push({
+						leaving: leaving[ el.props.sharedId ],
+						entering: el
+					})
+				}
+			})
+		})
 
-		let i = leaving.length;
-		while(i-- > 0){
-			let id = leaving[i].props.sharedId;
-			let j = entering.length;
-			while( j-- > 0 && entering[j].props.sharedId !== id ){
-				// Pass
-			}
-			if( j >= 0 ){
-				// We have a match
-				couples.push({
-					leaving: leaving[i],
-					entering: entering[j]
-				})
-			}
-		}
 		return couples;
 	}
 
