@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default function TabSelector( props ){
 	let tabs = props.items.map ( item => (
-		<TouchableHighlight style={styles.tab} onPress={ () => props.onItemPress( item.id ) }>
+		<TouchableHighlight style={styles.tab} onPress={ () => props.onItemPress( item.id ) } key={ item.icon }>
 			<View style={ styles.tab }>
 				<Icon name={ item.icon } size={24} style={ styles.icon } />
 				<Text style={ styles.text }>{ item.label }</Text>

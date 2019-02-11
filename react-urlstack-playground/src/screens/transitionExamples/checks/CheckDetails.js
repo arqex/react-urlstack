@@ -77,13 +77,14 @@ export default function CheckDetails( props ){
 					<Icon name="barcode" size={ 22 } color="white" />
 				</View>
 			</Animated.View>
+			<Animated.View style={ cardStyles }>
+				<CheckItem data={ check } transitionState={ 2 } />
+			</Animated.View>
 			<View style={ styles.body }>
-				<Animated.View style={ cardStyles }>
-					<CheckItem data={ check } transitionState={ 2 } />
-				</Animated.View>
 				<FlatList data={ check.transactions }
 					keyExtractor={ (item) => item.id }
 					renderItem={ renderTransactions }
+					ListFooterComponent={ <View key="fooo" style={{height: 100}} /> }
 				/>
 			</View>
 			<View style={ styles.footer }>
@@ -141,8 +142,14 @@ const styles = StyleSheet.create({
 	},
 
 	body: {
-		transform: [ {translateY: -80} ],
-		flex: 1
+		flex: 1,
+		paddingTop: 90
+	},
+
+	card: {
+		position: 'absolute',
+		top: 100,
+		left: 0, right: 0
 	},
 	
 	headerControls: {
