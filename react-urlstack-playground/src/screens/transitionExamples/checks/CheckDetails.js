@@ -42,7 +42,7 @@ export default function CheckDetails( props ){
 
 	let renderTransactions = function({item}){
 		return (
-			<Animated.View key={ item.id } style={ [styles.transContainer, stages[i++]] }>
+			<Animated.View style={ [styles.transContainer, stages[i++]] }>
 				<View style={ styles.transLeft }>
 					<Text style={ styles.transTitle }>{ item.title }</Text>
 					<Text style={ styles.transDesc }>{ item.description }</Text>
@@ -82,6 +82,7 @@ export default function CheckDetails( props ){
 					<CheckItem data={ check } transitionState={ 2 } />
 				</Animated.View>
 				<FlatList data={ check.transactions }
+					keyExtractor={ (item) => item.id }
 					renderItem={ renderTransactions }
 				/>
 			</View>
@@ -140,8 +141,7 @@ const styles = StyleSheet.create({
 	},
 
 	body: {
-		padding: 20,
-		transform: [ {translateY: -100} ],
+		transform: [ {translateY: -80} ],
 		flex: 1
 	},
 	
@@ -176,7 +176,10 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'center',
 		alignItems: 'center',
-		padding: 10
+		paddingTop: 10,
+		paddingBottom: 10,
+		paddingLeft: 30,
+		paddingRight: 30,
 	},
 
 	transLeft:{

@@ -49,7 +49,6 @@ export default function CheckItem( props ){
 								<Text style={ [styles.detailValue] }>{ props.data.status }</Text>
 							</View>
 						</View>
-
 					</View>
 				</SharedElement>
 			</View>
@@ -66,6 +65,8 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		borderRadius: 10,
 		marginBottom: 10,
+		marginLeft: 20,
+		marginRight: 20,
 		elevation: 10,
 		height: 145
 	},
