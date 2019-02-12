@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
-import ListItem from '../components/ListItem';
-import ScreenHeader from '../components/ScreenHeader';
-import {getItems} from '../data/testItems';
+import ListItem from '../../components/ListItem';
+import ScreenHeader from '../../components/ScreenHeader';
+import {getItems} from './testItems';
 
 class TestList extends Component {
 	constructor( props ) {

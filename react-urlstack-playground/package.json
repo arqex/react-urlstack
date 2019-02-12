@@ -38,6 +38,7 @@
     "jest": "23.6.0",
     "jest-pnp-resolver": "1.0.1",
     "jest-resolve": "23.6.0",
+    "native-base": "^2.11.0",
     "pnp-webpack-plugin": "1.1.0",
     "react": "^16.7.0",
     "react-app-polyfill": "^0.2.0",

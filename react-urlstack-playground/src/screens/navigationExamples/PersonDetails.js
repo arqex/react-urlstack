@@ -1,7 +1,7 @@
 import React from 'react'
 import {View, Text, TouchableHighlight} from 'react-native'
-import { getById } from '../data/testItems'
-import ScreenHeader from '../components/ScreenHeader';
+import { getById } from './testItems'
+import ScreenHeader from '../../components/ScreenHeader';
 
 export default function TestDetails( props ){
 	let details = getById( props.location.params.id );
