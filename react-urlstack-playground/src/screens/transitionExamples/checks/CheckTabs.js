@@ -44,13 +44,14 @@ export default CheckTabs;
 
 let styles = StyleSheet.create({
 	container: {
-		flex: 1
+		flex: 1,
+		alignItems: 'stretch'
 	},
 	content: {
 		flex: 1
 	},
 	tabs: {
-		width: '100%'
+		height: 50
 	},
 	tab: {
 		flex: 1,

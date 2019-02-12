@@ -16,7 +16,7 @@ export default function CheckList( props ){
 
 	let renderCheckItem = function({item}){
 		return (
-			<Animated.View style={ checkScale } key={ 'i' + item.id }>
+			<Animated.View style={ checkScale }>
 				<CheckItem data={ item }
 					transitionState={ 1 }
 					onPress={ () => props.router.navigate(`/checks/money/${item.id}`) }
@@ -25,19 +25,24 @@ export default function CheckList( props ){
 		)
 	}
 
+	let header =  (
+		<View style={styles.header}>
+			<View style={styles.titleWrapper}>
+				<Text style={styles.title}>My Checks</Text>
+			</View>
+			<View style={styles.headerControls}>
+				<Icon name="sort-amount-desc" size={22} color="#247aff" style={styles.icon} />
+				<Icon name="file-text" size={22} color="#247aff" style={styles.icon} />
+			</View>
+		</View>
+	)
+
 	return (
 		<View style={ styles.container }>
-			<View style={ styles.header }>
-				<View style={ styles.titleWrapper }>
-					<Text style={ styles.title }>My Checks</Text>
-				</View>
-				<View style={ styles.headerControls }>
-					<Icon name="sort-amount-desc" size={ 22 } color="#247aff" style={ styles.icon } />
-					<Icon name="file-text" size={ 22 } color="#247aff" style={ styles.icon } />
-				</View>
-			</View>
 			<FlatList data={ data }
-				renderItem={ renderCheckItem }
+				ListHeaderComponent={ header }
+				renderItem={renderCheckItem}
+				keyExtractor={ item => 'i' + item.id }
 			/>
 		</View>
 	)
@@ -45,7 +50,6 @@ export default function CheckList( props ){
 
 const styles = StyleSheet.create({
 	container: {
-		padding: 20
 	},
 
 	header: {
@@ -53,7 +57,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		marginBottom: 10,
 		alignItems: 'center',
-		padding: 5
+		padding: 25
 	},
 
 	titleWrapper: {

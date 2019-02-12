@@ -42,7 +42,7 @@ export default function CheckDetails( props ){
 
 	let renderTransactions = function({item}){
 		return (
-			<Animated.View key={ item.id } style={ [styles.transContainer, stages[i++]] }>
+			<Animated.View style={ [styles.transContainer, stages[i++]] }>
 				<View style={ styles.transLeft }>
 					<Text style={ styles.transTitle }>{ item.title }</Text>
 					<Text style={ styles.transDesc }>{ item.description }</Text>
@@ -77,12 +77,14 @@ export default function CheckDetails( props ){
 					<Icon name="barcode" size={ 22 } color="white" />
 				</View>
 			</Animated.View>
+			<Animated.View style={ cardStyles }>
+				<CheckItem data={ check } transitionState={ 2 } />
+			</Animated.View>
 			<View style={ styles.body }>
-				<Animated.View style={ cardStyles }>
-					<CheckItem data={ check } transitionState={ 2 } />
-				</Animated.View>
 				<FlatList data={ check.transactions }
+					keyExtractor={ (item) => item.id }
 					renderItem={ renderTransactions }
+					ListFooterComponent={ <View key="fooo" style={{height: 100}} /> }
 				/>
 			</View>
 			<View style={ styles.footer }>
@@ -140,9 +142,14 @@ const styles = StyleSheet.create({
 	},
 
 	body: {
-		padding: 20,
-		transform: [ {translateY: -100} ],
-		flex: 1
+		flex: 1,
+		paddingTop: 90
+	},
+
+	card: {
+		position: 'absolute',
+		top: 100,
+		left: 0, right: 0
 	},
 	
 	headerControls: {
@@ -176,7 +183,10 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'center',
 		alignItems: 'center',
-		padding: 10
+		paddingTop: 10,
+		paddingBottom: 10,
+		paddingLeft: 30,
+		paddingRight: 30,
 	},
 
 	transLeft:{
