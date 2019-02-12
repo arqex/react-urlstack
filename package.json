@@ -31,7 +31,6 @@
     "@babel/preset-react": "^7.0.0",
     "@babel/runtime": "^7.2.0",
     "bili": "^3.4.2",
-    "native-base": "^2.10.0",
     "react": "^16.6.3",
     "react-art": "^16.6.3",
     "react-dom": "^16.6.3",

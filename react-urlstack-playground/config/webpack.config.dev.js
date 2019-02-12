@@ -222,10 +222,6 @@ module.exports = {
               path.join( __dirname, '../src' ),
               path.join( __dirname, '../react-urlstack' ),
               path.join( __dirname, '../node_modules/react-native-vector-icons'),
-              path.join( __dirname, '../node_modules/native-base'),
-              path.join( __dirname, '../node_modules/native-base-shoutem-theme'),
-              path.join( __dirname, '../node_modules/react-native-drawer'),
-              path.join( __dirname, '../node_modules/react-native-keyboard-aware-scroll-view'),
             ],
             loader: require.resolve('babel-loader'),
             options: { 
