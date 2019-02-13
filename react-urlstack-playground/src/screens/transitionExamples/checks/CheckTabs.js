@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { View, Animated, StyleSheet } from 'react-native'
-import TabSelector from '../../../components/TabSelector'
+import TabSelector from '../../../components/gallery/ui/TabSelector'
 
 class CheckTabs extends Component {
 	constructor( props ){

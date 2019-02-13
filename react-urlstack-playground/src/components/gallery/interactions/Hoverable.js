@@ -1,15 +1,38 @@
 import isHoverEnabled from "./hoverState";
 import { element, func, oneOf, oneOfType, object, array } from "prop-types";
 import React, { Component } from "react";
-import {TouchableNativeFeedback, TouchableOpacity, TouchableHighlight} from 'react-native';
+import {TouchableNativeFeedback, TouchableOpacity, TouchableHighlight, Platform, View} from 'react-native';
 
 const touchableComponents = {
 	native: TouchableNativeFeedback,
 	opacity: TouchableOpacity,
-	highlight: TouchableHighlight
+	highlight: TouchableHighlight,
+	default: Platform.OS === 'Android' ? TouchableNativeFeedback : TouchableOpacity,
+	none: View
 }
 
+const nofn = function(){}
+
 export default class Hoverable extends Component {
+	static propTypes = {
+		/** The children of the hoverable */
+		children: oneOfType([func, element]),
+		/** Callback called when the mouse gets into the component */
+		onHoverIn: func,
+		/** Callback called when the mouse gets out the component */
+		onHoverOut: func,
+		/** Type of touchable used as a wrapper element for the content. The `default` one is using TouchableNativeFeedback for `android` and TouchableOpacity for others. */
+		touchable: oneOf(['opacity', 'highlight', 'native', 'default', 'none']),
+		/** Styles for the container when hovering */
+		hoverStyle: oneOfType([object, array])
+	}
+
+	static defaultProps = {
+		onHoverIn: nofn,
+		onHoverOut: nofn,
+		touchable: 'default'
+	}
+
 	constructor(props) {
 		super(props);
 		this.state = { isHovered: false, showHover: true };
@@ -96,10 +119,3 @@ Hoverable.propTypes = {
 	touchable: oneOf(['opacity', 'highlight', 'native']),
 	hoverStyle: oneOfType([object, array])
 };
-
-const nofn = function(){}
-Hoverable.defaultProps = {
-	onHoverIn: nofn,
-	onHoverOut: nofn,
-	touchable: 'opacity'
-}

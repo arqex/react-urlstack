@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
-import Hoverable from '../hover/Hoverable';
+import Hoverable from '../gallery/interactions/Hoverable';
 
 const MenuItem = ({
 	children, router, route, active

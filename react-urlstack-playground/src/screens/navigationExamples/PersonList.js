@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
-import ListItem from '../../components/ListItem';
+import ListItem from '../../components/gallery/ui/ListItem';
 import ScreenHeader from '../../components/ScreenHeader';
 import {getItems} from './testItems';
 
