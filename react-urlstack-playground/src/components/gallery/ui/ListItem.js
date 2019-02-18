@@ -3,23 +3,35 @@ import {
   StyleSheet,
   View,
   Text,
-  TouchableOpacity,
 } from 'react-native';
 
+import Hoverable from '../interactions/Hoverable'
+
 export default ( props ) => {
-  return (
-    <TouchableOpacity onPress={ e => props.onPress && props.onPress(e) }>
-      <View style={ styles.container }>
-        { optionalRender( props.leftContent, 'left' ) }
-        <View style={ styles.texts }>
-          <Text style={ styles.title }>{ props.title }</Text>
-          { optionalRender( props.subtitle, 'subtitle', Text ) }
-        </View>
-        { optionalRender( props.rightContent, 'right' ) }
+  let mainContent = props.mainContent;
+
+  if( !mainContent ){
+    mainContent = (
+      <View style={ [ styles.mainContent, props.mainStyle ] }>
+        <Text style={ styles.title }>{ props.title }</Text>
+        { optionalRender( props.subtitle, 'subtitle', Text ) }
       </View>
-    </TouchableOpacity>
+    )
+  }
+
+  let containerStyle = [
+    styles.container, props.containerStyle
+  ]
+  
+  return (
+    <Hoverable onPress={ e => props.onPress && props.onPress(e) } style={ containerStyle } hoverStyle={ props.hoverStyle } >
+      { optionalRender( props.leftContent, 'left' ) }
+      { mainContent }
+      { optionalRender( props.rightContent, 'right' ) }
+    </Hoverable>
   )
 }
+
 
 function optionalRender( content, style, Component = Text ){
   if( !content ) return
@@ -35,9 +47,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderBottomColor: '#eee',
     borderBottomWidth: 1,
+    alignItems: 'center'
   },
 
-  texts: {
+  mainContent: {
     flex: 1,
     flexGrow: 1,
     flexDirection: 'column',

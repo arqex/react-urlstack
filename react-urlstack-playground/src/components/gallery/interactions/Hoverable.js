@@ -71,7 +71,7 @@ export default class Hoverable extends Component {
 
 		if( style ){
 			if( style.splice ){
-				merged = style
+				merged = style.slice()
 			}
 			else {
 				merged.push( style )

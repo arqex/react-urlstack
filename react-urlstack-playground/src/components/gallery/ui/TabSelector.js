@@ -1,16 +1,18 @@
 import React from 'react'
-import { View, Text, TouchableHighlight, StyleSheet } from 'react-native'
-import Icon from 'react-native-vector-icons/FontAwesome';
-
+import { View, Text, StyleSheet } from 'react-native'
+import Icon from './Icon';
+import Hoverable from '../interactions/Hoverable';
 
 export default function TabSelector( props ){
 	let tabs = props.items.map ( item => (
-		<TouchableHighlight style={styles.tab} onPress={ () => props.onItemPress( item.id ) } key={ item.icon }>
-			<View style={ styles.tab }>
-				<Icon name={ item.icon } size={24} style={ styles.icon } />
-				<Text style={ styles.text }>{ item.label }</Text>
-			</View>
-		</TouchableHighlight>
+		<Hoverable style={[ styles.tab, props.tabStyle ]}
+			hoverStyle={ props.tabHoverStyle }
+			onPress={ () => props.onItemPress && props.onItemPress( item.id ) }
+			key={ item.icon }
+			>
+			<Icon name={ item.icon } size={ props.iconSize || 24 } style={ [styles.icon, props.iconStyle] } />
+			<Text style={ styles.text }>{ item.label }</Text>
+		</Hoverable>
 	))
 
 	return (
@@ -43,6 +45,5 @@ let styles = StyleSheet.create({
 		color: '#aaa',
 		fontSize: 12,
 		textAlign: 'center'
-
 	}
 })
