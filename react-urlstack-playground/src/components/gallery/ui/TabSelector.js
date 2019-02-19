@@ -1,25 +1,166 @@
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import React, {Component} from 'react'
+import { View, Text, StyleSheet, Dimensions, Animated, Platform, ScrollView } from 'react-native'
+import PropTypes from 'prop-types';
 import Icon from './Icon';
 import Hoverable from '../interactions/Hoverable';
 
-export default function TabSelector( props ){
-	let tabs = props.items.map ( item => (
-		<Hoverable style={[ styles.tab, props.tabStyle ]}
-			hoverStyle={ props.tabHoverStyle }
-			onPress={ () => props.onItemPress && props.onItemPress( item.id ) }
-			key={ item.icon }
-			>
-			<Icon name={ item.icon } size={ props.iconSize || 24 } style={ [styles.icon, props.iconStyle] } />
-			<Text style={ styles.text }>{ item.label }</Text>
-		</Hoverable>
-	))
+export default class TabSelector extends Component {
+	static propTypes = {
+		items: PropTypes.array,
+		minTabWidth: PropTypes.number,
+		iconSize: PropTypes.number
+	}
+	static defaultProps = {
+		items: [],
+		minTabWidth: 80
+	}
 
-	return (
-		<View style={ styles.container }>
-			{ tabs }
-		</View>
-	)
+	constructor( props ){
+		super( props )
+		this._onLayout = this._onLayout.bind( this )
+
+		let barWidth = Dimensions.get('window').width
+		this.state = {
+			width: barWidth,
+			itemWidth: barWidth / props.items.length
+		}
+
+		this.currentIndex = this.getCurrentIndex( props );
+		this.animatedBar = new Animated.Value( this.getCurrentBarX( props ) )
+	}
+
+	render() {
+		let props = this.props;
+
+		let tabs = this.renderTabsAndIndex( props );
+
+		let containerStyles = [
+			styles.container,
+			props.containerStyle,
+			{ width: Math.max(this.state.width, props.minTabWidth * props.items.length) }
+		]
+	
+		return (
+			<ScrollView	onLayout={ e => this._onLayout( e.nativeEvent.layout ) }
+				style={{overflowX: 'hidden', overflowY: 'hidden'}}
+				horizontal ref={ el => this.scroll = el }
+				showsHorizontalScrollIndicator={ false }
+				showsVerticalScrollIndicator={ false }>
+				<View style={ containerStyles }>
+					{ this.renderCurrentBar( tabs.currentIndex ) }
+					{ tabs.items }
+				</View>
+			</ScrollView>
+		)
+	}
+
+	renderTabsAndIndex( props ){
+		let currentIndex;
+
+		let tabs = props.items.map( (item, i) => {
+			let isCurrent = item.id === props.current;
+			if( isCurrent ){
+				currentIndex = i;
+			}
+
+			return (
+				<Hoverable style={[ styles.tab, props.tabStyle, isCurrent && props.currentTabStyle ]}
+				hoverStyle={ props.tabHoverStyle }
+				onPress={ () => props.onTabPress && props.onTabPress( item ) }
+				key={ item.icon }
+				>
+					<Icon name={ item.icon } size={ props.iconSize || 24 } style={ [styles.icon, props.iconStyle, isCurrent && props.currentIconStyle] } />
+					<Text style={ [styles.text, props.textStyle, isCurrent && props.currentTextStyle] }>{ item.label }</Text>
+				</Hoverable>
+			)
+		})
+
+		return {
+			items: tabs,
+			currentIndex
+		}
+	}
+
+	renderCurrentBar( currentIndex ){
+		if( currentIndex === undefined ) return;
+		
+		let style= [
+			styles.currentBar,
+			this.props.currentBarStyle,
+			{ minWidth: Math.max( this.props.minTabWidth, this.state.itemWidth ) },
+			{ transform: [{translateX: this.animatedBar}] }
+		]
+
+		return (
+			<Animated.View style={ style } />
+		)
+	}
+
+	_onLayout( layout ){
+		if( layout.width !== this.state.width ){
+			this.setState({
+				width: layout.width,
+				itemWidth: layout.width / this.props.items.length 
+			})
+		}
+	}
+
+	getCurrentIndex( props ){
+		let { items, current } = (props || this.props);
+		let i = items.length;
+		while( i-- > 0 ){
+			if( items[i].id === current ){
+				return i;
+			}
+		}
+	}
+
+	getCurrentBarX( props ){
+		return Math.round( this.currentIndex * Math.max( props.minTabWidth, this.state.itemWidth ) )
+	}
+
+	componentDidUpdate( prevProps, prevState ){
+		this.checkBarAnimation();
+	}
+
+	checkBarAnimation(){
+		this.currentIndex = this.getCurrentIndex()
+
+		if( this.currentIndex !== undefined ){
+			Animated.timing( this.animatedBar, {
+				toValue: this.getCurrentBarX( this.props ),
+				duration: 300,
+				useNativeDriver: Platform.OS !== 'web'
+			}).start()
+
+			this.startScroll()
+		}
+	}
+
+	startScroll(){
+		if( !this.scroll ) return;
+
+		let containerWidth = this.state.width
+		let itemWidth = Math.max( this.props.minTabWidth, this.state.itemWidth )
+		let contentWidth = itemWidth * this.props.items.length;
+
+		if( contentWidth === containerWidth ) return;
+
+		let scrollTo = Math.round( (itemWidth * this.currentIndex) - (containerWidth/2) + (itemWidth/2) )
+		if( scrollTo <= 0 ){
+			this.scrollTo( 0 )
+		}
+		else if( scrollTo > contentWidth - containerWidth ){
+			this.scrollTo( contentWidth - containerWidth )
+		}
+		else {
+			this.scrollTo( scrollTo )
+		}
+	}
+
+	scrollTo( x ){
+		this.scroll.scrollTo( {x, animated: true} )
+	}
 }
 
 let styles = StyleSheet.create({
@@ -27,8 +168,9 @@ let styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'row',
 		backgroundColor: '#f6f6f6',
-		borderTopWidth: 3,
-		borderTopColor: '#f0f0f0'
+		borderWidth: 0,
+		borderColor: '#f0f0f0',
+		borderTopWidth: 3
 	},
 
 	tab: {
@@ -45,5 +187,12 @@ let styles = StyleSheet.create({
 		color: '#aaa',
 		fontSize: 12,
 		textAlign: 'center'
+	},
+
+	currentBar: {
+		position: 'absolute',
+		top: -3, left: 0,
+		height: 3,
+		backgroundColor: '#1978c8'
 	}
 })
