@@ -8,20 +8,37 @@ Since the hover behavior is usually related to clickable elements, by default th
 
 ```js
 let styles = RN.StyleSheet.create({
-	container: { backgroundColor: 'red', height: 100 }
+	container: { backgroundColor: 'red', height: 100, padding: 20, margin: 20 },
+	square: {
+		backgroundColor: 'white',
+		height: 20,
+		margin: 10
+	}
 })
 
-let hoverStyles = `
-	background: 'red'
-`
-;
+let hoverStyles = {
+	wrapper: `
+		background: blue
+	`,
+	square1: `
+		background: green
+	`,
+	square2: `
+		background: yellow
+	`
+}
+
+;<div>
+
 <Hoverable style={ styles.container }
-	hoverCSS="background: blue; color: white">
+	hoverStyle={{wrapper: "background: blue; color: white"}}>
 	<RN.Text>Hoverable</RN.Text>
 </Hoverable>
 
-<Hoverable style={ styles.container }>
-	hoverCSS
-
+<Hoverable style={ styles.container } hoverStyle={ hoverStyles }>
+	<RN.View className="square1" style={ styles.square }></RN.View>
+	<RN.View className="square2" style={ styles.square }></RN.View>
 </Hoverable>
+
+</div>
 ```
