@@ -1,10 +1,27 @@
-A component that allows to style onHover in react-native. This is possible to do it in RNW using special code forthe dom but with this component is possible to do it exactly with the same code for any platform.
+A component that allows to style hover status for react-native-web. It actually uses css for styling hover states by adding a className and a `<style>` block to the element, so it's possible to set hover styles for inner elements or texts.
 
-Hoverable is not a transparent layer, you can style it by using the `style`. It accepts any property a default `View` accepts.
+This hover behaviour is only added when running in the DOM, so we can reuse the exact component in react-native without problems, saving us creating a specific version for the web.
+
+Hoverable is not a transparent layer, it actually creates a an element that you can style as usual using the `style` prop. Use `StyleSheet.create` with the `style` prop to make them overridable by the hoverCSS.
+
+Since the hover behavior is usually related to clickable elements, by default the component used as a wrapper is a react-native's `Touchable` one. By default, in Android `TouchableNativeFeedback` is used, and `TouchableOpacity` otherwise. This component can be customized using the `touchable` prop. `Hoverable` pass down all the props to the wrapper component, so we can configure it as if it was a `Touchable`.
 
 ```js
-<Hoverable hoverStyle={{backgroundColor: '#eee'}}>
+let styles = RN.StyleSheet.create({
+	container: { backgroundColor: 'red', height: 100 }
+})
+
+let hoverStyles = `
+	background: 'red'
+`
+;
+<Hoverable style={ styles.container }
+	hoverCSS="background: blue; color: white">
 	<RN.Text>Hoverable</RN.Text>
-	<RN.View style={{width: 100, height: 100, backgroundColor: 'red'}}></RN.View>
+</Hoverable>
+
+<Hoverable style={ styles.container }>
+	hoverCSS
+
 </Hoverable>
 ```
