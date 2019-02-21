@@ -19,12 +19,12 @@ export default class Hoverable extends Component {
 		/** Type of touchable used as a wrapper element for the content. The `default` one is using TouchableNativeFeedback for `android` and TouchableOpacity for others. */
 		touchable: PropTypes.oneOf(['opacity', 'highlight', 'native', 'default', 'none']),
 		/** Styles for the container when hovering */
-		hoverStyle: PropTypes.object
+		hoverStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.string])
 	}
 
 	static defaultProps = {
 		touchable: 'default',
-		hoverStyle: {}
+		hoverStyle: ''
 	}
 
 	constructor(props){
@@ -38,7 +38,7 @@ export default class Hoverable extends Component {
 		const { children, hoverStyle, touchable, ...touchableProps } = this.props;
 		let css;
 
-		if( this.cn ){
+		if( this.cn && hoverStyle ){
 			touchableProps.className = this.cn
 			css = (
 				<style>{ this.renderHoverStyle( hoverStyle ) }</style>
@@ -58,6 +58,10 @@ export default class Hoverable extends Component {
 	}
 
 	renderHoverStyle( hoverStyle ){
+		if( typeof hoverStyle === 'string' ){
+			return `.${ this.cn }:hover { ${hoverStyle} } `
+		}
+
 		let css = '';
 		Object.keys( hoverStyle ).forEach( selector => {
 			if( selector === 'wrapper' ){
@@ -67,6 +71,7 @@ export default class Hoverable extends Component {
 				css += `.${ this.cn }:hover .${selector} { ${hoverStyle[selector]} } `
 			}
 		})
+
 		return css;
 	}
 }

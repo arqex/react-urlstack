@@ -28,12 +28,16 @@ let tabItems = [
 	current={ state.tabs2 }
 	containerStyle={{borderTop: 0, borderBottomWidth: 3}}
 	tabStyle={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}
+	tabHoverStyle={{
+		tabText: "color: #666 !important",
+		tabIcon: "color: #666 !important"
+	}}
 	textStyle={{ fontSize: 20 }}
 	currentBarStyle={{top: 'auto', bottom: -3}}
 	onTabPress={ item => setState({tabs2: item.id}) }
 	currentTextStyle={{color: '#1978c8'}}
 	currentIconStyle={{color: '#1978c8'}}
-	iconSize={20} />
+	iconSize={18} />
 
 </div>
 

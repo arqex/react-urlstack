@@ -8,11 +8,17 @@ export default class TabSelector extends Component {
 	static propTypes = {
 		items: PropTypes.array,
 		minTabWidth: PropTypes.number,
-		iconSize: PropTypes.number
+		iconSize: PropTypes.number,
+		/** Styles for the container when hovering */
+		tabHoverStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.string])
 	}
 	static defaultProps = {
 		items: [],
-		minTabWidth: 80
+		minTabWidth: 80,
+		tabHoverStyle: {
+			tabText: "color: #666",
+			tabIcon: "color: #666"
+		}
 	}
 
 	constructor( props ){
@@ -65,12 +71,12 @@ export default class TabSelector extends Component {
 
 			return (
 				<Hoverable style={[ styles.tab, props.tabStyle, isCurrent && props.currentTabStyle ]}
-				hoverStyle={ props.tabHoverStyle }
-				onPress={ () => props.onTabPress && props.onTabPress( item ) }
-				key={ item.icon }
+					hoverStyle={ props.tabHoverStyle }
+					onPress={ () => props.onTabPress && props.onTabPress( item ) }
+					key={ item.icon }
 				>
-					<Icon name={ item.icon } size={ props.iconSize || 24 } style={ [styles.icon, props.iconStyle, isCurrent && props.currentIconStyle] } />
-					<Text style={ [styles.text, props.textStyle, isCurrent && props.currentTextStyle] }>{ item.label }</Text>
+					<Icon className="tabIcon" name={ item.icon } size={ props.iconSize || 24 } style={ [styles.icon, props.iconStyle, isCurrent && props.currentIconStyle] } />
+					<Text className="tabText" style={ [styles.text, props.textStyle, isCurrent && props.currentTextStyle] }>{ item.label }</Text>
 				</Hoverable>
 			)
 		})
