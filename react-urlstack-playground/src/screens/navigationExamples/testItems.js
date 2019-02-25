@@ -1,11 +1,14 @@
 export function getItems() {
-	let count = Math.floor( Math.random() * 30 );
+	let count = Math.floor( Math.random() * 30 + 10 );
 	let randomItems = [];
+	let remaining = items.slice();
 
 	while( count-- > 0 ){
+		let i = Math.floor( Math.random() * remaining.length);
 		randomItems.push(
-			items[ Math.floor( Math.random() * 100) ]
+			remaining[ i ]
 		)
+		remaining.splice( i, 1)
 	}
 
 	return randomItems;

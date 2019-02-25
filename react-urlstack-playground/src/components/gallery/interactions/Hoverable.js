@@ -46,9 +46,7 @@ export default class Hoverable extends Component {
 		}
 
 		let C = touchableComponents[touchable];
-
-		console.log( touchableProps )
-
+		
 		return (
 			<C { ...touchableProps }>
 				{ children }

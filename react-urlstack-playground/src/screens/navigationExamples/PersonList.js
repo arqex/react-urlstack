@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import {  StyleSheet, Text, View } from 'react-native';
 import ListItem from '../../components/gallery/ui/ListItem';
+import DynamicHeaderList from '../../components/gallery/ui/DynamicHeaderList';
 import ScreenHeader from '../../components/ScreenHeader';
+import ResponsiveWrapper from '../../components/ResponsiveWrapper'
+import Screen from '../../components/Screen'
 import {getItems} from './testItems';
 
-class TestList extends Component {
+class PersonList extends Component {
 	constructor( props ) {
 		super( props )
 		this.state = {
 			items: getItems()
 		}
-
+		
 		this.baseUrl = props.baseUrl || '/list'
 	}
 
@@ -25,12 +28,16 @@ class TestList extends Component {
 		}
 
 		return (
-			<View style={styles.container}>
-				<ScreenHeader title="Person list" active={ this.props.breakPoint === 0 } />
-				<FlatList data={items}
-					keyExtractor={ item => item.id + '' }
-					renderItem={({ item }) => this.renderItem(item)} />
-			</View>
+			<Screen style={styles.container}>
+				<ResponsiveWrapper>
+					<ScreenHeader title="Person list" active={ this.props.breakPoint === 0 } />
+					<DynamicHeaderList containerType="flatList"
+						data={items}
+						header={ <View style={{backgroundColor: 'blue', flex: 1, width: '100%'}} /> }
+						keyExtractor={ item => item.id + '' }
+						renderItem={({ item }) => this.renderItem(item)} />
+				</ResponsiveWrapper>
+			</Screen>
 		)
 	}
 
@@ -68,10 +75,6 @@ class TestList extends Component {
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		justifyContent: 'center'
-	},
 	text: {
 		textAlign: 'center'
 	},
@@ -83,4 +86,4 @@ const styles = StyleSheet.create({
 	}
 })
 
-export default TestList;
+export default PersonList;
