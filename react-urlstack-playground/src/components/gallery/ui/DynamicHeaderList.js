@@ -37,6 +37,12 @@ export default class DynamicHeaderList extends Component {
 			onMomentumScrollEnd: this._onScrollEnd,
 			onScroll: this._onScroll()
 		}
+
+		// Transition should go from 0->1 : minHeaderHeight->maxHeaderHeight
+		this.transition = Animated.divide(
+			Animated.add( this.headerHeight, -(props.minHeaderHeight) ),
+			diff
+		)
 	}
 
 	render() {
@@ -66,7 +72,7 @@ export default class DynamicHeaderList extends Component {
 		return (
 			<View style={ styles.container }>
 				<Animated.View style={[ {height: this.headerHeight}, styles.header]}>
-					{ this.props.header }
+					{ React.cloneElement(this.props.header, {transition: this.transition}) }
 				</Animated.View>
 				<View style={ styles.listContainer }>
 					{ list }

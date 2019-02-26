@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import {  StyleSheet, Text, View } from 'react-native';
 import ListItem from '../../components/gallery/ui/ListItem';
 import DynamicHeaderList from '../../components/gallery/ui/DynamicHeaderList';
-import ScreenHeader from '../../components/ScreenHeader';
-import ResponsiveWrapper from '../../components/ResponsiveWrapper'
-import Screen from '../../components/Screen'
+import CollapsibleHeader from '../../components/CollapsibleHeader';
 import {getItems} from './testItems';
 
 class PersonList extends Component {
@@ -28,16 +26,11 @@ class PersonList extends Component {
 		}
 
 		return (
-			<Screen style={styles.container}>
-				<ResponsiveWrapper>
-					<ScreenHeader title="Person list" active={ this.props.breakPoint === 0 } />
-					<DynamicHeaderList containerType="flatList"
-						data={items}
-						header={ <View style={{backgroundColor: 'blue', flex: 1, width: '100%'}} /> }
-						keyExtractor={ item => item.id + '' }
-						renderItem={({ item }) => this.renderItem(item)} />
-				</ResponsiveWrapper>
-			</Screen>
+			<DynamicHeaderList containerType="flatList"
+				data={items}
+				header={ <CollapsibleHeader title="My header" subtitle="Something else to say" containerStyle={[ styles.header, styles.centered ] } /> }
+				keyExtractor={ item => item.id + '' }
+				renderItem={({ item }) => this.renderItem(item)} />
 		)
 	}
 
@@ -61,10 +54,12 @@ class PersonList extends Component {
 		let {router} = this.props;
 
 		return (
-			<ListItem key={item.id}
-				title={item.name}
-				subtitle={ item.email }
-				onPress={ () => router.navigate( this.baseUrl+ '/' + item.id ) } />
+			<View style={ styles.centered }>
+				<ListItem key={item.id}
+					title={item.name}
+					subtitle={ item.email }
+					onPress={ () => router.navigate( this.baseUrl+ '/' + item.id ) } />
+			</View>
 		)
 	}
 
@@ -78,12 +73,20 @@ const styles = StyleSheet.create({
 	text: {
 		textAlign: 'center'
 	},
+	header: {
+		backgroundColor: 'blue', flex: 1
+	},
+	centered: {
+		maxWidth: 800,
+		width: '100%',
+		margin: 'auto'
+	},
 	bottomButton: {
 		position: 'absolute',
 		bottom: 10,
 		left: 10,
 		right: 10
-	}
+	},
 })
 
 export default PersonList;
