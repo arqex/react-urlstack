@@ -13,7 +13,7 @@ export default class DynamicHeaderList extends Component {
 	}
 
 	static defaultProps = {
-		minHeaderHeight: 100,
+		minHeaderHeight: 80,
 		maxHeaderHeight: 220,
 		containerType: 'scrollView'
 	}

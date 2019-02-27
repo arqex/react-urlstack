@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import {  StyleSheet, Text, View } from 'react-native';
+import {  StyleSheet, Text, View, Button } from 'react-native';
 import ListItem from '../../components/gallery/ui/ListItem';
 import DynamicHeaderList from '../../components/gallery/ui/DynamicHeaderList';
+import Icon from '../../components/gallery/ui/Icon';
 import CollapsibleHeader from '../../components/CollapsibleHeader';
 import {getItems} from './testItems';
 
@@ -25,10 +26,18 @@ class PersonList extends Component {
 			return this.renderNoArticles();
 		}
 
+		let header = (
+			<CollapsibleHeader
+				title="My header"
+				leftContent={ <Icon size={20} color="white" name="chevron-left" /> }
+				rightContent={ <Button title="Ok" onPress={ () => console.log('Click') } />}
+				containerStyle={[ styles.header, styles.centered ] } />
+		)
+
 		return (
 			<DynamicHeaderList containerType="flatList"
 				data={items}
-				header={ <CollapsibleHeader title="My header" subtitle="Something else to say" containerStyle={[ styles.header, styles.centered ] } /> }
+				header={ header }
 				keyExtractor={ item => item.id + '' }
 				renderItem={({ item }) => this.renderItem(item)} />
 		)

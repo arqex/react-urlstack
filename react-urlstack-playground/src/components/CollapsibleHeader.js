@@ -1,5 +1,5 @@
 import React, {PureComponent} from 'react';
-import {StyleSheet, Text, View, Platform } from 'react-native';
+import {StyleSheet, Text, View, Platform, Animated } from 'react-native';
 
 const isIOS = Platform.OS === 'ios'
 
@@ -16,12 +16,29 @@ function mergeStyles( original, custom ){
 }
 
 export default class CollapsibleHeader extends PureComponent {
+
+	constructor( props ){
+		super( props )
+
+		this.extendedOpacity = props.transition.interpolate({
+			inputRange: [0, 0.3, 0.5, 1],
+			outputRange: [0, 0, 1, 1]
+		})
+
+		this.collpasedOpacity = props.transition.interpolate({
+			inputRange: [0, 0.3, 0.5, 1],
+			outputRange: [1, 1, 0, 0]
+		})
+	}
+
 	render(){
 		let collapsed = {
 			left: this.renderLeft(),
 			right: this.renderRight(),
 			texts: this.renderCollapsedTexts()
 		}
+
+		console.log( this.props.transition )
 
 		return (
 			<View style={ mergeStyles( [styles.container, isIOS && styles.containerIos], this.props.containerStyle) }>
@@ -38,7 +55,7 @@ export default class CollapsibleHeader extends PureComponent {
 
 		return (
 			<View style={ mergeStyles(styles.topBar, this.props.collapsedStyle) }>
-				{ parts.left }{ parts.texts }{ parts.rigth }
+				{ parts.left }{ parts.texts }{ parts.right }
 			</View>
 		)
 	}
@@ -74,12 +91,12 @@ export default class CollapsibleHeader extends PureComponent {
 		}
 
 		return (
-			<View style={ mergeStyles(styles.collapsedTexts, this.props.collapsedTextsStyles) }>
+			<Animated.View style={ mergeStyles([styles.collapsedTexts, {opacity: this.collpasedOpacity}], this.props.collapsedTextsStyles) }>
 				<Text style={ mergeStyles([styles.collapsedTitle, isIOS && styles.collapsedTitleIos], styles.collapsedTitleStyle) }>
 					{ this.props.collapsedTitle || this.props.title }
 				</Text>
 				{ subtitle }
-			</View>
+			</Animated.View>
 		)
 	}
 
@@ -98,12 +115,12 @@ export default class CollapsibleHeader extends PureComponent {
 		}
 
 		return (
-			<View style={ mergeStyles(styles.extendedContent, this.props.extendedContentStyle) }>
+			<Animated.View style={ mergeStyles([styles.extendedContent, {opacity: this.extendedOpacity}], this.props.extendedContentStyle) }>
 				<Text style={ mergeStyles([styles.extendedTitle, isIOS && styles.extendedTitleIos], styles.extendedTitleStyle) }>
 					{ this.props.extendedTitle ||this.props.title }
 				</Text>
 				{ subtitle }
-			</View>
+			</Animated.View>
 		)
 	}
 }
@@ -119,7 +136,11 @@ let styles = StyleSheet.create({
 	},
 
 	topBar:{
-		padding: 10
+		padding: 10,
+		flexDirection: 'row',
+		alignItems: 'center',
+		position: 'relative',
+		zIndex: 2
 	},
 
 	extendedContent: {
@@ -130,9 +151,13 @@ let styles = StyleSheet.create({
 		justifyContent: 'flex-end'
 	},
 
+	collapsedTexts: {
+		flex: 1
+	},
+
 	collapsedTitle: {
 		fontSize: 20,
-		fontWeight: 400,
+		fontWeight: '400',
 		color: 'white'
 	},
 	collapsedTitleIos: {
@@ -141,7 +166,7 @@ let styles = StyleSheet.create({
 
 	collapsedSubtitle: {
 		fontSize: 16,
-		fontWeight: 300,
+		fontWeight: '300',
 		color: 'white'
 	},
 
@@ -152,7 +177,7 @@ let styles = StyleSheet.create({
 	
 	extendedTitle: {
 		fontSize: 24,
-		fontWeight: 400,
+		fontWeight: '400',
 		color: 'white'
 	},
 	extendedTitleIos: {
@@ -161,7 +186,7 @@ let styles = StyleSheet.create({
 
 	extendedSubtitle: {
 		fontSize: 18,
-		fontWeight: 300,
+		fontWeight: '300',
 		color: 'white'
 	},
 
@@ -172,5 +197,12 @@ let styles = StyleSheet.create({
 	content: {},
 	test: {
 		color: 'white',
+	},
+
+	leftContent: {
+		marginRight: 10
+	},
+	rightContent: {
+		marginLeft: 10
 	}
 })

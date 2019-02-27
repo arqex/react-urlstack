@@ -6,6 +6,8 @@ Hoverable is not a transparent layer, it actually creates a an element that you 
 
 Since the hover behavior is usually related to clickable elements, by default the component used as a wrapper is a react-native's `Touchable` one. By default, in Android `TouchableNativeFeedback` is used, and `TouchableOpacity` otherwise. This component can be customized using the `touchable` prop. `Hoverable` pass down all the props to the wrapper component, so we can configure it as if it was a `Touchable`.
 
+It is possible to use CSS transitions to be used by the changes in hover states through the `transition` prop.
+
 ```js
 let styles = RN.StyleSheet.create({
 	container: { backgroundColor: 'red', height: 100, padding: 20, margin: 20 },
@@ -35,7 +37,7 @@ let hoverStyles = {
 	<RN.Text>Hoverable</RN.Text>
 </Hoverable>
 
-<Hoverable style={ styles.container } hoverStyle={ hoverStyles }>
+<Hoverable style={ styles.container } hoverStyle={ hoverStyles } transition="background 1s">
 	<RN.View className="square1" style={ styles.square }></RN.View>
 	<RN.View className="square2" style={ styles.square }></RN.View>
 </Hoverable>

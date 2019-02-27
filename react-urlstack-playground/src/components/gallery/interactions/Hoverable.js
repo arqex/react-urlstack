@@ -19,7 +19,9 @@ export default class Hoverable extends Component {
 		/** Type of touchable used as a wrapper element for the content. The `default` one is using TouchableNativeFeedback for `android` and TouchableOpacity for others. */
 		touchable: PropTypes.oneOf(['opacity', 'highlight', 'native', 'default', 'none']),
 		/** Styles for the container when hovering */
-		hoverStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.string])
+		hoverStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+		/** If you want to use CSS transitions in the wrapper you can define it with this prop */
+		transition: PropTypes.string
 	}
 
 	static defaultProps = {
@@ -35,13 +37,13 @@ export default class Hoverable extends Component {
 	}
 
 	render() {
-		const { children, hoverStyle, touchable, ...touchableProps } = this.props;
+		const { children, hoverStyle, touchable, transition, ...touchableProps } = this.props;
 		let css;
 
 		if( this.cn && hoverStyle ){
 			touchableProps.className = this.cn
 			css = (
-				<style>{ this.renderHoverStyle( hoverStyle ) }</style>
+				<style>{ this.renderHoverStyle( hoverStyle, transition ) }</style>
 			)
 		}
 
@@ -55,12 +57,15 @@ export default class Hoverable extends Component {
 		)
 	}
 
-	renderHoverStyle( hoverStyle ){
+	renderHoverStyle( hoverStyle, transition ){
+		let css = ''
+		if( transition ){
+			css += `.${ this.cn } {transition: ${transition}} `
+		}
 		if( typeof hoverStyle === 'string' ){
-			return `.${ this.cn }:hover { ${hoverStyle} } `
+			return css + `.${ this.cn }:hover { ${hoverStyle} } `
 		}
 
-		let css = '';
 		Object.keys( hoverStyle ).forEach( selector => {
 			if( selector === 'wrapper' ){
 				css += `.${ this.cn }:hover { ${hoverStyle[selector]} } `
