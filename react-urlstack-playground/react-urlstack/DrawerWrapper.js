@@ -3,7 +3,7 @@ import { StyleSheet, Animated, View } from 'react-native'
 import {animatedStyles} from './utils/animatedStyles'
 import Interactable from 'react-interactable'
 
-let handleWidth = 30
+let handleWidth = 15
 
 export default class DrawerWrapper extends Component {
 	constructor(props){
@@ -65,7 +65,7 @@ export default class DrawerWrapper extends Component {
 		];
 
 		return (
-			<Animated.View style={ containerStyles }>
+			<Animated.View style={ containerStyles } pointerEvents="box-none">
 				{ overlay }
 				<Interactable.View dragEnabled={ !!collapsible }
 					ref="drawer"
@@ -73,7 +73,8 @@ export default class DrawerWrapper extends Component {
 					boundaries={{right: this.drawerWidth - handleWidth, bounce: 0}}
 					onDrag={ e => this.onDrag( e ) }
 					animatedValueX={ this.drawerPos }>
-					<View style={ drawerStyles } ref="layout" onLayout={ e => this.updateLayout(e) }>
+					<View style={ drawerStyles } ref="layout"
+						onLayout={ e => this.updateLayout(e) }>
 						<Drawer router={ router } drawer={ this._drawerMethods } />
 						{ handle }
 					</View>

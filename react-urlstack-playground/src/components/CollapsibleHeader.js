@@ -21,12 +21,12 @@ export default class CollapsibleHeader extends PureComponent {
 		super( props )
 
 		this.extendedOpacity = props.transition.interpolate({
-			inputRange: [0, 0.3, 0.5, 1],
+			inputRange: [0, 0.15, 0.35, 1],
 			outputRange: [0, 0, 1, 1]
 		})
 
 		this.collpasedOpacity = props.transition.interpolate({
-			inputRange: [0, 0.3, 0.5, 1],
+			inputRange: [0, 0.15, 0.35, 1],
 			outputRange: [1, 1, 0, 0]
 		})
 	}
@@ -82,9 +82,11 @@ export default class CollapsibleHeader extends PureComponent {
 
 	renderCollapsedTexts(){
 		let subtitle;
+		let textStyle = this.props.textStyle;
+
 		if( this.props.subtitle ){
 			subtitle = (
-				<Text style={ mergeStyles([styles.collapsedSubtitle, isIOS && styles.collapsedSubtitleIos], styles.collapsedSubtitleStyle) }>
+				<Text style={ mergeStyles([styles.collapsedSubtitle, isIOS && styles.collapsedSubtitleIos, textStyle], styles.collapsedSubtitleStyle) }>
 					{ this.props.collapsedSubtitle || this.props.subtitle }
 				</Text>
 			)
@@ -92,7 +94,7 @@ export default class CollapsibleHeader extends PureComponent {
 
 		return (
 			<Animated.View style={ mergeStyles([styles.collapsedTexts, {opacity: this.collpasedOpacity}], this.props.collapsedTextsStyles) }>
-				<Text style={ mergeStyles([styles.collapsedTitle, isIOS && styles.collapsedTitleIos], styles.collapsedTitleStyle) }>
+				<Text style={ mergeStyles([styles.collapsedTitle, isIOS && styles.collapsedTitleIos, textStyle], styles.collapsedTitleStyle) }>
 					{ this.props.collapsedTitle || this.props.title }
 				</Text>
 				{ subtitle }
@@ -106,9 +108,11 @@ export default class CollapsibleHeader extends PureComponent {
 		}
 		
 		let subtitle;
+		let textStyle = this.props.textStyle;
+
 		if( this.props.subtitle ){
 			subtitle = (
-				<Text style={ mergeStyles([styles.extendedSubtitle, isIOS && styles.extendedSubtitleIos], this.props.extendedSubtitleStyle) }>
+				<Text style={ mergeStyles([styles.extendedSubtitle, isIOS && styles.extendedSubtitleIos, textStyle], this.props.extendedSubtitleStyle) }>
 					{ this.props.extendedSubtitle ||this.props.subtitle }
 				</Text>
 			)
@@ -116,7 +120,7 @@ export default class CollapsibleHeader extends PureComponent {
 
 		return (
 			<Animated.View style={ mergeStyles([styles.extendedContent, {opacity: this.extendedOpacity}], this.props.extendedContentStyle) }>
-				<Text style={ mergeStyles([styles.extendedTitle, isIOS && styles.extendedTitleIos], styles.extendedTitleStyle) }>
+				<Text style={ mergeStyles([styles.extendedTitle, isIOS && styles.extendedTitleIos, textStyle], styles.extendedTitleStyle) }>
 					{ this.props.extendedTitle ||this.props.title }
 				</Text>
 				{ subtitle }

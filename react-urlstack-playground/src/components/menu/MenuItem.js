@@ -6,7 +6,7 @@ const MenuItem = ({
 	children, router, route, active
 }) => (
 	<Hoverable style={ [styles.container, active && styles.activeContainer] }
-		hoverStyle={ [styles.hover] }
+		hoverStyle="backgroundColor: #fff"
 		onPress={ () => router.navigate( route ) }>
 			<Text style={ [styles.text, active && styles.active] }>{ children }</Text>
 	</Hoverable>
@@ -21,9 +21,6 @@ let styles = StyleSheet.create({
 	},
 	text: {
 		fontSize: 16
-	},
-	hover: {
-		backgroundColor: '#fff'
 	},
 	activeContainer: {
 		backgroundColor: '#ddd'

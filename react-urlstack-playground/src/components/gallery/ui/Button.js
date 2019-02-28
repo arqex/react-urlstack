@@ -2,13 +2,37 @@ import React, {Component} from 'react'
 import {Text, View, StyleSheet} from 'react-native'
 import Icon from './Icon'
 import Hoverable from '../interactions/Hoverable'
+import PropTypes from 'prop-types'
 
 export default class Button extends Component {
+	static propTypes = {
+		primaryColor: PropTypes.string,
+		secondaryColor: PropTypes.string,
+		filled: PropTypes.bool,
+		icon: PropTypes.string
+	}
+
+	static defaultProps = {
+		primaryColor: '#2196f3',
+		secondaryColor: '#fff',
+		filled: true,
+	}
+
+	constructor( props ){
+		super( props )
+		this.state = {
+			focus: false
+		}
+	}
+
 	render(){
-		let { icon, children, style, textStyle, hoverStyle, transition, ...props } = this.props
+		let { icon, children, style, textStyle, hoverStyle, transition, primaryColor, secondaryColor, filled, ...props } = this.props
+		let textColor = filled ? secondaryColor : primaryColor;
+		let bgColor = filled ? primaryColor : 'transparent';
 		let content;
+
 		if( typeof children === 'string' ){
-			content = <Text style={ [ styles.text, textStyle ] }>{ children }</Text>
+			content = <Text style={ [ {color: textColor}, styles.text, textStyle ] }>{ children }</Text>
 		}
 		else {
 			content = children
@@ -16,16 +40,20 @@ export default class Button extends Component {
 
 		if( icon ){
 			content = (
-				<View style={ styles.iconWrapper }>
-					<Icon name={ icon } /> { content }
+				<View style={ styles.textWrapper }>
+					<View style={ [ styles.iconWrapper, !children && styles.iconOnlyWrapper ] }>
+						<Icon name={ icon } color={ textColor } size={18} />
+					</View>{ content }
 				</View>
 			)
 		}
 		return (
 			<Hoverable accesibilityRole="button"
-				style={[ styles.container, style ]}
+				onBlur={ () => this.setState({focus: false}) }
+				onFocus={ () => this.setState({focus: true}) }
+				style={[ { backgroundColor: bgColor }, styles.container, this.state.focus && styles.focus, style ]}
 				transition={ transition || 'background-color .3s' }
-				hoverStyle={ hoverStyle || defaultHoverStyle }
+				hoverStyle={ hoverStyle || (filled ? defaultHoverFilled : defaultHoverTransparent ) }
 				{ ...props}>
 				{ content }
 			</Hoverable> 
@@ -33,27 +61,42 @@ export default class Button extends Component {
 	}
 }
 
-const defaultHoverStyle = `
-	background-color: #31a6ff
+const defaultHoverFilled = `
+	background-color: #31a6ff !important
+`
+
+const defaultHoverTransparent = `
+	background-color: rgba( 0, 0, 100, .06 ) !important
 `
 
 const styles = StyleSheet.create({
 	container:{
-		backgroundColor: '#2196f3',
 		borderRadius: 2,
-		transition: '',
-		padding: 10,
-		flex: -1
+		padding: 7,
+		flex: -1,
+		borderWidth: 3,
+		borderColor: 'transparent'
 	},
 
-	iconWrapper: {
+	focus: {
+		borderColor: 'rgba(0,0,0,.2)',
+	},
+
+	textWrapper: {
 		flexDirection: 'row',
 		justifyContent: 'center',
 		alignItems: 'center'
-	},	
+	},
+
+	iconWrapper: {
+		marginRight: 8
+	},
+
+	iconOnlyWrapper: {
+		marginRight: 0
+	},
 
 	text: {
-		color: 'white',
 		fontWeight: '500',
 		textAlign: 'center'
 	}

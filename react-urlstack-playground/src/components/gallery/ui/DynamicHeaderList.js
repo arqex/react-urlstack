@@ -43,11 +43,15 @@ export default class DynamicHeaderList extends Component {
 			Animated.add( this.headerHeight, -(props.minHeaderHeight) ),
 			diff
 		)
+
+		this.state = {
+			headerWidth: '100%'
+		}
 	}
 
 	render() {
 		let { header, containerType, minHeaderHeight, maxHeaderHeight, children, ...listProps} = this.props;
-		let placeholder = <View style={{height: maxHeaderHeight}} />
+		let placeholder = <View style={{height: maxHeaderHeight}} onLayout={ e => this.setState({headerWidth: e.nativeEvent.layout.width}) } />
 
 		let list;
 		if( containerType === 'flatList' ){
@@ -71,7 +75,7 @@ export default class DynamicHeaderList extends Component {
 		
 		return (
 			<View style={ styles.container }>
-				<Animated.View style={[ {height: this.headerHeight}, styles.header]}>
+				<Animated.View style={[ {height: this.headerHeight, width: this.state.headerWidth}, styles.header]}>
 					{ React.cloneElement(this.props.header, {transition: this.transition}) }
 				</Animated.View>
 				<View style={ styles.listContainer }>
@@ -103,7 +107,6 @@ let styles = StyleSheet.create({
 	header: {
 		position: 'absolute',
 		top: 0, left: 0,
-		width: '100%',
 		zIndex: 1,
 		flex: 1
 	},
