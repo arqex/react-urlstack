@@ -19,6 +19,9 @@ const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 
 console.log('App src', paths.appSrc )
 
+global.isWeb = true;
+console.log( global.isWeb )
+
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
 const publicPath = '/';
@@ -222,6 +225,7 @@ module.exports = {
               path.join( __dirname, '../src' ),
               path.join( __dirname, '../react-urlstack' ),
               path.join( __dirname, '../node_modules/react-native-vector-icons'),
+              path.join( __dirname, '../@expo/vector-icons'),
             ],
             loader: require.resolve('babel-loader'),
             options: { 

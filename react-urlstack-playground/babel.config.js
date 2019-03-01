@@ -1,10 +1,17 @@
 let Path = require('path');	
 
- module.exports = function(api) {	
+console.log( global.isWeb )
+
+let presets = []
+if( !global.isWeb ){
+  presets.push('babel-preset-expo')
+}
+
+module.exports = function(api) {	
   api.cache(false);	
 
    return {	
-    presets: ['babel-preset-expo'],	
+    presets: presets,	
     /*	
     plugins: [[	
       'module-resolver', {	

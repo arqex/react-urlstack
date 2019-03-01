@@ -6,7 +6,7 @@
     "ios": "expo start --ios",
     "web": "node scripts/start.js",
     "buildWeb": "node scripts/build.js",
-    "styles": "npx styleguidist server --config ./config/styleguide.config.js"
+    "style": "npx styleguidist server --config ./config/styleguide.config.js"
   },
   "dependencies": {
     "@babel/core": "7.1.6",
