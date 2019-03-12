@@ -3,6 +3,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import iconFont from 'react-native-vector-icons/fonts/FontAwesome.ttf';
 import loadWebIcons from './utils/loadIconFont';
 
+console.log('WHY?')
+
 loadWebIcons( 'FontAwesome', iconFont )
 
 export default Icon;

@@ -1,5 +1,5 @@
-import React, {Component} from 'react'
-import {Text, View, StyleSheet} from 'react-native'
+import React, { Component } from 'react'
+import { Text, View, StyleSheet } from 'react-native'
 import Icon from './Icon.web'
 import Hoverable from '../interactions/Hoverable'
 import PropTypes from 'prop-types'
@@ -9,54 +9,56 @@ export default class Button extends Component {
 		primaryColor: PropTypes.string,
 		secondaryColor: PropTypes.string,
 		filled: PropTypes.bool,
-		icon: PropTypes.string
+		icon: PropTypes.string,
+		iconSize: PropTypes.number
 	}
 
 	static defaultProps = {
 		primaryColor: '#2196f3',
 		secondaryColor: '#fff',
 		filled: true,
+		iconSize: 18
 	}
 
-	constructor( props ){
-		super( props )
+	constructor(props) {
+		super(props)
 		this.state = {
 			focus: false
 		}
 	}
 
-	render(){
-		let { icon, children, style, textStyle, hoverStyle, transition, primaryColor, secondaryColor, filled, ...props } = this.props
+	render() {
+		let { icon, children, style, textStyle, hoverStyle, transition, primaryColor, secondaryColor, filled, iconSize, ...props } = this.props
 		let textColor = filled ? secondaryColor : primaryColor;
 		let bgColor = filled ? primaryColor : 'transparent';
 		let content;
 
-		if( typeof children === 'string' ){
-			content = <Text style={ [ {color: textColor}, styles.text, textStyle ] }>{ children }</Text>
+		if (typeof children === 'string') {
+			content = <Text style={[{ color: textColor }, styles.text, textStyle]}>{children}</Text>
 		}
 		else {
 			content = children
 		}
 
-		if( icon ){
+		if (icon) {
 			content = (
-				<View style={ styles.textWrapper }>
-					<View style={ [ styles.iconWrapper, !children && styles.iconOnlyWrapper ] }>
-						<Icon name={ icon } color={ textColor } size={18} />
-					</View>{ content }
+				<View style={styles.textWrapper}>
+					<View style={[styles.iconWrapper, !children && styles.iconOnlyWrapper]}>
+						<Icon name={icon} color={textColor} size={iconSize} />
+					</View>{content}
 				</View>
 			)
 		}
 		return (
 			<Hoverable accesibilityRole="button"
-				onBlur={ () => this.setState({focus: false}) }
-				onFocus={ () => this.setState({focus: true}) }
-				style={[ { backgroundColor: bgColor }, styles.container, this.state.focus && styles.focus, style ]}
-				transition={ transition || 'background-color .3s' }
-				hoverStyle={ hoverStyle || (filled ? defaultHoverFilled : defaultHoverTransparent ) }
-				{ ...props}>
-				{ content }
-			</Hoverable> 
+				onBlur={() => this.setState({ focus: false })}
+				onFocus={() => this.setState({ focus: true })}
+				style={[{ backgroundColor: bgColor }, styles.container, this.state.focus && styles.focus, style]}
+				transition={transition || 'background-color .3s'}
+				hoverStyle={hoverStyle || (filled ? defaultHoverFilled : defaultHoverTransparent)}
+				{...props}>
+				{content}
+			</Hoverable>
 		)
 	}
 }
@@ -70,8 +72,8 @@ const defaultHoverTransparent = `
 `
 
 const styles = StyleSheet.create({
-	container:{
-		borderRadius: 2,
+	container: {
+		borderRadius: 5,
 		padding: 7,
 		flex: -1,
 		borderWidth: 3,

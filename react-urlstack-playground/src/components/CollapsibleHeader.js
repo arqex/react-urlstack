@@ -38,8 +38,6 @@ export default class CollapsibleHeader extends PureComponent {
 			texts: this.renderCollapsedTexts()
 		}
 
-		console.log( this.props.transition )
-
 		return (
 			<View style={ mergeStyles( [styles.container, isIOS && styles.containerIos], this.props.containerStyle) }>
 				{ this.renderCollapsed( this.props, collapsed ) }
@@ -119,7 +117,7 @@ export default class CollapsibleHeader extends PureComponent {
 		}
 
 		return (
-			<Animated.View style={ mergeStyles([styles.extendedContent, {opacity: this.extendedOpacity}], this.props.extendedContentStyle) }>
+			<Animated.View style={ mergeStyles([styles.extendedContent, {opacity: this.extendedOpacity}], this.props.extendedStyle) }>
 				<Text style={ mergeStyles([styles.extendedTitle, isIOS && styles.extendedTitleIos, textStyle], styles.extendedTitleStyle) }>
 					{ this.props.extendedTitle ||this.props.title }
 				</Text>
@@ -133,14 +131,16 @@ let styles = StyleSheet.create({
 	container: {
 		backgroundColor: 'purple',
 		position: 'relative',
+		flex: 1
 	},
 
 	containerIos: {
 		backgroundColor: 'white'
 	},
 
-	topBar:{
-		padding: 10,
+	topBar: {
+		paddingLeft: 10,
+		paddingRight: 10,
 		flexDirection: 'row',
 		alignItems: 'center',
 		position: 'relative',
@@ -160,7 +160,7 @@ let styles = StyleSheet.create({
 	},
 
 	collapsedTitle: {
-		fontSize: 20,
+		fontSize: 18,
 		fontWeight: '400',
 		color: 'white'
 	},
@@ -169,7 +169,7 @@ let styles = StyleSheet.create({
 	},
 
 	collapsedSubtitle: {
-		fontSize: 16,
+		fontSize: 14,
 		fontWeight: '300',
 		color: 'white'
 	},

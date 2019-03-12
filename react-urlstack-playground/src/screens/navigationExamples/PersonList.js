@@ -13,7 +13,7 @@ class PersonList extends Component {
 			items: getItems()
 		}
 		
-		this.baseUrl = props.baseUrl || '/list'
+		this.baseUrl = props.baseUrl || '/basicStack'
 	}
 
 	render() {
@@ -29,11 +29,12 @@ class PersonList extends Component {
 		let header = (
 			<CollapsibleHeader
 				textStyle={{color: '#333'}}
-				title="My header"
-				subtitle="Some subtitle"
-				leftContent={ <Button icon="chevron-left" filled={ false } primaryColor="#333" /> }
-				rightContent={ <Button onPress={ () => console.log('Click') }>Ok</Button> }
-				containerStyle={[ styles.header, styles.centered ] } />
+				title="Person list"
+				subtitle="A basic stack example"
+				leftContent={ <Button icon="chevron-left" filled={ false } /> }
+				rightContent={ <Button filled={false} icon="question-circle" onPress={ () => this.props.router.navigate('/basicStackInfo') } /> }
+				containerStyle={[ styles.header, styles.centered ] }
+				collapsedStyle={{height: 50}} />
 		)
 
 		return (
@@ -41,6 +42,7 @@ class PersonList extends Component {
 				data={items}
 				header={ header }
 				keyExtractor={ item => item.id + '' }
+				minHeaderHeight={ 50 }
 				renderItem={({ item }) => this.renderItem(item)} />
 		)
 	}
@@ -69,6 +71,7 @@ class PersonList extends Component {
 				<ListItem key={item.id}
 					title={item.name}
 					subtitle={ item.email }
+					containerStyle={[ router.location.params.id == item.id && styles.activeListItem ]}
 					onPress={ () => router.navigate( this.baseUrl+ '/' + item.id ) } />
 			</View>
 		)
@@ -98,6 +101,9 @@ const styles = StyleSheet.create({
 		left: 10,
 		right: 10
 	},
+	activeListItem: {
+		backgroundColor: '#fff0ff'
+	}
 })
 
 export default PersonList;

@@ -9,13 +9,15 @@ export default class Button extends Component {
 		primaryColor: PropTypes.string,
 		secondaryColor: PropTypes.string,
 		filled: PropTypes.bool,
-		icon: PropTypes.string
+		icon: PropTypes.string,
+		iconSize: PropTypes.number
 	}
 
 	static defaultProps = {
 		primaryColor: '#2196f3',
 		secondaryColor: '#fff',
 		filled: true,
+		iconSize: 18
 	}
 
 	constructor( props ){
@@ -26,7 +28,7 @@ export default class Button extends Component {
 	}
 
 	render(){
-		let { icon, children, style, textStyle, hoverStyle, transition, primaryColor, secondaryColor, filled, ...props } = this.props
+		let { icon, children, style, textStyle, hoverStyle, transition, primaryColor, secondaryColor, filled, iconSize, ...props } = this.props
 		let textColor = filled ? secondaryColor : primaryColor;
 		let bgColor = filled ? primaryColor : 'transparent';
 		let content;
@@ -38,11 +40,13 @@ export default class Button extends Component {
 			content = children
 		}
 
+		console.log('Icon size', iconSize);
+
 		if( icon ){
 			content = (
 				<View style={ styles.textWrapper }>
 					<View style={ [ styles.iconWrapper, !children && styles.iconOnlyWrapper ] }>
-						<Icon name={ icon } color={ textColor } size={18} />
+						<Icon name={icon} color={textColor} size={iconSize} />
 					</View>{ content }
 				</View>
 			)
@@ -71,7 +75,7 @@ const defaultHoverTransparent = `
 
 const styles = StyleSheet.create({
 	container:{
-		borderRadius: 2,
+		borderRadius: 5,
 		padding: 7,
 		flex: -1,
 		borderWidth: 3,

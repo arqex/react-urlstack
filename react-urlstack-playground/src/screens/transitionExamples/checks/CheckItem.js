@@ -2,7 +2,8 @@ import React from 'react'
 import {View, Text, Image, StyleSheet, TouchableHighlight} from 'react-native'
 import {SharedElement} from '../../../../react-urlstack'
 import checkTransition from './checkTransition'
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from '../../../components/gallery/ui/Icon'
+
 
 const iconNames = {
 	Received: 'check-square',

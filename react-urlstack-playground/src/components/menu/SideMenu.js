@@ -27,7 +27,7 @@ export default class SideMenu extends Component {
         <View>
           <MenuGroup title="Navigation examples">
             <MenuItem router={router} active={ currentRoute === '/'} route="/">Welcome</MenuItem>
-            <MenuItem router={router} active={ currentRoute.slice(0,5) === '/list'} route="/list">Basic stack</MenuItem>
+            <MenuItem router={router} active={ currentRoute.slice(0,5) === '/basicStack'} route="/basicStack">Basic stack</MenuItem>
             <MenuItem router={router} active={ currentRoute.slice(0,5) === '/tabs'} route="/tabs">Tab navigation</MenuItem>
             <MenuItem router={router} active={ currentRoute.slice(0,6) === '/modal'} route="/modal">Modal</MenuItem>
             <MenuItem router={router} active={ currentRoute.slice(0,8) === '/unknown'} route="/unknown">Unexistant route</MenuItem>
@@ -53,7 +53,7 @@ export default class SideMenu extends Component {
 
 const styles = StyleSheet.create({
   menu: {
-    backgroundColor: '#e9eaea',
+    backgroundColor: '#dadddd',
     flex: 1,
     width: 300
   }

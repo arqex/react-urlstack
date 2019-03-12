@@ -137,6 +137,9 @@ export default class Navigator extends Component {
 		this.router.start();
 		this.showingModal = this.detectModal();
 		this.updateModalIndexes( this.showingModal )
+
+		// for debug purposes
+		// window.router = this.router
 	}
 
 	getWindowSize(){
@@ -168,7 +171,6 @@ export default class Navigator extends Component {
 	}
 
 	_onLayout( layout ){
-		console.log( layout )
 		this.calculateTransition( this.props.transitions, layout.width )
 		this.setState( {layout} )
 	}
@@ -244,7 +246,8 @@ if( Platform.OS === 'web' ){
 
 let styles = StyleSheet.create({
 	windowWrapper: {
-		paddingTop: statusBarHeight,
+		borderTopWidth: statusBarHeight,
+		borderColor: 'black',
 		flex: 1,
 	},
 

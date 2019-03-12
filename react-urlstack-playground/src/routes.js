@@ -1,6 +1,7 @@
 import PersonMoreInfo from './screens/navigationExamples/PersonMoreInfo'
 import PersonList from './screens/navigationExamples/PersonList'
 import PersonDetails from './screens/navigationExamples/PersonDetails'
+import PersonInfo from './screens/navigationExamples/PersonInfo'
 import Welcome from './screens/navigationExamples/Welcome'
 import Modal from './screens/navigationExamples/Modal'
 import Tabs from './screens/navigationExamples/Tabs'
@@ -30,11 +31,14 @@ export default [
 			]}
 		]}
 	]},
-	{ path: '/list', cb: PersonList, children: [
+
+	{ path: '/basicStack', cb: PersonList, children: [
 		{path: '/:id', cb: PersonDetails, children: [
 			{path: '/moreInfo', cb: PersonMoreInfo }
 		]}
 	]},
+	{ path: '/basicStackInfo', cb: PersonInfo, isModal: true },
+
 	{ path: '/simpleScreen', cb: SimpleScreen },
 	{ path: '/modal', cb: Modal, isModal: true },
 

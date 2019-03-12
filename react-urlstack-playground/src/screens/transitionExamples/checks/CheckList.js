@@ -1,6 +1,7 @@
 import React from 'react'
 import {View, Text, FlatList, StyleSheet, Animated} from 'react-native'
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from '../../../components/gallery/ui/Icon'
+
 import CheckItem from './CheckItem';
 import data from './checkData'
 

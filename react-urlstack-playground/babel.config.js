@@ -1,6 +1,6 @@
 let Path = require('path');	
 
-console.log( global.isWeb )
+console.log( 'IS WEB', global.isWeb )
 
 let presets = []
 if( !global.isWeb ){

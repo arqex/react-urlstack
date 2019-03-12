@@ -17,10 +17,11 @@ module.exports = {
 	sections: [
 		{name: 'Component gallery', content: Path.join(cPath, 'introduction.md') },
 		{name: 'UI', components: [
-			uiPath('Button.js'),
+			uiPath('Button.web.js'),
 			uiPath('DynamicHeaderList.js'),
+			uiPath('Icon.web.js'),
 			uiPath('ListItem.js'),
-			uiPath('TabSelector.js'),
+			uiPath('TabSelector.web.js'),
 		]},
 		{
 			name: 'Icons',
